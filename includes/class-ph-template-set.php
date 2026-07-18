@@ -28,7 +28,10 @@ class PH_Template_Set {
 	const EDIT_CLOSED_QUERY_ARG = 'ph_template_editor_closed';
 	const EDITOR_MODE_LEGACY = 'legacy';
 	const EDITOR_MODE_VISUAL = 'visual_editor';
+	const EDITOR_MODE_PAGE_BUILDER = 'page_builder';
+	const EDITOR_MODE_DEVELOPER = 'developer';
 	const EDITOR_NONCE_ACTION = 'propertyhive_template_set_editor';
+	const EXPERIENCE_NONCE_ACTION = 'propertyhive_template_experience';
 
 	/**
 	 * True while rendering the homepage module shortcode.
@@ -67,6 +70,7 @@ class PH_Template_Set {
 		add_action( 'admin_bar_menu', array( __CLASS__, 'add_admin_bar_menu' ), 80 );
 		add_action( 'wp_footer', array( __CLASS__, 'render_template_editor' ), 20 );
 		add_action( 'wp_ajax_propertyhive_template_set_save', array( __CLASS__, 'ajax_save_template_editor' ) );
+		add_action( 'wp_ajax_propertyhive_set_template_experience', array( __CLASS__, 'ajax_set_template_experience' ) );
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'open_search_wrapper' ), 11 );
 		add_action( 'propertyhive_after_main_content', array( __CLASS__, 'close_search_wrapper' ), 9 );
@@ -140,6 +144,37 @@ class PH_Template_Set {
 
 	public static function get_editor_modes() {
 		return PH_Template_Set_Options::get_editor_modes();
+	}
+
+	/**
+	 * Effective editor mode for the current site.
+	 *
+	 * @return string
+	 */
+	public static function get_editor_mode() {
+		$settings = self::get_settings();
+
+		return isset( $settings['template_set_editor_mode'] ) ? $settings['template_set_editor_mode'] : self::EDITOR_MODE_VISUAL;
+	}
+
+	/**
+	 * Modes in which the visual template set does NOT drive the front end,
+	 * leaving page builders or theme/template overrides in control.
+	 *
+	 * @param string $mode Editor mode.
+	 * @return bool
+	 */
+	public static function editor_mode_stands_down( $mode ) {
+		return in_array( $mode, array( self::EDITOR_MODE_PAGE_BUILDER, self::EDITOR_MODE_DEVELOPER ), true );
+	}
+
+	/**
+	 * Detect a supported page builder that is active on this site.
+	 *
+	 * @return array
+	 */
+	public static function detect_page_builder() {
+		return PH_Template_Set_Page_Builders::detect();
 	}
 
 	public static function get_gallery_layouts() {
@@ -274,6 +309,44 @@ class PH_Template_Set {
 		return PH_Template_Set_Editor_Controller::ajax_save_template_editor();
 	}
 
+	/**
+	 * Persist the chosen editing experience (Visual / Page Builder / Developer)
+	 * from the Frontend settings card chooser via AJAX.
+	 */
+	public static function ajax_set_template_experience() {
+		check_ajax_referer( self::EXPERIENCE_NONCE_ACTION, 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to change this setting.', 'propertyhive' ) ), 403 );
+		}
+
+		$requested_mode = isset( $_POST['mode'] ) ? sanitize_title( wp_unslash( $_POST['mode'] ) ) : '';
+		$valid_modes    = array(
+			self::EDITOR_MODE_VISUAL,
+			self::EDITOR_MODE_PAGE_BUILDER,
+			self::EDITOR_MODE_DEVELOPER,
+		);
+
+		if ( ! in_array( $requested_mode, $valid_modes, true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unknown editing experience.', 'propertyhive' ) ), 400 );
+		}
+
+		$settings                             = get_option( 'propertyhive_template_assistant', array() );
+		$settings                             = is_array( $settings ) ? $settings : array();
+		$settings['template_set_editor_mode'] = $requested_mode;
+
+		// Selecting the visual editor turns the template set on; the other modes
+		// leave the enabled flag untouched (the front-end guard stands the set
+		// down) so a user can switch back to Visual without losing their config.
+		if ( self::EDITOR_MODE_VISUAL === $requested_mode ) {
+			$settings[ self::OPTION_ENABLED ] = 'yes';
+		}
+
+		update_option( 'propertyhive_template_assistant', $settings );
+
+		wp_send_json_success( array( 'mode' => $requested_mode ) );
+	}
+
 	private static function get_script_data() {
 		return PH_Template_Set_Editor_Controller::get_script_data();
 	}
@@ -384,6 +457,7 @@ class PH_Template_Set {
 
 }
 
+include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-page-builders.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-options.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-catalog.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-settings.php';

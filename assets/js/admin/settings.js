@@ -2,6 +2,188 @@ var initial_save_changes_value = '';
 
 jQuery( function($){
 
+    var $settings_form = $('#mainform');
+    var $settings_wrap = $settings_form.closest('.ph-settings-redesign');
+    var $save_tray = $settings_form.find('[data-ph-save-tray]');
+    var $save_button = $settings_form.find('[data-ph-save-button]');
+    var $save_state = $settings_form.find('[data-ph-save-state]');
+    var $save_toast = $settings_form.find('[data-ph-save-toast]');
+    var save_tray_initial_state = '';
+    var save_tray_state_ready = false;
+    var save_tray_dirty = false;
+    var save_tray_submitting = false;
+    var save_tray_check_timer;
+
+    function ph_get_save_tray_form_state()
+    {
+        var state = [];
+
+        $settings_form.find(':input').not(':button, :submit, :reset').each(function()
+        {
+            if ( !this.name )
+            {
+                return;
+            }
+
+            var $field = $(this);
+            var field_type = (this.type || this.tagName || '').toLowerCase();
+            var field_value;
+
+            if ( field_type == 'checkbox' || field_type == 'radio' )
+            {
+                field_value = (this.checked ? 'checked:' : 'unchecked:') + $field.val();
+            }
+            else if ( field_type == 'file' )
+            {
+                field_value = Array.prototype.map.call(this.files || [], function(file)
+                {
+                    return file.name + ':' + file.size + ':' + file.lastModified;
+                });
+            }
+            else
+            {
+                field_value = $field.val();
+            }
+
+            state.push([this.name, field_type, field_value]);
+        });
+
+        if ( typeof window.tinymce !== 'undefined' && window.tinymce.editors )
+        {
+            Array.prototype.forEach.call(window.tinymce.editors, function(editor)
+            {
+                var editor_element = editor.getElement ? editor.getElement() : null;
+
+                if ( editor_element && $.contains($settings_form[0], editor_element) )
+                {
+                    state.push(['tinymce:' + editor.id, 'editor', editor.getContent()]);
+                }
+            });
+        }
+
+        return JSON.stringify(state);
+    }
+
+    function ph_set_save_tray_dirty(is_dirty)
+    {
+        if ( !$save_tray.length || save_tray_submitting )
+        {
+            return;
+        }
+
+        save_tray_dirty = is_dirty;
+        $settings_wrap.toggleClass('ph-save-tray-visible', is_dirty);
+        $save_tray.prop('inert', !is_dirty).attr('aria-hidden', is_dirty ? 'false' : 'true');
+        $save_button.prop('disabled', !is_dirty);
+
+        if ( is_dirty )
+        {
+            $save_state.text(propertyhive_admin_settings.unsaved_changes_text);
+        }
+    }
+
+    function ph_check_save_tray_state()
+    {
+        if ( !save_tray_state_ready || save_tray_submitting )
+        {
+            return;
+        }
+
+        ph_set_save_tray_dirty(ph_get_save_tray_form_state() !== save_tray_initial_state);
+    }
+
+    function ph_schedule_save_tray_check()
+    {
+        window.clearTimeout(save_tray_check_timer);
+        save_tray_check_timer = window.setTimeout(ph_check_save_tray_state, 0);
+    }
+
+    function ph_bind_save_tray_editor(editor)
+    {
+        if ( !editor || editor.__propertyhiveSaveTrayBound )
+        {
+            return;
+        }
+
+        var editor_element = editor.getElement ? editor.getElement() : null;
+        if ( !editor_element || !$.contains($settings_form[0], editor_element) )
+        {
+            return;
+        }
+
+        editor.__propertyhiveSaveTrayBound = true;
+        editor.on('input change undo redo', ph_schedule_save_tray_check);
+    }
+
+    function ph_show_saved_toast()
+    {
+        if ( !$save_toast.length )
+        {
+            return;
+        }
+
+        var $saved_notice = $('#message.updated').filter(function()
+        {
+            return $(this).text().indexOf(propertyhive_admin_settings.saved_message) !== -1;
+        }).first();
+
+        if ( !$saved_notice.length )
+        {
+            return;
+        }
+
+        $saved_notice.addClass('ph-save-notice-consumed').attr('aria-hidden', 'true');
+        $save_toast.addClass('is-visible').attr('aria-hidden', 'false');
+
+        window.setTimeout(function()
+        {
+            $save_toast.removeClass('is-visible').attr('aria-hidden', 'true');
+        }, 1800);
+    }
+
+    function ph_init_save_tray()
+    {
+        if ( !$save_tray.length )
+        {
+            return;
+        }
+
+        save_tray_initial_state = ph_get_save_tray_form_state();
+        save_tray_state_ready = true;
+        ph_set_save_tray_dirty(false);
+
+        $settings_form.on('input.phSaveTray change.phSaveTray', ':input', ph_schedule_save_tray_check);
+        $settings_form.on('click.phSaveTray', '[data-ph-save-discard]', function()
+        {
+            if ( !save_tray_dirty )
+            {
+                return;
+            }
+
+            ph_set_save_tray_dirty(false);
+            window.setTimeout(function()
+            {
+                window.location.reload();
+            }, 280);
+        });
+
+        if ( typeof window.MutationObserver !== 'undefined' )
+        {
+            var save_tray_observer = new MutationObserver(ph_schedule_save_tray_check);
+            save_tray_observer.observe($settings_form[0], { childList: true, subtree: true });
+        }
+
+        $(document).on('tinymce-editor-init.phSaveTray', function(event, editor)
+        {
+            ph_bind_save_tray_editor(editor);
+        });
+
+        if ( typeof window.tinymce !== 'undefined' && window.tinymce.editors )
+        {
+            Array.prototype.forEach.call(window.tinymce.editors, ph_bind_save_tray_editor);
+        }
+    }
+
     // sortable custom field tables
 
     $('.ph_customfields.sortable-custom-field').each(function()
@@ -30,7 +212,7 @@ jQuery( function($){
 
     //
 
-    initial_save_changes_value = (jQuery('p.submit button.button-primary').length > 0) ? jQuery('p.submit button.button-primary').text() : '';
+    initial_save_changes_value = (jQuery('[data-ph-save-button-label]').length > 0) ? jQuery('[data-ph-save-button-label]').first().text() : '';
 
     $('a#add_department').click(function(e)
     {
@@ -84,8 +266,13 @@ jQuery( function($){
 
     $('input.colorpick').wpColorPicker();
 
-    $('form').submit(function()
+    $('form').submit(function(event)
     {
+        if ( this.id == 'mainform' && $(this).data('ph-save-tray-native-submit') )
+        {
+            return true;
+        }
+
         // Check for confirm removal checkbox
         // and make sure it's ticked
         if ( $('input[type=\'checkbox\'][name=\'confirm_removal\']').length > 0 )
@@ -164,6 +351,53 @@ jQuery( function($){
                 alert( propertyhive_admin_settings.default_country_not_in_selected );
                 return false;
             }
+        }
+
+        if ( this.id == 'mainform' && $save_tray.length )
+        {
+            event.preventDefault();
+
+            save_tray_submitting = true;
+            $settings_wrap
+                .addClass('ph-save-tray-saving')
+                .addClass('ph-save-tray-visible');
+            $save_tray.prop('inert', false).attr('aria-hidden', 'false');
+            $save_state.text(propertyhive_admin_settings.saving_text);
+            $save_button.prop('disabled', true);
+            $save_button.find('[data-ph-save-button-label]').text(propertyhive_admin_settings.saving_text);
+
+            window.setTimeout(function()
+            {
+                $settings_wrap
+                    .removeClass('ph-save-tray-visible')
+                    .removeClass('ph-save-tray-saving');
+            }, 300);
+
+            window.setTimeout(function()
+            {
+                if ( !$settings_form.find('[data-ph-save-post-value]').length )
+                {
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'save',
+                        value: $save_button.val() || initial_save_changes_value,
+                        'data-ph-save-post-value': ''
+                    }).appendTo($settings_form);
+                }
+
+                $settings_form.data('ph-save-tray-native-submit', true);
+
+                if ( typeof $settings_form[0].requestSubmit === 'function' )
+                {
+                    $settings_form[0].requestSubmit();
+                }
+                else
+                {
+                    $settings_form[0].submit();
+                }
+            }, 560);
+
+            return false;
         }
 
         // Disable submit button when form is being submitted to prevent double submissions
@@ -378,6 +612,9 @@ jQuery( function($){
     }
 
     ph_resize_pro_features_list();
+    ph_show_saved_toast();
+
+    window.setTimeout(ph_init_save_tray, 120);
 });
 
 jQuery(window).on( "resize", function() 
@@ -414,7 +651,7 @@ function ph_toggle_license_key_settings()
         jQuery('#row_propertyhive_pro_license_key').hide();
         jQuery('#row_license_key_info').show();
         jQuery('#row_propertyhive_license_key').show();
-        jQuery('p.submit button.button-primary').text(initial_save_changes_value);
+        ph_set_settings_save_button_text(initial_save_changes_value);
     }
     else
     {
@@ -426,13 +663,19 @@ function ph_toggle_license_key_settings()
 
         if ( propertyhive_admin_settings.valid_pro_license_key )
         {
-            jQuery('p.submit button.button-primary').text('Deactivate key');
+            ph_set_settings_save_button_text('Deactivate key');
         }
         else
         {
-            jQuery('p.submit button.button-primary').text('Activate key');
+            ph_set_settings_save_button_text('Activate key');
         }
     }
+}
+
+function ph_set_settings_save_button_text(button_text)
+{
+    jQuery('[data-ph-save-button-label]').text(button_text);
+    jQuery('[data-ph-save-button]').val(button_text);
 }
 
 function ph_toggle_maps_provider_options()

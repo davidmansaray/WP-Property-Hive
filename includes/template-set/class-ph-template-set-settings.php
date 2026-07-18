@@ -265,8 +265,19 @@ class PH_Template_Set_Settings {
 			$recommended_image_size = 'standard';
 		}
 
+		// The enabled flag is owned by the experience chooser (AJAX) rather than a
+		// form checkbox, so a save that doesn't post the key preserves the stored
+		// value instead of treating the absence as "unchecked".
+		if ( $activate ) {
+			$enabled = 'yes';
+		} elseif ( array_key_exists( PH_Template_Set::OPTION_ENABLED, $raw_settings ) ) {
+			$enabled = ! empty( $raw_settings[ PH_Template_Set::OPTION_ENABLED ] ) ? 'yes' : '';
+		} else {
+			$enabled = ( isset( $current[ PH_Template_Set::OPTION_ENABLED ] ) && 'yes' === $current[ PH_Template_Set::OPTION_ENABLED ] ) ? 'yes' : '';
+		}
+
 		$template_set_settings = array(
-			PH_Template_Set::OPTION_ENABLED           => $activate || ! empty( $raw_settings[ PH_Template_Set::OPTION_ENABLED ] ) ? 'yes' : '',
+			PH_Template_Set::OPTION_ENABLED           => $enabled,
 			'template_set_editor_mode'                => $editor_mode,
 			'template_set_detail_template'            => $detail_template,
 			'template_set_search_template'            => $search_template,

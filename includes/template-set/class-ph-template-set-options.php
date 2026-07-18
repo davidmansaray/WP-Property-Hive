@@ -16,8 +16,10 @@ class PH_Template_Set_Options {
 	 */
 	public static function get_editor_modes() {
 		return array(
-			PH_Template_Set::EDITOR_MODE_LEGACY => __( 'Legacy preview controls', 'propertyhive' ),
-			PH_Template_Set::EDITOR_MODE_VISUAL => __( 'Visual editor', 'propertyhive' ),
+			PH_Template_Set::EDITOR_MODE_VISUAL       => __( 'Visual editor', 'propertyhive' ),
+			PH_Template_Set::EDITOR_MODE_PAGE_BUILDER => __( 'Page builder', 'propertyhive' ),
+			PH_Template_Set::EDITOR_MODE_DEVELOPER    => __( 'Developer mode', 'propertyhive' ),
+			PH_Template_Set::EDITOR_MODE_LEGACY       => __( 'Legacy preview controls', 'propertyhive' ),
 		);
 	}
 

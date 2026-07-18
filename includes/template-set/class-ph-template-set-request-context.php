@@ -30,7 +30,14 @@ class PH_Template_Set_Request_Context {
 		$settings = PH_Template_Set_Settings::get_settings();
 
 		if ( isset( $settings[ PH_Template_Set::OPTION_ENABLED ] ) && 'yes' === $settings[ PH_Template_Set::OPTION_ENABLED ] ) {
-			return true;
+			// Page Builder and Developer experiences stand the visual template
+			// set down so page builders or theme/template overrides stay in
+			// control of the front end.
+			$editor_mode = isset( $settings['template_set_editor_mode'] ) ? $settings['template_set_editor_mode'] : PH_Template_Set::EDITOR_MODE_VISUAL;
+
+			if ( ! PH_Template_Set::editor_mode_stands_down( $editor_mode ) ) {
+				return true;
+			}
 		}
 
 		return self::can_render_preview_request();

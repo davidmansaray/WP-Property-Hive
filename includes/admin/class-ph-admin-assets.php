@@ -42,7 +42,10 @@ class PH_Admin_Assets {
 
             // Admin styles for PH pages only
             wp_enqueue_style( 'propertyhive_admin_styles', PH()->plugin_url() . '/assets/css/admin.css', array(), PH_VERSION );
-            
+
+            // Frontend settings redesign (icon nav bar + template experience chooser).
+            wp_enqueue_style( 'propertyhive_frontend_redesign', PH()->plugin_url() . '/assets/css/admin-frontend-redesign.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
+
             wp_enqueue_style( 'font_awesome', PH()->plugin_url() . '/assets/css/font-awesome.min.css', array(), PH_VERSION );
             
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
@@ -410,6 +413,9 @@ class PH_Admin_Assets {
                 'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? sanitize_text_field($_GET['section']) : '' ),
                 'ajax_nonce'                                => wp_create_nonce("updates"),
                 'features_settings_url'                     => admin_url('admin.php?page=ph-settings&tab=features'),
+                'unsaved_changes_text'                      => __( 'Unsaved changes', 'propertyhive' ),
+                'saving_text'                               => __( 'Saving…', 'propertyhive' ),
+                'saved_message'                             => __( 'Your settings have been saved.', 'propertyhive' ),
             );
             if ( isset($_GET['tab']) && ph_clean($_GET['tab']) == 'licensekey' )
             {

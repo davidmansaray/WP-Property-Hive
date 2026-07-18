@@ -718,10 +718,10 @@ class PH_Settings_General extends PH_Settings_Page {
                     {
                         e.preventDefault();
 
-                        jQuery(this).closest(\'tr\').find(\'input\').val(\'\');
+                        jQuery(this).closest(\'tr\').find(\'input\').val(\'\').trigger(\'input\');
 
                         setTimeout(function() {
-                            jQuery(\'.submit button[type="submit"]\').trigger(\'click\');
+                            jQuery(\'[data-ph-save-button]\').trigger(\'click\');
                         }, 0);
                     });
                 });
