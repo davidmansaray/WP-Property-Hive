@@ -1267,6 +1267,13 @@
 }
 
 @media screen and (max-width: 782px) {
+    .propertyhive .form-table pre {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
     .propertyhive .ph-save-tray {
         bottom: 12px;
         left: 50%;

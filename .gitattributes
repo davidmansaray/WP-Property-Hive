@@ -12,3 +12,7 @@
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
+
+# Keep internal design prototypes and review artifacts out of release archives.
+/.design export-ignore
+/.design/** export-ignore
