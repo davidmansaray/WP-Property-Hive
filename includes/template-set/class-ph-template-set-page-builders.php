@@ -17,16 +17,20 @@ class PH_Template_Set_Page_Builders {
 	public static function get_supported() {
 		return array(
 			'elementor' => array(
-				'name'      => __( 'Elementor', 'propertyhive' ),
-				'url'       => 'https://elementor.com/',
-				'docs_url'  => 'https://docs.wp-property-hive.com/article/281-elementor-integration',
-				'video_url' => 'https://www.youtube.com/watch?v=EgEwr_ynvq8',
+				'name'                   => __( 'Elementor', 'propertyhive' ),
+				'url'                    => 'https://elementor.com/',
+				'docs_url'               => 'https://docs.wp-property-hive.com/article/281-elementor-integration',
+				'video_url'              => 'https://www.youtube.com/watch?v=EgEwr_ynvq8',
+				'requires_theme_builder' => true,
+				'template_types'         => array( 'detail' ),
 			),
 			'divi' => array(
-				'name'      => __( 'Divi', 'propertyhive' ),
-				'url'       => 'https://www.elegantthemes.com/gallery/divi/',
-				'docs_url'  => 'https://docs.wp-property-hive.com/article/488-divi-integration',
-				'video_url' => '',
+				'name'                   => __( 'Divi', 'propertyhive' ),
+				'url'                    => 'https://www.elegantthemes.com/gallery/divi/',
+				'docs_url'               => 'https://docs.wp-property-hive.com/article/488-divi-integration',
+				'video_url'              => '',
+				'requires_theme_builder' => true,
+				'template_types'         => array( 'detail' ),
 			),
 		);
 	}
@@ -40,15 +44,28 @@ class PH_Template_Set_Page_Builders {
 	 *     @type string $name          Human readable name.
 	 *     @type string $version       Detected version, if available.
 	 *     @type bool   $theme_builder Whether theme/template building is available.
+	 *     @type bool   $ready         Whether the detected builder can build supported templates.
+	 *     @type array  $template_types Supported Property Hive template types.
 	 * }
 	 */
 	public static function detect() {
 		$elementor = self::detect_elementor();
+		$divi      = self::detect_divi();
+
+		// Prefer a builder that is fully ready. This prevents Elementor Free
+		// from masking an active Divi Theme Builder installation.
+		if ( $elementor['ready'] ) {
+			return $elementor;
+		}
+
+		if ( $divi['ready'] ) {
+			return $divi;
+		}
+
 		if ( $elementor['active'] ) {
 			return $elementor;
 		}
 
-		$divi = self::detect_divi();
 		if ( $divi['active'] ) {
 			return $divi;
 		}
@@ -59,6 +76,8 @@ class PH_Template_Set_Page_Builders {
 			'name'          => '',
 			'version'       => '',
 			'theme_builder' => false,
+			'ready'         => false,
+			'template_types' => array(),
 		);
 	}
 
@@ -66,7 +85,8 @@ class PH_Template_Set_Page_Builders {
 	 * @return array
 	 */
 	private static function detect_elementor() {
-		$active = defined( 'ELEMENTOR_VERSION' ) || did_action( 'elementor/loaded' );
+		$active        = defined( 'ELEMENTOR_VERSION' ) || did_action( 'elementor/loaded' );
+		$theme_builder = defined( 'ELEMENTOR_PRO_VERSION' );
 
 		return array(
 			'active'        => (bool) $active,
@@ -74,7 +94,9 @@ class PH_Template_Set_Page_Builders {
 			'name'          => __( 'Elementor', 'propertyhive' ),
 			'version'       => defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : '',
 			// Elementor's Theme Builder ships with Elementor Pro.
-			'theme_builder' => defined( 'ELEMENTOR_PRO_VERSION' ),
+			'theme_builder' => $theme_builder,
+			'ready'         => (bool) ( $active && $theme_builder ),
+			'template_types' => array( 'detail' ),
 		);
 	}
 
@@ -98,6 +120,8 @@ class PH_Template_Set_Page_Builders {
 			'version'       => $version,
 			// Divi's Theme Builder is part of Divi core.
 			'theme_builder' => (bool) $active,
+			'ready'         => (bool) $active,
+			'template_types' => array( 'detail' ),
 		);
 	}
 }

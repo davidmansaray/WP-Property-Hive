@@ -8,6 +8,7 @@ jQuery( function($){
     var $save_button = $settings_form.find('[data-ph-save-button]');
     var $save_state = $settings_form.find('[data-ph-save-state]');
     var $save_toast = $settings_form.find('[data-ph-save-toast]');
+    var $save_discard = $settings_form.find('[data-ph-save-discard]');
     var save_tray_initial_state = '';
     var save_tray_state_ready = false;
     var save_tray_dirty = false;
@@ -71,14 +72,23 @@ jQuery( function($){
             return;
         }
 
+        var is_action_save = $save_tray.is('[data-ph-save-always-active="true"]') ||
+            ( initial_save_changes_value && $save_button.val() !== initial_save_changes_value );
+        var should_show = is_dirty || is_action_save;
+
         save_tray_dirty = is_dirty;
-        $settings_wrap.toggleClass('ph-save-tray-visible', is_dirty);
-        $save_tray.prop('inert', !is_dirty).attr('aria-hidden', is_dirty ? 'false' : 'true');
-        $save_button.prop('disabled', !is_dirty);
+        $settings_wrap.toggleClass('ph-save-tray-visible', should_show);
+        $save_tray.prop('inert', !should_show).attr('aria-hidden', should_show ? 'false' : 'true');
+        $save_button.prop('disabled', !should_show);
+        $save_discard.prop('disabled', !is_dirty);
 
         if ( is_dirty )
         {
             $save_state.text(propertyhive_admin_settings.unsaved_changes_text);
+        }
+        else if ( is_action_save )
+        {
+            $save_state.text(propertyhive_admin_settings.action_ready_text);
         }
     }
 
@@ -163,9 +173,11 @@ jQuery( function($){
             ph_set_save_tray_dirty(false);
             window.setTimeout(function()
             {
-                window.location.reload();
+                window.location.replace(window.location.pathname + window.location.search + window.location.hash);
             }, 280);
         });
+
+        $settings_form.on('ph-save-action-change.phSaveTray', ph_schedule_save_tray_check);
 
         if ( typeof window.MutationObserver !== 'undefined' )
         {
@@ -676,6 +688,7 @@ function ph_set_settings_save_button_text(button_text)
 {
     jQuery('[data-ph-save-button-label]').text(button_text);
     jQuery('[data-ph-save-button]').val(button_text);
+    jQuery('#mainform').trigger('ph-save-action-change');
 }
 
 function ph_toggle_maps_provider_options()

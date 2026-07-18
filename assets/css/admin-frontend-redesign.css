@@ -87,6 +87,12 @@
     outline: none;
 }
 
+.propertyhive .ph-settings-nav .ph-nav-tab:focus-visible {
+    z-index: 2;
+    outline: 3px solid var(--ph-tx-blue);
+    outline-offset: -3px;
+}
+
 .propertyhive .ph-settings-nav .ph-nav-tab.nav-tab-active {
     background: var(--ph-tx-yellow-tint);
 }
@@ -336,6 +342,12 @@
     color: var(--ph-tx-ink);
 }
 
+.propertyhive .ph-save-pill:focus-visible {
+    outline: 3px solid var(--ph-tx-blue);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px #fff;
+}
+
 .propertyhive .ph-save-pill:disabled,
 .propertyhive .ph-save-pill:disabled:hover {
     border-color: #e8e5d8;
@@ -533,6 +545,18 @@
     outline: none;
 }
 
+.propertyhive .ph-save-discard:focus-visible {
+    border-radius: 6px;
+    outline: 3px solid var(--ph-tx-blue);
+    outline-offset: 1px;
+}
+
+.propertyhive .ph-save-discard:disabled {
+    color: #a7a9b1;
+    cursor: default;
+    opacity: .65;
+}
+
 .propertyhive.ph-save-tray-saving .ph-save-tray-orb {
     animation: ph-save-orb-pulse .8s ease-in-out infinite alternate;
 }
@@ -704,6 +728,11 @@
     color: var(--ph-tx-green);
 }
 
+.propertyhive .ph-tx-badge--setup {
+    background: #fff1dc;
+    color: #9a5a00;
+}
+
 .propertyhive .ph-tx-checks {
     list-style: none;
     margin: 0 0 18px;
@@ -738,6 +767,10 @@
     background: var(--ph-tx-green);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E") center / 14px no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E") center / 14px no-repeat;
+}
+
+.propertyhive .ph-tx-checks li.ph-tx-check-warning::before {
+    background: #c26a00;
 }
 
 .propertyhive .ph-tx-checks--stacked {
@@ -1189,7 +1222,8 @@
  * ---------------------------------------------------------------------- */
 
 @media screen and (max-width: 1100px) {
-    .propertyhive .ph-tx-panel-card--columns {
+    .propertyhive .ph-tx-panel-card--columns,
+    .propertyhive .ph-tx-panel-card--columns.ph-tx-panel-card--two {
         grid-template-columns: 1fr;
     }
 

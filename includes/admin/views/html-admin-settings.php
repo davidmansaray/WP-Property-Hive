@@ -22,11 +22,14 @@ $ph_page_title   = isset( $tabs[ $current_tab ] ) ? $tabs[ $current_tab ] : '';
 $ph_page_desc    = isset( $ph_current_meta['description'] ) ? $ph_current_meta['description'] : ( isset( $ph_current_meta['subtitle'] ) ? $ph_current_meta['subtitle'] : '' );
 $ph_show_save    = ! isset( $GLOBALS['hide_save_button'] );
 $ph_button_text  = __( 'Save changes', 'propertyhive' );
+$ph_default_button_text = $ph_button_text;
 
 if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_text'] ) )
 {
 	$ph_button_text = $GLOBALS['save_button_text'];
 }
+
+$ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 ?>
 
 <div class="wrap propertyhive ph-settings-redesign">
@@ -119,6 +122,16 @@ if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_tex
 		<script>
 		jQuery( function( $ ) {
 			var $wrap = $( '.ph-settings-nav-wrap' );
+			var $addonsToggle = $wrap.find( '.ph-nav-addons-toggle' );
+
+			function closeAddonsMenu( restoreFocus ) {
+				$wrap.removeClass( 'is-open' );
+				$addonsToggle.attr( 'aria-expanded', 'false' );
+
+				if ( restoreFocus ) {
+					$addonsToggle.trigger( 'focus' );
+				}
+			}
 
 			$wrap.on( 'click', '.ph-nav-addons-toggle', function( e ) {
 				e.preventDefault();
@@ -128,8 +141,14 @@ if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_tex
 
 			$( document ).on( 'click', function( e ) {
 				if ( $wrap.hasClass( 'is-open' ) && ! $( e.target ).closest( '.ph-nav-addons' ).length ) {
-					$wrap.removeClass( 'is-open' );
-					$wrap.find( '.ph-nav-addons-toggle' ).attr( 'aria-expanded', 'false' );
+					closeAddonsMenu( false );
+				}
+			} );
+
+			$( document ).on( 'keydown', function( e ) {
+				if ( 'Escape' === e.key && $wrap.hasClass( 'is-open' ) ) {
+					e.preventDefault();
+					closeAddonsMenu( true );
 				}
 			} );
 		} );
@@ -175,7 +194,7 @@ if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_tex
         </p>
 
 		<?php if ( $ph_show_save ) : ?>
-			<div class="ph-save-tray" data-ph-save-tray aria-hidden="true" inert>
+			<div class="ph-save-tray" data-ph-save-tray data-ph-save-always-active="<?php echo $ph_always_show_save ? 'true' : 'false'; ?>" aria-hidden="true" inert>
 				<div class="ph-save-tray-status">
 					<span class="ph-save-tray-orb" aria-hidden="true"></span>
 					<span class="ph-save-tray-copy">

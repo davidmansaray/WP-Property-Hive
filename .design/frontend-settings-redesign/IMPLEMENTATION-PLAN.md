@@ -23,11 +23,12 @@ Second-pass revisions on top of the original build:
   Helpful resources; developer = one card, 2 columns).
 - Legacy table: Enable + Editing Experience rows removed (owned by chooser);
   remainder wrapped in a collapsed `<details>` "Advanced template settings"
-  card, hidden in Page Builder/Developer modes.
+  card, hidden in Visual Editor/Page Builder modes and available only in
+  Developer Mode.
 - Add-on tabs fall back to a neutral puzzle icon (was error-style icon).
 
 Remaining deltas vs mock (agreed): "Place" section deferred (Flags shows in
-its slot); doc/video resource links are placeholders; nav wraps to two rows on
+its slot); nav wraps to two rows on
 installs with many add-on tabs.
 
 ### Nav restyle + add-on handling evaluation (17 Jul 2026)

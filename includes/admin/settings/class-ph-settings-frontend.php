@@ -1671,14 +1671,17 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $settings = PH_Template_Set::get_settings();
         $mode     = isset( $settings['template_set_editor_mode'] ) ? $settings['template_set_editor_mode'] : PH_Template_Set::EDITOR_MODE_VISUAL;
 
-        // The chooser only knows three experiences. Legacy/unknown sites default
-        // to the visual editor card without persisting anything until chosen.
+        // The chooser only knows three experiences. Legacy/unknown sites preview
+        // the Visual Editor without claiming it has already been selected.
         $card_modes = array(
             PH_Template_Set::EDITOR_MODE_VISUAL,
             PH_Template_Set::EDITOR_MODE_PAGE_BUILDER,
             PH_Template_Set::EDITOR_MODE_DEVELOPER,
         );
-        $selected = in_array( $mode, $card_modes, true ) ? $mode : PH_Template_Set::EDITOR_MODE_VISUAL;
+        $visual_editor_enabled   = isset( $settings[ PH_Template_Set::OPTION_ENABLED ] ) && 'yes' === $settings[ PH_Template_Set::OPTION_ENABLED ];
+        $has_selected_experience = in_array( $mode, $card_modes, true ) &&
+            ( PH_Template_Set::EDITOR_MODE_VISUAL !== $mode || $visual_editor_enabled );
+        $selected                = $has_selected_experience ? $mode : PH_Template_Set::EDITOR_MODE_VISUAL;
 
         $nonce = wp_create_nonce( PH_Template_Set::EXPERIENCE_NONCE_ACTION );
 
@@ -1721,7 +1724,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ),
         );
         ?>
-        <div class="ph-template-experience" data-selected="<?php echo esc_attr( $selected ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+        <div class="ph-template-experience" data-selected="<?php echo esc_attr( $selected ); ?>" data-persisted-mode="<?php echo esc_attr( $has_selected_experience ? $mode : '' ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
 
             <div class="ph-tx-shell">
 
@@ -1732,7 +1735,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
             <div class="ph-tx-cards">
                 <?php foreach ( $cards as $card_mode => $card ) :
-                    $is_selected = ( $card_mode === $selected );
+                    $is_selected = $has_selected_experience && ( $card_mode === $selected );
                     ?>
                     <div class="ph-tx-card<?php echo $is_selected ? ' is-selected' : ''; ?>" data-mode="<?php echo esc_attr( $card_mode ); ?>">
                         <div class="ph-tx-card-head">
@@ -1790,9 +1793,11 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             var $wrap = $( '.ph-template-experience' );
             if ( ! $wrap.length ) { return; }
 
-            function showPanel( mode ) {
+            function showPanel( mode, markSelected ) {
                 $wrap.find( '.ph-tx-card' ).removeClass( 'is-selected' );
-                $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' ).addClass( 'is-selected' );
+                if ( markSelected ) {
+                    $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' ).addClass( 'is-selected' );
+                }
                 $wrap.find( '.ph-tx-panel' ).removeClass( 'is-active' );
                 $wrap.find( '.ph-tx-panel[data-panel="' + mode + '"]' ).addClass( 'is-active' );
                 $wrap.attr( 'data-selected', mode );
@@ -1801,7 +1806,10 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 $( '.ph-tx-advanced' ).toggle( mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>' );
             }
 
-            showPanel( $wrap.attr( 'data-selected' ) );
+            showPanel(
+                $wrap.attr( 'data-selected' ),
+                $wrap.attr( 'data-persisted-mode' ) === $wrap.attr( 'data-selected' )
+            );
 
             $wrap.on( 'click', '.ph-tx-select', function( e ) {
                 e.preventDefault();
@@ -1809,7 +1817,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 var mode  = $( this ).data( 'mode' );
                 var $btns = $wrap.find( '.ph-tx-select' );
 
-                if ( mode === $wrap.attr( 'data-selected' ) ) { return; }
+                if ( mode === $wrap.attr( 'data-persisted-mode' ) ) { return; }
 
                 $btns.prop( 'disabled', true );
                 $wrap.find( '.ph-tx-status' ).text( '' );
@@ -1820,7 +1828,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     nonce:  $wrap.data( 'nonce' )
                 } ).done( function( response ) {
                     if ( response && response.success ) {
-                        showPanel( mode );
+                        $wrap.attr( 'data-persisted-mode', mode );
+                        showPanel( mode, true );
                     } else {
                         var msg = ( response && response.data && response.data.message ) ? response.data.message : '<?php echo esc_js( __( 'Could not save. Please try again.', 'propertyhive' ) ); ?>';
                         $wrap.find( '.ph-tx-status' ).text( msg );
@@ -1891,6 +1900,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ? $builder_resources['docs_url']
             : 'https://docs.wp-property-hive.com/article/282-an-introduction-to-integrating-property-hive-to-your-website';
         $builder_video_url  = isset( $builder_resources['video_url'] ) ? $builder_resources['video_url'] : '';
+        $builder_ready      = ! empty( $builder['ready'] );
         ?>
         <div class="ph-tx-panel" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_PAGE_BUILDER ); ?>">
             <?php if ( ! empty( $builder['active'] ) ) :
@@ -1913,12 +1923,21 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                             /* translators: %s: page builder name */
                             echo esc_html( sprintf( __( '%s is active', 'propertyhive' ), $builder['name'] ) );
                             ?>
-                            <span class="ph-tx-badge ph-tx-badge--detected"><?php esc_html_e( 'Detected', 'propertyhive' ); ?></span>
+                            <span class="ph-tx-badge <?php echo esc_attr( $builder_ready ? 'ph-tx-badge--detected' : 'ph-tx-badge--setup' ); ?>">
+                                <?php echo $builder_ready ? esc_html__( 'Ready', 'propertyhive' ) : esc_html__( 'Setup required', 'propertyhive' ); ?>
+                            </span>
                         </h3>
-                        <p><?php
-                            /* translators: %s: page builder name */
-                            echo esc_html( sprintf( __( 'You can use %s to design your property templates with full visual control.', 'propertyhive' ), $builder['name'] ) );
-                        ?></p>
+                        <?php if ( $builder_ready ) : ?>
+                            <p><?php
+                                /* translators: %s: page builder name */
+                                echo esc_html( sprintf( __( 'You can use %s Theme Builder to design Property Detail templates with full visual control.', 'propertyhive' ), $builder['name'] ) );
+                            ?></p>
+                        <?php else : ?>
+                            <p><?php
+                                /* translators: %s: page builder name */
+                                echo esc_html( sprintf( __( '%s is active, but its Theme Builder is not available. Elementor Pro is required before you can create Property Hive templates.', 'propertyhive' ), $builder['name'] ) );
+                            ?></p>
+                        <?php endif; ?>
                         <div class="ph-tx-supported">
                             <ul class="ph-tx-checks ph-tx-checks--stacked">
                                 <?php if ( ! empty( $builder['version'] ) ) : ?>
@@ -1928,6 +1947,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                                 <?php endif; ?>
                                 <?php if ( ! empty( $builder['theme_builder'] ) ) : ?>
                                     <li><?php esc_html_e( 'Theme Builder active', 'propertyhive' ); ?></li>
+                                <?php else : ?>
+                                    <li class="ph-tx-check-warning"><?php esc_html_e( 'Elementor Pro Theme Builder required', 'propertyhive' ); ?></li>
                                 <?php endif; ?>
                             </ul>
                             <?php if ( ! empty( $theme_builder_url ) ) : ?>
@@ -1940,9 +1961,15 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     <div class="ph-tx-panel-col">
                         <h3><?php esc_html_e( 'Getting started', 'propertyhive' ); ?></h3>
                         <ol class="ph-tx-steps">
-                            <li><strong><?php esc_html_e( 'Open your builder', 'propertyhive' ); ?></strong><br><?php echo esc_html( sprintf( __( 'Design your Property Hive templates using %s.', 'propertyhive' ), $builder['name'] ) ); ?></li>
-                            <li><strong><?php esc_html_e( 'Choose a template to customise', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Select the template you want to edit (Search Results or Property Detail).', 'propertyhive' ); ?></li>
-                            <li><strong><?php esc_html_e( 'Publish your changes', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Your changes will be applied automatically across your site.', 'propertyhive' ); ?></li>
+                            <?php if ( $builder_ready ) : ?>
+                                <li><strong><?php esc_html_e( 'Open Theme Builder', 'propertyhive' ); ?></strong><br><?php echo esc_html( sprintf( __( 'Open the Theme Builder provided by %s.', 'propertyhive' ), $builder['name'] ) ); ?></li>
+                                <li><strong><?php esc_html_e( 'Create a Property Detail template', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Choose the single-property display conditions described in the integration guide.', 'propertyhive' ); ?></li>
+                                <li><strong><?php esc_html_e( 'Publish your changes', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Your detail-template changes will be applied to matching properties.', 'propertyhive' ); ?></li>
+                            <?php else : ?>
+                                <li><strong><?php esc_html_e( 'Activate Elementor Pro', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Property Hive template integration requires Elementor Pro Theme Builder.', 'propertyhive' ); ?></li>
+                                <li><strong><?php esc_html_e( 'Open Theme Builder', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Create a new Single template for Property Hive properties.', 'propertyhive' ); ?></li>
+                                <li><strong><?php esc_html_e( 'Follow the integration guide', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Apply the correct display conditions before publishing.', 'propertyhive' ); ?></li>
+                            <?php endif; ?>
                         </ol>
                     </div>
                     <div class="ph-tx-panel-col">
@@ -1958,7 +1985,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                             <a class="ph-tx-resource" href="<?php echo esc_url( $builder_docs_url ); ?>" target="_blank" rel="noopener">
                                 <span class="ph-tx-resource-text">
                                     <strong><?php esc_html_e( 'Which templates can I edit?', 'propertyhive' ); ?></strong>
-                                    <span><?php echo esc_html( sprintf( __( 'See which Property Hive templates can be built with %s.', 'propertyhive' ), $builder['name'] ) ); ?></span>
+                                    <span><?php echo esc_html( sprintf( __( 'See how %s integrates with Property Detail templates.', 'propertyhive' ), $builder['name'] ) ); ?></span>
                                 </span>
                                 <span class="ph-tx-btn-glyph" aria-hidden="true">&#8599;</span>
                             </a>

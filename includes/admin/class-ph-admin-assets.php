@@ -414,6 +414,7 @@ class PH_Admin_Assets {
                 'ajax_nonce'                                => wp_create_nonce("updates"),
                 'features_settings_url'                     => admin_url('admin.php?page=ph-settings&tab=features'),
                 'unsaved_changes_text'                      => __( 'Unsaved changes', 'propertyhive' ),
+                'action_ready_text'                         => __( 'Ready to continue', 'propertyhive' ),
                 'saving_text'                               => __( 'Saving…', 'propertyhive' ),
                 'saved_message'                             => __( 'Your settings have been saved.', 'propertyhive' ),
             );
