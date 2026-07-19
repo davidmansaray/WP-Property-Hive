@@ -3,7 +3,7 @@
  *
  * Styles the settings page chrome (icon nav bar, breadcrumb sub-nav, page
  * header band) and the "How will you be building your property pages?"
- * experience chooser on Settings → Frontend → Template Set.
+ * editing-method experience on Settings → Frontend → Property Templates.
  */
 
 .propertyhive {
@@ -654,12 +654,139 @@
     margin: 0 0 20px;
 }
 
+.propertyhive .ph-tx-current-method {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--ph-tx-border);
+    border-radius: var(--ph-tx-radius);
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+}
+
+.propertyhive .ph-tx-current-method[hidden] {
+    display: none;
+}
+
+.propertyhive .ph-tx-current-method:focus {
+    outline: none;
+}
+
+.propertyhive .ph-tx-current-method:focus-visible {
+    outline: 3px solid var(--ph-tx-blue);
+    outline-offset: 2px;
+}
+
+.propertyhive .ph-tx-current-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--ph-tx-yellow-soft);
+    color: var(--ph-tx-ink);
+}
+
+.propertyhive .ph-tx-current-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.propertyhive .ph-tx-current-copy {
+    display: grid;
+    min-width: 0;
+    gap: 1px;
+}
+
+.propertyhive .ph-tx-current-kicker {
+    color: var(--ph-tx-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.propertyhive .ph-tx-current-label {
+    color: var(--ph-tx-ink);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.propertyhive .ph-tx-current-description {
+    overflow: hidden;
+    color: var(--ph-tx-muted);
+    font-size: 12px;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.propertyhive .ph-tx-change-method {
+    min-height: 36px;
+    margin-left: auto;
+    flex: 0 0 auto;
+    border-color: var(--ph-tx-border-strong);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ph-tx-ink);
+    font-weight: 600;
+}
+
+.propertyhive .ph-tx-change-method:hover,
+.propertyhive .ph-tx-change-method:focus {
+    border-color: var(--ph-tx-ink);
+    background: #fff;
+    color: var(--ph-tx-ink);
+}
+
+.propertyhive .ph-tx-chooser {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+    visibility: hidden;
+    transition:
+        grid-template-rows .3s cubic-bezier(.4, 0, .7, .2),
+        margin-top .3s cubic-bezier(.4, 0, .7, .2),
+        opacity .18s ease,
+        transform .24s cubic-bezier(.4, 0, .7, .2),
+        visibility 0s linear .3s;
+}
+
+.propertyhive .ph-tx-chooser.is-open {
+    grid-template-rows: 1fr;
+    margin-top: 14px;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition:
+        grid-template-rows .38s cubic-bezier(.16, 1, .3, 1),
+        margin-top .38s cubic-bezier(.16, 1, .3, 1),
+        opacity .24s ease,
+        transform .32s cubic-bezier(.16, 1, .3, 1),
+        visibility 0s;
+}
+
+.propertyhive .ph-tx-chooser-clip {
+    min-height: 0;
+    overflow: hidden;
+}
+
 .propertyhive .ph-tx-shell {
     background: #fff;
     border: 1px solid var(--ph-tx-border);
     border-radius: var(--ph-tx-radius);
     padding: 26px;
     box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+}
+
+.propertyhive .ph-tx-intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
 }
 
 .propertyhive .ph-tx-intro h2 {
@@ -673,6 +800,32 @@
 .propertyhive .ph-tx-intro p {
     margin: 0 0 18px;
     color: var(--ph-tx-muted);
+}
+
+.propertyhive .ph-tx-change-choice {
+    display: none;
+}
+
+.propertyhive .has-persisted-experience .ph-tx-first-choice {
+    display: none;
+}
+
+.propertyhive .has-persisted-experience .ph-tx-change-choice {
+    display: inline;
+}
+
+.propertyhive .ph-tx-chooser-cancel {
+    min-height: 32px;
+    padding: 4px 2px;
+    flex: 0 0 auto;
+    color: var(--ph-tx-muted);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.propertyhive .ph-tx-chooser-cancel:hover,
+.propertyhive .ph-tx-chooser-cancel:focus {
+    color: var(--ph-tx-ink);
 }
 
 .propertyhive .ph-tx-cards {
@@ -1333,6 +1486,30 @@
 }
 
 @media screen and (max-width: 782px) {
+    .propertyhive .ph-tx-current-method {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .propertyhive .ph-tx-current-copy {
+        flex: 1 1 calc(100% - 54px);
+    }
+
+    .propertyhive .ph-tx-current-description {
+        white-space: normal;
+    }
+
+    .propertyhive .ph-tx-change-method {
+        justify-content: center;
+        margin-left: 54px;
+        width: calc(100% - 54px);
+    }
+
+    .propertyhive .ph-tx-intro {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
     .propertyhive .ph-settings-nav .ph-nav-tab {
         gap: 4px;
         padding: 10px 6px;
@@ -1415,6 +1592,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .propertyhive .ph-tx-chooser,
+    .propertyhive .ph-tx-chooser.is-open {
+        transform: none;
+        transition-duration: .01ms;
+    }
+
     .propertyhive .ph-save-tray,
     .propertyhive.ph-save-tray-visible .ph-save-tray,
     .propertyhive.ph-save-tray-saving .ph-save-tray {

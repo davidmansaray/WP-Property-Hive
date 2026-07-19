@@ -1465,13 +1465,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
         $catalog_html .= '</ul></div>';
 
-        // Card-based editing-experience chooser (renders above the settings table).
+        // Editing method summary and chooser (renders above the settings table).
         $settings[] = array(
             'type' => 'template_experience',
         );
 
         // Remaining template styling controls live in a collapsed "advanced"
-        // card, only shown when the Visual Editor experience is selected. The
+        // card, only shown when Developer Mode is selected. The
         // enable flag and editor mode are owned by the chooser above.
         $settings[] = array(
             'type' => 'template_advanced_start',
@@ -1680,7 +1680,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
      */
     public function template_advanced_start() {
         // Keep these controls exclusive to Developer Mode. Visual Editor and
-        // Page Builder each provide their own editing experience.
+        // Page Builder each provide their own editing method.
         $show_advanced = PH_Template_Set::EDITOR_MODE_DEVELOPER === PH_Template_Set::get_editor_mode();
 
         echo '<details class="ph-tx-advanced"' . ( $show_advanced ? '' : ' style="display:none"' ) . '><summary>' . esc_html__( 'Advanced template settings', 'propertyhive' ) . '<span class="ph-tx-advanced-chevron" aria-hidden="true"></span></summary><div class="ph-tx-advanced-body">';
@@ -1697,8 +1697,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     }
 
     /**
-     * Render the card-based "How will you be building your property pages?"
-     * chooser plus the contextual panel for the selected experience.
+     * Render the editing method summary, chooser, and method-specific workspace.
      *
      * @access public
      * @return void
@@ -1708,7 +1707,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $settings = PH_Template_Set::get_settings();
         $mode     = isset( $settings['template_set_editor_mode'] ) ? $settings['template_set_editor_mode'] : PH_Template_Set::EDITOR_MODE_VISUAL;
 
-        // The chooser only knows three experiences. Legacy/unknown sites preview
+        // The chooser only knows three editing methods. Legacy/unknown sites preview
         // the Visual Editor without claiming it has already been selected.
         $card_modes = array(
             PH_Template_Set::EDITOR_MODE_VISUAL,
@@ -1760,59 +1759,85 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 ),
             ),
         );
+        $current_card = $cards[ $selected ];
         ?>
-        <div class="ph-template-experience" data-selected="<?php echo esc_attr( $selected ); ?>" data-persisted-mode="<?php echo esc_attr( $has_selected_experience ? $mode : '' ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+        <div class="ph-template-experience<?php echo $has_selected_experience ? ' has-persisted-experience' : ''; ?>" data-selected="<?php echo esc_attr( $selected ); ?>" data-persisted-mode="<?php echo esc_attr( $has_selected_experience ? $mode : '' ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
 
-            <div class="ph-tx-shell">
-
-            <div class="ph-tx-intro">
-                <h2><?php esc_html_e( 'How will you be building your property pages?', 'propertyhive' ); ?></h2>
-                <p><?php esc_html_e( 'You can switch between experiences at any time.', 'propertyhive' ); ?></p>
+            <div class="ph-tx-current-method" tabindex="-1"<?php echo $has_selected_experience ? '' : ' hidden'; ?>>
+                <span class="ph-tx-current-icon" aria-hidden="true"><?php echo $current_card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                <span class="ph-tx-current-copy">
+                    <span class="ph-tx-current-kicker"><?php esc_html_e( 'Editing method', 'propertyhive' ); ?></span>
+                    <strong class="ph-tx-current-label"><?php echo esc_html( $current_card['label'] ); ?></strong>
+                    <span class="ph-tx-current-description"><?php echo esc_html( $current_card['description'] ); ?></span>
+                </span>
+                <button type="button" class="button ph-tx-change-method" aria-expanded="false" aria-controls="ph-template-editing-method-chooser">
+                    <?php esc_html_e( 'Change editing method', 'propertyhive' ); ?>
+                </button>
             </div>
 
-            <div class="ph-tx-cards">
-                <?php foreach ( $cards as $card_mode => $card ) :
-                    $is_selected = $has_selected_experience && ( $card_mode === $selected );
-                    ?>
-                    <div class="ph-tx-card<?php echo $is_selected ? ' is-selected' : ''; ?>" data-mode="<?php echo esc_attr( $card_mode ); ?>">
-                        <div class="ph-tx-card-head">
-                            <span class="ph-tx-card-icon"><?php echo $card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                            <h3>
-                                <?php echo esc_html( $card['label'] ); ?>
-                                <?php if ( ! empty( $card['badge'] ) ) : ?>
-                                    <span class="ph-tx-badge"><?php echo esc_html( $card['badge'] ); ?></span>
-                                <?php endif; ?>
-                            </h3>
-                            <p><?php echo esc_html( $card['description'] ); ?></p>
+            <div id="ph-template-editing-method-chooser" class="ph-tx-chooser<?php echo $has_selected_experience ? '' : ' is-open'; ?>" aria-hidden="<?php echo $has_selected_experience ? 'true' : 'false'; ?>"<?php echo $has_selected_experience ? ' inert' : ''; ?>>
+                <div class="ph-tx-chooser-clip">
+                    <div class="ph-tx-shell">
+
+                    <div class="ph-tx-intro">
+                        <div>
+                            <h2 id="ph-template-editing-method-title" tabindex="-1">
+                                <span class="ph-tx-first-choice"><?php esc_html_e( 'How would you like to edit your property templates?', 'propertyhive' ); ?></span>
+                                <span class="ph-tx-change-choice"><?php esc_html_e( 'Change editing method', 'propertyhive' ); ?></span>
+                            </h2>
+                            <p>
+                                <span class="ph-tx-first-choice"><?php esc_html_e( 'Choose the approach that best matches how you work.', 'propertyhive' ); ?></span>
+                                <span class="ph-tx-change-choice"><?php esc_html_e( 'Your existing template settings are kept when you switch methods.', 'propertyhive' ); ?></span>
+                            </p>
                         </div>
-                        <ul class="ph-tx-checks">
-                            <?php foreach ( $card['checks'] as $check ) : ?>
-                                <li><?php echo esc_html( $check ); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <button type="button" class="button ph-tx-select" data-mode="<?php echo esc_attr( $card_mode ); ?>">
-                            <span class="ph-tx-select-choose"><?php
-                                /* translators: %s: experience name */
-                                echo esc_html( sprintf( __( 'Choose %s', 'propertyhive' ), $card['label'] ) );
-                            ?></span>
-                            <span class="ph-tx-select-selected"><?php esc_html_e( 'Selected', 'propertyhive' ); ?></span>
-                        </button>
+                        <button type="button" class="button-link ph-tx-chooser-cancel"<?php echo $has_selected_experience ? '' : ' hidden'; ?>><?php esc_html_e( 'Cancel', 'propertyhive' ); ?></button>
                     </div>
-                <?php endforeach; ?>
-            </div>
 
-            <div class="ph-tx-hint">
-                <span class="ph-tx-hint-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'bulb' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                <?php
-                printf(
-                    /* translators: %s: "Learn more" link */
-                    esc_html__( 'Not sure which option to choose? %s about each editing experience.', 'propertyhive' ),
-                    '<a href="' . esc_url( 'https://docs.wp-property-hive.com/article/282-an-introduction-to-integrating-property-hive-to-your-website' ) . '" target="_blank" rel="noopener">' . esc_html__( 'Learn more', 'propertyhive' ) . '</a>'
-                );
-                ?>
-            </div>
+                    <div class="ph-tx-cards">
+                        <?php foreach ( $cards as $card_mode => $card ) :
+                            $is_selected = $has_selected_experience && ( $card_mode === $selected );
+                            ?>
+                            <div class="ph-tx-card<?php echo $is_selected ? ' is-selected' : ''; ?>" data-mode="<?php echo esc_attr( $card_mode ); ?>" data-label="<?php echo esc_attr( $card['label'] ); ?>" data-description="<?php echo esc_attr( $card['description'] ); ?>">
+                                <div class="ph-tx-card-head">
+                                    <span class="ph-tx-card-icon"><?php echo $card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                                    <h3>
+                                        <?php echo esc_html( $card['label'] ); ?>
+                                        <?php if ( ! empty( $card['badge'] ) ) : ?>
+                                            <span class="ph-tx-badge"><?php echo esc_html( $card['badge'] ); ?></span>
+                                        <?php endif; ?>
+                                    </h3>
+                                    <p><?php echo esc_html( $card['description'] ); ?></p>
+                                </div>
+                                <ul class="ph-tx-checks">
+                                    <?php foreach ( $card['checks'] as $check ) : ?>
+                                        <li><?php echo esc_html( $check ); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <button type="button" class="button ph-tx-select" data-mode="<?php echo esc_attr( $card_mode ); ?>">
+                                    <span class="ph-tx-select-choose"><?php
+                                        /* translators: %s: editing method name */
+                                        echo esc_html( sprintf( __( 'Choose %s', 'propertyhive' ), $card['label'] ) );
+                                    ?></span>
+                                    <span class="ph-tx-select-selected"><?php esc_html_e( 'Selected', 'propertyhive' ); ?></span>
+                                </button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
 
-            </div><!-- .ph-tx-shell -->
+                    <div class="ph-tx-hint">
+                        <span class="ph-tx-hint-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'bulb' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                        <?php
+                        printf(
+                            /* translators: %s: "Learn more" link */
+                            esc_html__( 'Not sure which option to choose? %s about each editing method.', 'propertyhive' ),
+                            '<a href="' . esc_url( 'https://docs.wp-property-hive.com/article/282-an-introduction-to-integrating-property-hive-to-your-website' ) . '" target="_blank" rel="noopener">' . esc_html__( 'Learn more', 'propertyhive' ) . '</a>'
+                        );
+                        ?>
+                    </div>
+
+                    </div><!-- .ph-tx-shell -->
+                </div><!-- .ph-tx-chooser-clip -->
+            </div><!-- .ph-tx-chooser -->
 
             <div class="ph-tx-panels">
                 <?php
@@ -1829,6 +1854,11 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         jQuery( function( $ ) {
             var $wrap = $( '.ph-template-experience' );
             if ( ! $wrap.length ) { return; }
+            var $chooser = $wrap.find( '.ph-tx-chooser' );
+            var $current = $wrap.find( '.ph-tx-current-method' );
+            var $change  = $wrap.find( '.ph-tx-change-method' );
+            var $cancel  = $wrap.find( '.ph-tx-chooser-cancel' );
+            var $title   = $wrap.find( '#ph-template-editing-method-title' );
 
             function showPanel( mode, markSelected ) {
                 $wrap.find( '.ph-tx-card' ).removeClass( 'is-selected' );
@@ -1836,11 +1866,35 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' ).addClass( 'is-selected' );
                 }
                 $wrap.find( '.ph-tx-panel' ).removeClass( 'is-active' );
-                $wrap.find( '.ph-tx-panel[data-panel="' + mode + '"]' ).addClass( 'is-active' );
+                if ( markSelected ) {
+                    $wrap.find( '.ph-tx-panel[data-panel="' + mode + '"]' ).addClass( 'is-active' );
+                }
                 $wrap.attr( 'data-selected', mode );
 
                 // Advanced settings are available only when Developer Mode is selected.
-                $( '.ph-tx-advanced' ).toggle( mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>' );
+                $( '.ph-tx-advanced' ).toggle( markSelected && mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>' );
+            }
+
+            function updateCurrentMethod( mode ) {
+                var $card = $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' );
+                $current.find( '.ph-tx-current-icon' ).html( $card.find( '.ph-tx-card-icon' ).html() );
+                $current.find( '.ph-tx-current-label' ).text( $card.data( 'label' ) );
+                $current.find( '.ph-tx-current-description' ).text( $card.data( 'description' ) );
+            }
+
+            function setChooserOpen( open, restoreFocus ) {
+                $chooser.toggleClass( 'is-open', open ).attr( 'aria-hidden', open ? 'false' : 'true' );
+                $change.attr( 'aria-expanded', open ? 'true' : 'false' );
+
+                if ( open ) {
+                    $chooser.removeAttr( 'inert' );
+                    window.setTimeout( function() { $title.trigger( 'focus' ); }, 180 );
+                } else {
+                    $chooser.attr( 'inert', '' );
+                    if ( restoreFocus ) {
+                        $change.trigger( 'focus' );
+                    }
+                }
             }
 
             showPanel(
@@ -1848,13 +1902,33 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 $wrap.attr( 'data-persisted-mode' ) === $wrap.attr( 'data-selected' )
             );
 
+            $wrap.on( 'click', '.ph-tx-change-method', function( e ) {
+                e.preventDefault();
+                setChooserOpen( true, false );
+            } );
+
+            $wrap.on( 'click', '.ph-tx-chooser-cancel', function( e ) {
+                e.preventDefault();
+                setChooserOpen( false, true );
+            } );
+
+            $( document ).on( 'keydown.phTemplateEditingMethod', function( e ) {
+                if ( 'Escape' === e.key && $chooser.hasClass( 'is-open' ) && $wrap.attr( 'data-persisted-mode' ) ) {
+                    e.preventDefault();
+                    setChooserOpen( false, true );
+                }
+            } );
+
             $wrap.on( 'click', '.ph-tx-select', function( e ) {
                 e.preventDefault();
 
                 var mode  = $( this ).data( 'mode' );
                 var $btns = $wrap.find( '.ph-tx-select' );
 
-                if ( mode === $wrap.attr( 'data-persisted-mode' ) ) { return; }
+                if ( mode === $wrap.attr( 'data-persisted-mode' ) ) {
+                    setChooserOpen( false, true );
+                    return;
+                }
 
                 $btns.prop( 'disabled', true );
                 $wrap.find( '.ph-tx-status' ).text( '' );
@@ -1866,7 +1940,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 } ).done( function( response ) {
                     if ( response && response.success ) {
                         $wrap.attr( 'data-persisted-mode', mode );
+                        $wrap.addClass( 'has-persisted-experience' );
+                        $current.removeAttr( 'hidden' );
+                        $cancel.removeAttr( 'hidden' );
+                        updateCurrentMethod( mode );
                         showPanel( mode, true );
+                        setChooserOpen( false, false );
+                        $current.trigger( 'focus' );
                     } else {
                         var msg = ( response && response.data && response.data.message ) ? response.data.message : '<?php echo esc_js( __( 'Could not save. Please try again.', 'propertyhive' ) ); ?>';
                         $wrap.find( '.ph-tx-status' ).text( msg );
