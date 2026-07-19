@@ -20,7 +20,11 @@ $ph_tab_meta     = PH_Admin_Settings::get_tab_meta();
 $ph_current_meta = isset( $ph_tab_meta[ $current_tab ] ) ? $ph_tab_meta[ $current_tab ] : array();
 $ph_page_title   = isset( $tabs[ $current_tab ] ) ? $tabs[ $current_tab ] : '';
 $ph_page_desc    = isset( $ph_current_meta['description'] ) ? $ph_current_meta['description'] : ( isset( $ph_current_meta['subtitle'] ) ? $ph_current_meta['subtitle'] : '' );
+$ph_page_title   = apply_filters( 'propertyhive_settings_page_title', $ph_page_title, $current_tab, $current_section );
+$ph_page_desc    = apply_filters( 'propertyhive_settings_page_description', $ph_page_desc, $current_tab, $current_section );
 $ph_show_save    = ! isset( $GLOBALS['hide_save_button'] );
+$ph_show_cancel  = isset( $GLOBALS['show_cancel_button'] ) && true === $GLOBALS['show_cancel_button'];
+$ph_show_header  = '' !== $ph_page_title || '' !== $ph_page_desc || $ph_show_cancel;
 $ph_button_text  = __( 'Save changes', 'propertyhive' );
 $ph_default_button_text = $ph_button_text;
 
@@ -158,32 +162,34 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 
 		<?php echo $ph_sections_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
-		<div class="ph-settings-header">
-			<div class="ph-settings-header-text">
-				<?php if ( '' !== $ph_page_title ) : ?>
-					<h1><?php echo esc_html( $ph_page_title ); ?></h1>
-				<?php endif; ?>
-				<?php if ( '' !== $ph_page_desc ) : ?>
-					<p><?php echo esc_html( $ph_page_desc ); ?></p>
-				<?php endif; ?>
-			</div>
-			<div class="ph-settings-header-actions">
-				<?php
-				if ( isset( $GLOBALS['show_cancel_button'] ) && $GLOBALS['show_cancel_button'] === TRUE )
-				{
-					$cancel_href = 'javascript:history.go(-1);';
-					if ( isset( $GLOBALS['cancel_button_href'] ) && ! empty( $GLOBALS['cancel_button_href'] ) )
+		<?php if ( $ph_show_header ) : ?>
+			<div class="ph-settings-header<?php echo '' === $ph_page_title && '' === $ph_page_desc ? ' ph-settings-header--actions-only' : ''; ?>">
+				<div class="ph-settings-header-text">
+					<?php if ( '' !== $ph_page_title ) : ?>
+						<h1><?php echo esc_html( $ph_page_title ); ?></h1>
+					<?php endif; ?>
+					<?php if ( '' !== $ph_page_desc ) : ?>
+						<p><?php echo esc_html( $ph_page_desc ); ?></p>
+					<?php endif; ?>
+				</div>
+				<div class="ph-settings-header-actions">
+					<?php
+					if ( $ph_show_cancel )
 					{
-						$cancel_href = $GLOBALS['cancel_button_href'];
+						$cancel_href = 'javascript:history.go(-1);';
+						if ( isset( $GLOBALS['cancel_button_href'] ) && ! empty( $GLOBALS['cancel_button_href'] ) )
+						{
+							$cancel_href = $GLOBALS['cancel_button_href'];
+						}
+						?>
+						<a href="<?php echo esc_url( $cancel_href ); ?>" class="button ph-cancel-button"><?php echo esc_html( __( 'Cancel', 'propertyhive' ) ); ?></a>
+						<?php
 					}
 					?>
-					<a href="<?php echo esc_url( $cancel_href ); ?>" class="button ph-cancel-button"><?php echo esc_html( __( 'Cancel', 'propertyhive' ) ); ?></a>
-					<?php
-				}
-				?>
-				<a class="ph-help-button" href="https://wp-property-hive.com/documentation/" target="_blank" rel="noopener" title="<?php echo esc_attr( __( 'Help & documentation', 'propertyhive' ) ); ?>">?</a>
+					<a class="ph-help-button" href="https://wp-property-hive.com/documentation/" target="_blank" rel="noopener" title="<?php echo esc_attr( __( 'Help & documentation', 'propertyhive' ) ); ?>">?</a>
+				</div>
 			</div>
-		</div>
+		<?php endif; ?>
 
 		<?php echo $ph_settings_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 

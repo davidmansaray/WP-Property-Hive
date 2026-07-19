@@ -193,7 +193,7 @@ class PH_Template_Set_Request_Context {
 
 		$catalog         = PH_Template_Set_Catalog::get_template_catalog();
 		$current_slug    = self::get_current_catalog_template();
-		$current_label   = isset( $catalog[ $current_slug ] ) ? $catalog[ $current_slug ]['label'] : __( 'Template Set', 'propertyhive' );
+		$current_label   = isset( $catalog[ $current_slug ] ) ? $catalog[ $current_slug ]['label'] : __( 'Property Templates', 'propertyhive' );
 		$settings_url    = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
 		$root_id         = 'ph-template-set';
 		$inactive_suffix = self::is_enabled() ? '' : ' ' . __( '(inactive)', 'propertyhive' );
@@ -270,7 +270,7 @@ class PH_Template_Set_Request_Context {
 			array(
 				'id'     => 'ph-template-set-settings',
 				'parent' => $root_id,
-				'title'  => __( 'Open Template Set settings', 'propertyhive' ),
+				'title'  => __( 'Open Property Templates settings', 'propertyhive' ),
 				'href'   => $settings_url,
 			)
 		);

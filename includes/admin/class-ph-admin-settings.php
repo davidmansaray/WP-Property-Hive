@@ -154,6 +154,11 @@ class PH_Admin_Settings {
 		// Get current tab/section
 		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( $_GET['tab'] );
 		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( $_REQUEST['section'] );
+		if ( '' === $current_section ) {
+			$current_section = sanitize_title(
+				apply_filters( 'propertyhive_default_settings_section_' . $current_tab, '' )
+			);
+		}
 
 	    // Save settings if data has been posted
 	    //if ( ! empty( $_POST ) )

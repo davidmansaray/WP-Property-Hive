@@ -30,6 +30,9 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         add_action( 'admin_init', array( $this, 'check_for_delete_search_form') );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 16 );
+		add_filter( 'propertyhive_default_settings_section_' . $this->id, array( $this, 'get_default_section' ) );
+		add_filter( 'propertyhive_settings_page_title', array( $this, 'get_page_title' ), 10, 3 );
+		add_filter( 'propertyhive_settings_page_description', array( $this, 'get_page_description' ), 10, 3 );
 		add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
@@ -96,13 +99,47 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 	 */
 	public function get_sections() {
 		$sections = array(
-			'' => __( 'Search Results', 'propertyhive' ),
+			'template-set' => __( 'Property Templates', 'propertyhive' ),
+			'search-results' => __( 'Search Results', 'propertyhive' ),
 			'search-forms' => __( 'Search Forms', 'propertyhive' ),
 			'flags' => __( 'Flags', 'propertyhive' ),
-			'template-set' => __( 'Template Set', 'propertyhive' ),
 		);
 
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
+	}
+
+	/**
+	 * Get the section shown when the main Frontend tab is opened.
+	 *
+	 * @param string $section Existing default section.
+	 * @return string
+	 */
+	public function get_default_section( $section = '' ) {
+		return '' === $section ? 'template-set' : $section;
+	}
+
+	/**
+	 * Remove the redundant page heading beneath the Frontend section menu.
+	 *
+	 * @param string $title Current page title.
+	 * @param string $tab Current settings tab.
+	 * @param string $section Current settings section.
+	 * @return string
+	 */
+	public function get_page_title( $title, $tab, $section ) {
+		return $this->id === $tab ? '' : $title;
+	}
+
+	/**
+	 * Remove the redundant page description beneath the Frontend section menu.
+	 *
+	 * @param string $description Current page description.
+	 * @param string $tab Current settings tab.
+	 * @param string $section Current settings section.
+	 * @return string
+	 */
+	public function get_page_description( $description, $tab, $section ) {
+		return $this->id === $tab ? '' : $description;
 	}
 
 	/**
@@ -1420,7 +1457,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
         $template_set_settings = PH_Template_Set::get_settings();
         $settings         = array();
-        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes the standard sales detail and portal-style search results examples. Use the preview links or the front-end visual editor to review either example in context.', 'propertyhive' ) . '</p><ul>';
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'Property Templates include standard sales detail and portal-style search results examples. Use the preview links or the Visual Editor to review either example in context.', 'propertyhive' ) . '</p><ul>';
 
         foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
             $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
@@ -2149,6 +2186,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
         	switch ($current_section)
             {
+                case "search-results": { $settings = $this->get_settings(); break; }
             	case "search-forms": { $hide_save_button = true; $settings = $this->get_search_forms_settings(); break; }
                 case "addsearchform": { $settings = $this->get_search_form_settings(); break; }
                 case "editsearchform": { $settings = $this->get_search_form_settings(); break; }
@@ -2159,7 +2197,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         }
         else
         {
-        	$settings = $this->get_settings(); 
+            $settings = $this->get_template_set_settings();
         }
 
 		PH_Admin_Settings::output_fields( $settings );
@@ -2173,6 +2211,14 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 		global $current_section;
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+		// Property Templates is the Frontend default. Search Results now has an
+		// explicit section ID but continues to use its established save path.
+		if ( '' === $current_section ) {
+			$current_section = 'template-set';
+		} elseif ( 'search-results' === $current_section ) {
+			$current_section = '';
+		}
 
 		if ( $current_section != '' ) 
         {
