@@ -30,13 +30,23 @@
 }
 
 .propertyhive .ph-settings-nav-wrap {
+    position: relative;
     margin: 10px 0 14px;
+}
+
+.propertyhive .ph-settings-nav-wrap.is-open {
+    /*
+     * WordPress renders the admin sidebar at 9990 and the toolbar at 99999.
+     * Keep the add-on menu above the sidebar without covering the toolbar.
+     */
+    z-index: 9991;
 }
 
 .propertyhive .ph-settings-nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: stretch;
+    min-width: 0;
     border: 1px solid var(--ph-tx-border);
     border-radius: var(--ph-tx-radius);
     background: #fff;
@@ -51,6 +61,7 @@
     align-items: center;
     gap: 12px;
     flex: 1 1 auto;
+    min-width: 0;
     float: none;
     margin: 0;
     padding: 14px 18px;
@@ -128,20 +139,29 @@
 .propertyhive .ph-settings-nav .ph-nav-text {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     text-align: left;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
     font-weight: 700;
     font-size: 13px;
     white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-subtitle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
     font-size: 11.5px;
     color: var(--ph-tx-muted);
     font-weight: 400;
     white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .propertyhive .ph-nav-count {
@@ -179,6 +199,7 @@
     position: relative;
     display: flex;
     align-items: stretch;
+    flex: 0 0 auto;
 }
 
 .propertyhive .ph-nav-addons .ph-nav-addons-toggle {
@@ -216,7 +237,7 @@
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(20, 20, 30, 0.12);
     padding: 6px;
-    z-index: 100;
+    z-index: 2;
 }
 
 .propertyhive .is-open .ph-nav-addons-menu {
@@ -256,6 +277,8 @@
 /* The active add-on tab (rendered inline beside the toggle) sizes to content. */
 .propertyhive .ph-settings-nav .ph-nav-addon {
     flex: 0 1 auto;
+    min-width: 0;
+    max-width: 260px;
 }
 
 /* -------------------------------------------------------------------------
@@ -1221,6 +1244,49 @@
  * Responsive
  * ---------------------------------------------------------------------- */
 
+@media screen and (max-width: 1400px) {
+    .propertyhive .ph-settings-nav .ph-nav-tab {
+        gap: 8px;
+        padding: 12px 10px;
+    }
+
+    .propertyhive .ph-settings-nav .ph-nav-subtitle {
+        display: none;
+    }
+
+    .propertyhive .ph-settings-nav .ph-nav-addon {
+        max-width: 220px;
+    }
+
+    .propertyhive .ph-nav-addons-toggle.is-compact {
+        padding: 12px 9px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .propertyhive .ph-settings-nav .ph-nav-core {
+        flex: 1 1 0;
+        justify-content: center;
+        padding-inline: 8px;
+    }
+
+    /*
+     * Icon-only core tabs keep the complete settings rail on one line on
+     * narrower admin screens. The text stays available to assistive tech.
+     */
+    .propertyhive .ph-settings-nav .ph-nav-core .ph-nav-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+
 @media screen and (max-width: 1100px) {
     .propertyhive .ph-tx-panel-card--columns,
     .propertyhive .ph-tx-panel-card--columns.ph-tx-panel-card--two {
@@ -1267,6 +1333,46 @@
 }
 
 @media screen and (max-width: 782px) {
+    .propertyhive .ph-settings-nav .ph-nav-tab {
+        gap: 4px;
+        padding: 10px 6px;
+    }
+
+    .propertyhive .ph-settings-nav .ph-nav-addon {
+        flex: 0 0 auto;
+        max-width: none;
+    }
+
+    .propertyhive .ph-settings-nav .ph-nav-addon .ph-nav-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .propertyhive .ph-nav-addons-toggle,
+    .propertyhive .ph-nav-addons-toggle.is-compact {
+        gap: 4px;
+        padding: 10px 7px;
+    }
+
+    .propertyhive .ph-nav-addons-toggle .ph-nav-icon {
+        display: none;
+    }
+
+    .propertyhive .ph-nav-addons-toggle .ph-nav-label {
+        font-size: 0;
+    }
+
+    .propertyhive .ph-nav-addons-toggle .ph-nav-count {
+        font-size: 10.5px;
+    }
+
     .propertyhive .form-table pre {
         max-width: 100%;
         white-space: pre-wrap;
