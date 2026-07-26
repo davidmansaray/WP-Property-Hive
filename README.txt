@@ -180,6 +180,16 @@ The free core plugin contains the foundations that you need to create a property
 15. Specify the countries your operate in for full international support
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
+== Search Template Set customisation ==
+
+Portal-Style Search Results remains available as the existing search presentation. Portal Grid and Map Atlas add image-led and location-led choices while using the normal Property Hive archive, search form, result loop and theme override system. Map Atlas uses the Map Search add-on when it is available and correctly configured; otherwise it remains a complete list/grid search experience.
+
+Themes can override a slug-specific part under `propertyhive/template-set/search/{template-slug}/{part}.php`, or a part shared by all search templates under `propertyhive/template-set/search/{part}.php`. Slug-specific theme files win before shared theme files, and all theme files win before plugin templates.
+
+Portal-Style Search Results continues to use the established `propertyhive-template-set` stylesheet unchanged. Portal Grid and Map Atlas use the required structural handle `propertyhive-template-set-search-structure`; their optional, deliberately low-priority cosmetic fallbacks use `propertyhive-template-set-search-fallbacks`. Themes can disable those cosmetics with `propertyhive_template_set_enqueue_search_fallbacks`, or replace their registered definition with `propertyhive_template_set_search_styles`.
+
+Search integrations can inspect `propertyhive_template_set_map_search_state`, adjust card facts with `propertyhive_template_set_search_facts`, adjust status badges with `propertyhive_template_set_search_badges`, and opt a promotion into a full grid row with `propertyhive_template_set_promo_grid_span`.
+
 == Changelog ==
 
 = 2.2.5 - 2026-06-18 =
