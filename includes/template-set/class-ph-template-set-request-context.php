@@ -44,6 +44,25 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
+	 * Is this the main, Property Hive-owned search-results request?
+	 *
+	 * @return bool
+	 */
+	public static function is_search_results_request() {
+		if ( ! self::is_enabled() || ! function_exists( 'is_search_results' ) || ! is_search_results() ) {
+			return false;
+		}
+
+		if ( class_exists( 'PH_Template_Loader' ) && ! PH_Template_Loader::owns_search_results_template() ) {
+			return false;
+		}
+
+		global $wp_query;
+
+		return $wp_query instanceof WP_Query && $wp_query->is_main_query();
+	}
+
+	/**
 	 * Get the selected detail template.
 	 *
 	 * @return string
@@ -119,6 +138,13 @@ class PH_Template_Set_Request_Context {
 			return add_query_arg( PH_Template_Set::MODULE_QUERY_ARG, $template, $archive_url );
 		}
 
+		if ( self::is_search_results_request() ) {
+			$archive_url = remove_query_arg(
+				array_merge( self::get_preview_clear_query_args(), array( 'paged', 'page' ) ),
+				self::get_current_url()
+			);
+		}
+
 		return add_query_arg( PH_Template_Set::SEARCH_QUERY_ARG, $template, $archive_url );
 	}
 
@@ -185,7 +211,7 @@ class PH_Template_Set_Request_Context {
 		}
 
 		$is_detail = is_property();
-		$is_search = is_post_type_archive( 'property' );
+		$is_search = self::is_search_results_request();
 
 		if ( ! $is_detail && ! $is_search ) {
 			return;
@@ -282,7 +308,7 @@ class PH_Template_Set_Request_Context {
 	 * @return bool
 	 */
 	public static function is_module_preview() {
-		if ( ! is_post_type_archive( 'property' ) ) {
+		if ( ! self::is_search_results_request() ) {
 			return false;
 		}
 
@@ -295,7 +321,7 @@ class PH_Template_Set_Request_Context {
 	 * @return bool
 	 */
 	public static function is_search_preview() {
-		if ( ! is_post_type_archive( 'property' ) ) {
+		if ( ! self::is_search_results_request() ) {
 			return false;
 		}
 
@@ -429,7 +455,7 @@ class PH_Template_Set_Request_Context {
 			return self::get_detail_template();
 		}
 
-		if ( is_post_type_archive( 'property' ) ) {
+		if ( self::is_search_results_request() ) {
 			if ( self::is_module_preview() ) {
 				return self::get_module_template();
 			}
@@ -451,7 +477,7 @@ class PH_Template_Set_Request_Context {
 			return false;
 		}
 
-		return is_property() || is_post_type_archive( 'property' );
+		return is_property() || self::is_search_results_request();
 	}
 
 	/**
@@ -567,7 +593,11 @@ class PH_Template_Set_Request_Context {
 	 * @return string
 	 */
 	public static function get_template_switch_url( $query_arg, $template ) {
-		$url = remove_query_arg( self::get_preview_clear_query_args(), self::get_current_url() );
+		$clear = self::get_preview_clear_query_args();
+		if ( PH_Template_Set::SEARCH_QUERY_ARG === $query_arg ) {
+			$clear = array_merge( $clear, array( 'paged', 'page' ) );
+		}
+		$url = remove_query_arg( $clear, self::get_current_url() );
 
 		return add_query_arg( $query_arg, sanitize_title( $template ), $url );
 	}
@@ -704,44 +734,141 @@ class PH_Template_Set_Request_Context {
 	 * @return string
 	 */
 	public static function get_search_view() {
-		$view     = isset( $_GET['ph_view'] ) ? sanitize_title( wp_unslash( $_GET['ph_view'] ) ) : '';
-		$template = self::get_search_template();
+		$presentation = self::get_search_presentation();
+
+		return 'map-only' === $presentation['map_mode'] ? 'map' : $presentation['card_layout'];
+	}
+
+	/**
+	 * Resolve the current Map Search capability and request state.
+	 *
+	 * @return array
+	 */
+	public static function get_map_search_state() {
+		$available      = class_exists( 'PH_Map_Search' );
+		$usable         = $available && class_exists( 'PH_Template_Set' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-map-search' );
+		$settings       = get_option( 'propertyhive_map_search', array() );
+		$format         = is_array( $settings ) && isset( $settings['format'] ) ? sanitize_key( $settings['format'] ) : '';
+		$requested_view = isset( $_GET['view'] ) && is_scalar( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '';
+
+		if ( ! in_array( $format, array( 'view', 'split' ), true ) ) {
+			$format = '';
+		}
+
+		$manages_archive = $usable && '' !== $format;
+		$shows_real_map  = $manages_archive && (
+			( 'view' === $format && 'map' === $requested_view )
+			|| ( 'split' === $format && in_array( $requested_view, array( '', 'map' ), true ) )
+		);
+		$shows_results   = ! ( 'view' === $format && 'map' === $requested_view && $usable );
+		$fallback_reason = '';
+
+		if ( ! $available ) {
+			$fallback_reason = 'unavailable';
+		} elseif ( ! $usable ) {
+			$fallback_reason = 'unusable';
+		} elseif ( '' === $format ) {
+			$fallback_reason = 'unconfigured';
+		} elseif ( ! $shows_real_map ) {
+			$fallback_reason = 'list-state';
+		}
+
+		$state = array(
+			'available'         => $available,
+			'usable'            => $usable,
+			'format'            => $format,
+			'requested_view'    => $requested_view,
+			'manages_archive'   => $manages_archive,
+			'shows_real_map'    => $shows_real_map,
+			'shows_results'     => $shows_results,
+			'shows_view_switch' => $usable && 'view' === $format,
+			'fallback_reason'   => $fallback_reason,
+		);
+
+		$state = apply_filters( 'propertyhive_template_set_map_search_state', $state );
+		$state = wp_parse_args( is_array( $state ) ? $state : array(), array(
+			'available'         => false,
+			'usable'            => false,
+			'format'            => '',
+			'requested_view'    => '',
+			'manages_archive'   => false,
+			'shows_real_map'    => false,
+			'shows_results'     => true,
+			'shows_view_switch' => false,
+			'fallback_reason'   => 'unavailable',
+		) );
+
+		foreach ( array( 'available', 'usable', 'manages_archive', 'shows_real_map', 'shows_results', 'shows_view_switch' ) as $key ) {
+			$state[ $key ] = (bool) $state[ $key ];
+		}
+		$state['format']          = in_array( $state['format'], array( 'view', 'split' ), true ) ? $state['format'] : '';
+		$state['requested_view']  = sanitize_key( $state['requested_view'] );
+		$state['fallback_reason'] = in_array( $state['fallback_reason'], array( '', 'unavailable', 'unusable', 'unconfigured', 'list-state' ), true ) ? $state['fallback_reason'] : '';
+
+		return $state;
+	}
+
+	/**
+	 * Pure search presentation resolver.
+	 *
+	 * @param string $template          Search template.
+	 * @param string $saved_layout      Saved card layout.
+	 * @param string $requested_ph_view Template Set card layout request.
+	 * @param string $requested_map_view Map Search view request.
+	 * @param array  $map_state         Normalized Map Search state.
+	 * @return array
+	 */
+	public static function resolve_search_presentation( $template, $saved_layout, $requested_ph_view, $requested_map_view, $map_state ) {
+		$manifest    = PH_Template_Set_Catalog::get_search_template_manifest( $template );
+		$card_layout = in_array( $saved_layout, $manifest['supported_layouts'], true ) ? $saved_layout : $manifest['default_layout'];
+		$ph_view     = in_array( $requested_ph_view, array( 'grid', 'list' ), true ) ? $requested_ph_view : '';
+		$map_view    = sanitize_key( $requested_map_view );
+		$format      = isset( $map_state['format'] ) && in_array( $map_state['format'], array( 'view', 'split' ), true ) ? $map_state['format'] : '';
+		$usable      = ! empty( $map_state['usable'] );
+
+		if ( '' !== $ph_view ) {
+			$card_layout = $ph_view;
+		}
+
+		$map_mode = 'none';
+		$has_map  = false;
+
+		if ( $usable && 'view' === $format ) {
+			if ( 'map' === $map_view ) {
+				$map_mode = 'map-only';
+				$has_map  = true;
+			} else {
+				$map_mode = 'toggle-list';
+			}
+		} elseif ( $usable && 'split' === $format && in_array( $map_view, array( '', 'map' ), true ) ) {
+			$map_mode    = 'split';
+			$has_map     = true;
+			$card_layout = 'list';
+		}
+
+		return array(
+			'card_layout' => 'list' === $card_layout ? 'list' : 'grid',
+			'map_mode'    => $map_mode,
+			'has_map'     => $has_map,
+		);
+	}
+
+	/**
+	 * Get the current normalized search presentation.
+	 *
+	 * @return array
+	 */
+	public static function get_search_presentation() {
 		$settings = PH_Template_Set_Settings::get_settings();
+		$ph_view  = isset( $_GET['ph_view'] ) && is_scalar( $_GET['ph_view'] ) ? sanitize_key( wp_unslash( $_GET['ph_view'] ) ) : '';
+		$map_view = isset( $_GET['view'] ) && is_scalar( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '';
 
-		$map_search_view = isset( $_GET['view'] ) ? sanitize_title( wp_unslash( $_GET['view'] ) ) : '';
-
-		if (
-			'map' === $map_search_view &&
-			class_exists( 'PH_Map_Search' ) &&
-			class_exists( 'PH_Template_Set' ) &&
-			method_exists( 'PH_Template_Set', 'is_add_on_usable' ) &&
-			PH_Template_Set::is_add_on_usable( 'propertyhive-map-search' )
-		) {
-			return 'map';
-		}
-
-		if ( 'compact-list-search-results' === $template ) {
-			return 'list';
-		}
-
-		if ( isset( PH_Template_Set_Options::get_search_layouts()[ $view ] ) ) {
-			return $view;
-		}
-
-		$view = isset( $settings['template_set_search_layout'] ) ? sanitize_title( $settings['template_set_search_layout'] ) : '';
-
-		if ( isset( PH_Template_Set_Options::get_search_layouts()[ $view ] ) ) {
-			return $view;
-		}
-
-		if ( 'brand-led-agency-search-results' === $template ) {
-			return 'grid';
-		}
-
-		if ( 'map-led-search-results' === $template ) {
-			return 'map';
-		}
-
-		return 'list';
+		return self::resolve_search_presentation(
+			self::get_search_template(),
+			isset( $settings['template_set_search_layout'] ) ? sanitize_key( $settings['template_set_search_layout'] ) : '',
+			$ph_view,
+			$map_view,
+			self::get_map_search_state()
+		);
 	}
 }
