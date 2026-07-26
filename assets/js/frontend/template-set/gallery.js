@@ -525,7 +525,7 @@
 			return true;
 		}
 
-		return !!event.target.closest('a, button, input, select, textarea, label, [role="button"], [data-add-to-shortlist], [data-ph-card-gallery-prev], [data-ph-card-gallery-next]');
+		return !!event.target.closest('a, button, input, select, textarea, label, iframe, audio, video, [contenteditable], [role="button"], [data-fancybox], [data-add-to-shortlist], [data-ph-card-gallery-prev], [data-ph-card-gallery-next], .promo');
 	}
 
 	function initSearchCardLinks() {
@@ -599,10 +599,20 @@
 		});
 	}
 
-	function init(nextConfig) {
+	function findWithin(root, selector) {
+		var matches = [];
+
+		if (root && root.nodeType === 1 && root.matches(selector)) {
+			matches.push(root);
+		}
+
+		return matches.concat(Array.prototype.slice.call((root || document).querySelectorAll(selector)));
+	}
+
+	function init(nextConfig, root) {
 		config = nextConfig || {};
-		document.querySelectorAll('[data-ph-template-gallery]').forEach(initGallery);
-		document.querySelectorAll('[data-ph-card-gallery-data]').forEach(initCardGallery);
+		findWithin(root, '[data-ph-template-gallery]').forEach(initGallery);
+		findWithin(root, '[data-ph-card-gallery-data]').forEach(initCardGallery);
 		initSearchCardLinks();
 		initKeyboardControls();
 	}

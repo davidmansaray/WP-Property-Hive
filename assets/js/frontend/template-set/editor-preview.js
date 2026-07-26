@@ -107,6 +107,7 @@
 		},
 		template_set_search_layout: function (value) {
 			setSearchOption('ph-search-view-', value);
+			setSearchOption('ph-search-layout-', value);
 		},
 		template_set_search_card_size: function (value) {
 			setSearchOption('ph-search-card-size-', value);
