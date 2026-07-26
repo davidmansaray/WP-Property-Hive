@@ -50,7 +50,9 @@ get_header( 'propertyhive' ); global $wpdb; ?>
 
                     <?php while ( have_posts() ) : the_post(); ?>
 
+                        <?php do_action( 'propertyhive_before_main_search_result_render', get_the_ID() ); ?>
                         <?php ph_get_template_part( 'content', 'property' ); ?>
+                        <?php do_action( 'propertyhive_after_main_search_result_render', get_the_ID() ); ?>
 
                     <?php endwhile; // end of the loop. ?>
 

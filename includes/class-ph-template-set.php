@@ -40,6 +40,27 @@ class PH_Template_Set {
 	 */
 	private static $rendering_module = false;
 
+	/**
+	 * Private render contexts prevent secondary loops inheriting search cards.
+	 *
+	 * @var array
+	 */
+	private static $search_render_contexts = array();
+
+	/**
+	 * Configured custom field keyed by its result-hook priority.
+	 *
+	 * @var array
+	 */
+	private static $search_custom_fields = array();
+
+	/**
+	 * Whether saved card hooks were prepared in this Infinite Scroll request.
+	 *
+	 * @var bool
+	 */
+	private static $infinite_search_hooks_prepared = false;
+
 	use PH_Template_Set_Search;
 	use PH_Template_Set_Preview;
 	use PH_Template_Set_Detail;
@@ -58,13 +79,17 @@ class PH_Template_Set {
 		add_filter( 'loop_search_results_columns', array( __CLASS__, 'search_result_columns' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'preserve_template_preview_on_property_links' ), 20, 2 );
 		add_filter( 'propertyhive_search_form_fields', array( __CLASS__, 'prepare_search_form_fields' ), 20 );
+		add_filter( 'propertyhive_search_form_fields_after_default', array( __CLASS__, 'normalize_map_search_hidden_fields' ), 20, 2 );
 		add_filter( 'propertyhive_taxonomy_hide_empty_args', array( __CLASS__, 'filter_search_taxonomy_empty_check_args' ), 20, 3 );
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'print_style_variables' ), 20 );
 		add_action( 'init', array( __CLASS__, 'register_shortcodes' ) );
+		add_action( 'init', array( __CLASS__, 'sanitize_map_search_request_state' ), 1 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_catalog_preview_request' ), 1 );
 		add_action( 'wp', array( __CLASS__, 'prepare_module_preview' ) );
+		add_action( 'wp', array( __CLASS__, 'normalize_configured_search_custom_fields' ), 11 );
+		add_action( 'wp', array( __CLASS__, 'suppress_infinite_scroll_when_unsafe' ), 19 );
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_layout' ) );
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_preview' ) );
 		add_action( 'admin_bar_menu', array( __CLASS__, 'add_admin_bar_menu' ), 80 );
@@ -76,16 +101,23 @@ class PH_Template_Set {
 		add_action( 'propertyhive_after_main_content', array( __CLASS__, 'close_search_wrapper' ), 9 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'prepare_search_result_cards' ), 1 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_module_preview' ), 12 );
-		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_search_template_intro' ), 18 );
+		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_search_template_intro' ), 5 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_search_tools' ), 25 );
-		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_map_panel' ), 35 );
+		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_map_dependency_notice' ), 35 );
+		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_map_fallback_panel' ), 36 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_demo_search_results' ), 45 );
 		add_filter( 'propertyhive_show_results', array( __CLASS__, 'maybe_hide_results_for_module_preview' ), 20 );
 		add_filter( 'propertyhive_show_page_title', array( __CLASS__, 'maybe_hide_title_for_module_preview' ), 20 );
 
 		add_action( 'propertyhive_before_search_results_loop_item_title', array( __CLASS__, 'render_card_badges' ), 5 );
 		add_action( 'propertyhive_before_search_results_loop_item_title', array( __CLASS__, 'render_card_gallery_data' ), 15 );
+		add_action( 'propertyhive_before_search_results_loop_item_title', array( __CLASS__, 'render_missing_card_image_label' ), 99 );
 		add_action( 'propertyhive_after_search_results_loop_item', array( __CLASS__, 'render_card_footer' ), 5 );
+		add_action( 'propertyhive_before_main_search_result_render', array( __CLASS__, 'begin_main_search_result_render' ) );
+		add_action( 'propertyhive_after_main_search_result_render', array( __CLASS__, 'end_main_search_result_render' ) );
+		add_action( 'propertyhive_before_get_template_part_render', array( __CLASS__, 'begin_infinite_search_result_render' ), 10, 3 );
+		add_action( 'propertyhive_after_get_template_part_render', array( __CLASS__, 'end_infinite_search_result_render' ), 10, 3 );
+		add_filter( 'propertyhive_save_search_params', array( __CLASS__, 'filter_save_search_params' ) );
 
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_detail_template_kicker' ), 3 );
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_detail_highlights' ), 25 );
@@ -187,6 +219,10 @@ class PH_Template_Set {
 
 	public static function get_search_layouts() {
 		return PH_Template_Set_Options::get_search_layouts();
+	}
+
+	public static function get_search_card_layouts() {
+		return PH_Template_Set_Options::get_search_card_layouts();
 	}
 
 	public static function get_search_card_sizes() {

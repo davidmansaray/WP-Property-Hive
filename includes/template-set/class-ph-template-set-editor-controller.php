@@ -51,9 +51,10 @@ class PH_Template_Set_Editor_Controller {
 					PH_Template_Set_Search_Form_Editor::render_sidebar_section();
 
 					self::render_template_editor_section_start( __( 'Search result cards', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_search_layout', __( 'Results layout', 'propertyhive' ), PH_Template_Set_Options::get_search_layouts(), PH_Template_Set_Request_Context::get_search_view() );
+					$presentation = PH_Template_Set_Request_Context::get_search_presentation();
+					self::render_template_editor_select( 'template_set_search_layout', __( 'Results layout', 'propertyhive' ), PH_Template_Set_Options::get_search_card_layouts(), $presentation['card_layout'] );
 					self::render_template_editor_select( 'template_set_search_card_size', __( 'Card size', 'propertyhive' ), PH_Template_Set_Options::get_search_card_sizes(), $settings['template_set_search_card_size'] );
-					self::render_template_editor_select( 'template_set_search_grid_columns', __( 'Cards per row', 'propertyhive' ), PH_Template_Set_Options::get_search_grid_column_options(), $settings['template_set_search_grid_columns'] );
+					self::render_template_editor_select( 'template_set_search_grid_columns', __( 'Cards per row', 'propertyhive' ), PH_Template_Set_Options::get_search_grid_column_options(), PH_Template_Set_Settings::get_search_grid_columns_for_template( PH_Template_Set_Request_Context::get_search_template(), $settings ) );
 					self::render_template_editor_select( 'template_set_image_style', __( 'Photo shape', 'propertyhive' ), PH_Template_Set_Options::get_image_styles(), $settings['template_set_image_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch contact details', 'propertyhive' ), $settings['template_set_show_branch'] );
 					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property labels', 'propertyhive' ), $settings['template_set_show_badges'] );
@@ -61,7 +62,7 @@ class PH_Template_Set_Editor_Controller {
 				} else {
 					self::render_template_editor_hidden( 'template_set_search_layout', $settings['template_set_search_layout'] );
 					self::render_template_editor_hidden( 'template_set_search_card_size', $settings['template_set_search_card_size'] );
-					self::render_template_editor_hidden( 'template_set_search_grid_columns', $settings['template_set_search_grid_columns'] );
+					self::render_template_editor_hidden( 'template_set_search_grid_columns', PH_Template_Set_Settings::get_search_grid_columns_for_template( PH_Template_Set_Request_Context::get_search_template(), $settings ) );
 					self::render_template_editor_hidden( 'template_set_image_style', $settings['template_set_image_style'] );
 					self::render_template_editor_hidden( 'template_set_show_branch', $settings['template_set_show_branch'] );
 					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
@@ -87,7 +88,7 @@ class PH_Template_Set_Editor_Controller {
 	 * @return string
 	 */
 	public static function get_template_editor_context() {
-		return is_post_type_archive( 'property' ) ? 'search' : 'detail';
+		return PH_Template_Set_Request_Context::is_search_results_request() ? 'search' : 'detail';
 	}
 
 	/**
@@ -249,7 +250,8 @@ class PH_Template_Set_Editor_Controller {
 	 * @return array
 	 */
 	public static function get_script_data() {
-		$settings = PH_Template_Set_Settings::get_settings();
+		$settings  = PH_Template_Set_Settings::get_settings();
+		$map_state = PH_Template_Set_Request_Context::get_map_search_state();
 
 		return array(
 			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
@@ -259,6 +261,11 @@ class PH_Template_Set_Editor_Controller {
 			'settings'            => PH_Template_Set_Settings::get_public_settings( $settings ),
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'editorSidebarLayout' => self::get_editor_sidebar_layout(),
+			'mapSearchState'      => $map_state,
+			'requiresFullPreviewNavigation' => ( $map_state['available'] && $map_state['usable'] )
+				|| ( class_exists( 'PH_Location_Autocomplete' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-location-autocomplete' ) )
+				|| ( class_exists( 'PH_Radial_Search' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-radial-search' ) )
+				|| ( function_exists( 'PHIS' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-infinite-scroll' ) ),
 			'labels'              => array(
 				'ready'             => __( 'Ready', 'propertyhive' ),
 				'changed'           => __( 'Unsaved changes', 'propertyhive' ),

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 global $propertyhive;
 
 ?>
-<p class="propertyhive-result-count">
+<p class="propertyhive-result-count" role="status" aria-live="polite" aria-atomic="true">
 	<?php
 	if ( 1 == $total ) {
 		_e( 'Showing the single result', 'propertyhive' );

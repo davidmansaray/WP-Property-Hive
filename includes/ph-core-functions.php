@@ -71,7 +71,12 @@ function ph_get_template_part( $slug, $name = '' ) {
     $template = apply_filters( 'ph_get_template_part', $template, $slug, $name );
 
     if ( $template ) {
-        load_template( $template, false );
+        do_action( 'propertyhive_before_get_template_part_render', $template, $slug, $name );
+        try {
+            load_template( $template, false );
+        } finally {
+            do_action( 'propertyhive_after_get_template_part_render', $template, $slug, $name );
+        }
     }
 }
 

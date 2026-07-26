@@ -15,7 +15,7 @@ trait PH_Template_Set_Property_Data {
 	 * @return bool
 	 */
 	private static function should_render_card_extras() {
-		return ( self::is_enabled() && ! is_property() ) || self::$rendering_module;
+		return self::$rendering_module || self::is_search_card_rendering();
 	}
 
 	/**
@@ -77,22 +77,25 @@ trait PH_Template_Set_Property_Data {
 
 		if ( $property->bedrooms > 0 ) {
 			$facts[] = array(
-				'label' => __( 'Beds', 'propertyhive' ),
+				'label' => _n( 'bed', 'beds', absint( $property->bedrooms ), 'propertyhive' ),
 				'value' => $property->bedrooms,
+				'quantity' => true,
 			);
 		}
 
 		if ( $property->bathrooms > 0 ) {
 			$facts[] = array(
-				'label' => __( 'Baths', 'propertyhive' ),
+				'label' => _n( 'bath', 'baths', absint( $property->bathrooms ), 'propertyhive' ),
 				'value' => $property->bathrooms,
+				'quantity' => true,
 			);
 		}
 
 		if ( $property->reception_rooms > 0 ) {
 			$facts[] = array(
-				'label' => __( 'Receptions', 'propertyhive' ),
+				'label' => _n( 'reception', 'receptions', absint( $property->reception_rooms ), 'propertyhive' ),
 				'value' => $property->reception_rooms,
+				'quantity' => true,
 			);
 		}
 
@@ -131,6 +134,8 @@ trait PH_Template_Set_Property_Data {
 			);
 		}
 
-		return array_slice( array_filter( $facts ), 0, absint( $limit ) );
+		$facts = apply_filters( 'propertyhive_template_set_search_facts', array_filter( $facts ), $property, self::get_search_template(), $limit );
+
+		return array_slice( is_array( $facts ) ? array_filter( $facts ) : array(), 0, absint( $limit ) );
 	}
 }
