@@ -32,12 +32,48 @@ class PH_Template_Set_Assets {
 			return $styles;
 		}
 
-		$styles['propertyhive-template-set'] = array(
-			'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/template-set.css',
-			'deps'    => array( 'propertyhive-general' ),
-			'version' => self::asset_version( 'assets/css/template-set.css' ),
-			'media'   => 'all',
-		);
+		$base_url       = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/';
+		$search_request = PH_Template_Set_Request_Context::is_search_results_request();
+		$search_template = $search_request ? PH_Template_Set_Request_Context::get_search_template() : '';
+		$legacy_search   = $search_request && 'portal-style-search-results' === $search_template;
+
+		if ( ! $search_request || $legacy_search || PH_Template_Set_Request_Context::is_template_editor_active() ) {
+			$styles['propertyhive-template-set'] = array(
+				'src'     => $base_url . 'template-set.css',
+				'deps'    => array( 'propertyhive-general' ),
+				'version' => self::asset_version( 'assets/css/template-set.css' ),
+				'media'   => 'all',
+			);
+		}
+
+		if ( $search_request && ! $legacy_search ) {
+			$structure_dependencies = array( 'propertyhive-general' );
+			if ( PH_Template_Set_Request_Context::is_template_editor_active() ) {
+				$structure_dependencies[] = 'propertyhive-template-set';
+			}
+
+			$styles['propertyhive-template-set-search-structure'] = array(
+				'src'     => $base_url . 'template-set-search-structure.css',
+				'deps'    => $structure_dependencies,
+				'version' => self::asset_version( 'assets/css/template-set-search-structure.css' ),
+				'media'   => 'all',
+			);
+
+			if ( apply_filters( 'propertyhive_template_set_enqueue_search_fallbacks', true ) ) {
+				$fallbacks = array(
+					'propertyhive-template-set-search-fallbacks' => array(
+						'src'     => $base_url . 'template-set-search-fallbacks.css',
+						'deps'    => array( 'propertyhive-template-set-search-structure' ),
+						'version' => self::asset_version( 'assets/css/template-set-search-fallbacks.css' ),
+						'media'   => 'all',
+					),
+				);
+				$fallbacks = apply_filters( 'propertyhive_template_set_search_styles', $fallbacks );
+				if ( is_array( $fallbacks ) ) {
+					$styles = array_merge( $styles, $fallbacks );
+				}
+			}
+		}
 
 		return $styles;
 	}
@@ -67,6 +103,10 @@ class PH_Template_Set_Assets {
 			'propertyhive-template-set-search-form-builder' => array(
 				'path' => 'assets/js/frontend/template-set/search-form-builder.js',
 				'deps' => array( 'propertyhive-template-set-editor-sidebar' ),
+			),
+			'propertyhive-template-set-search-map-rail'     => array(
+				'path' => 'assets/js/frontend/template-set/search-map-rail.js',
+				'deps' => array(),
 			),
 		);
 
@@ -98,7 +138,7 @@ class PH_Template_Set_Assets {
 	 * @return bool
 	 */
 	private static function should_enqueue_frontend_assets( $include_modules = false ) {
-		if ( is_property() || is_post_type_archive( 'property' ) ) {
+		if ( is_property() || PH_Template_Set_Request_Context::is_search_results_request() ) {
 			return PH_Template_Set_Request_Context::is_enabled() || PH_Template_Set_Request_Context::can_show_template_switcher();
 		}
 
@@ -133,6 +173,6 @@ class PH_Template_Set_Assets {
 			$accent = '#b7791f';
 		}
 
-		echo '<style id="propertyhive-template-set-vars">:root,.ph-template-set,.ph-template-set-active{--ph-template-brand:' . esc_html( $brand ) . ';--ph-template-accent:' . esc_html( $accent ) . ';}</style>' . "\n";
+		echo '<style id="propertyhive-template-set-vars">.ph-template-set{--ph-template-brand:' . esc_html( $brand ) . ';--ph-template-accent:' . esc_html( $accent ) . ';}</style>' . "\n";
 	}
 }
