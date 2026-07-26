@@ -270,8 +270,71 @@ class PH_Template_Set_Catalog {
 	 */
 	public static function get_search_templates() {
 		return apply_filters( 'propertyhive_template_set_search_templates', array(
-			'portal-style-search-results'      => __( 'Portal-Style Search Results', 'propertyhive' ),
+			'portal-style-search-results' => __( 'Portal-Style Search Results', 'propertyhive' ),
+			'portal-grid-search-results'  => __( 'Portal Grid', 'propertyhive' ),
+			'map-led-search-results'      => __( 'Map Atlas', 'propertyhive' ),
 		) );
+	}
+
+	/**
+	 * Get normalized search-template manifests.
+	 *
+	 * @return array
+	 */
+	public static function get_search_template_manifests() {
+		$templates = self::get_search_templates();
+		$manifests = array();
+
+		foreach ( $templates as $slug => $label ) {
+			$manifests[ $slug ] = self::get_search_template_manifest( $slug );
+		}
+
+		$manifests = apply_filters( 'propertyhive_template_set_search_template_manifests', $manifests );
+
+		return is_array( $manifests ) ? $manifests : array();
+	}
+
+	/**
+	 * Get one normalized search-template manifest.
+	 *
+	 * @param string $slug Search template slug.
+	 * @return array
+	 */
+	public static function get_search_template_manifest( $slug ) {
+		$slug      = sanitize_title( $slug );
+		$templates = self::get_search_templates();
+		$defaults  = array(
+			'label'             => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
+			'default_layout'    => 'grid',
+			'default_columns'   => 3,
+			'supported_layouts' => array( 'grid', 'list' ),
+			'fallback_slug'     => 'portal-style-search-results',
+			'enhanced_by'       => array(),
+			'preview_reload'    => false,
+		);
+		$manifest  = $defaults;
+
+		if ( in_array( $slug, array( 'portal-style-search-results', 'portal-grid-search-results' ), true ) ) {
+			$manifest['fallback_slug'] = 'portal-style-search-results';
+		} elseif ( 'map-led-search-results' === $slug ) {
+			$manifest['enhanced_by']    = array( 'propertyhive-map-search' );
+			$manifest['preview_reload'] = true;
+		}
+
+		$manifest = apply_filters( 'propertyhive_template_set_search_template_manifest', $manifest, $slug );
+		$manifest = is_array( $manifest ) ? wp_parse_args( $manifest, $defaults ) : $defaults;
+
+		$manifest['default_layout'] = in_array( $manifest['default_layout'], array( 'grid', 'list' ), true ) ? $manifest['default_layout'] : 'grid';
+		$manifest['default_columns'] = in_array( absint( $manifest['default_columns'] ), array( 2, 3, 4 ), true ) ? absint( $manifest['default_columns'] ) : 3;
+		$manifest['supported_layouts'] = array_values( array_intersect( (array) $manifest['supported_layouts'], array( 'grid', 'list' ) ) );
+		if ( empty( $manifest['supported_layouts'] ) ) {
+			$manifest['supported_layouts'] = array( 'grid', 'list' );
+		}
+		$manifest['fallback_slug']  = isset( $templates[ $manifest['fallback_slug'] ] ) ? sanitize_title( $manifest['fallback_slug'] ) : self::get_default_search_template();
+		$manifest['enhanced_by']    = array_values( array_filter( array_map( 'sanitize_key', (array) $manifest['enhanced_by'] ) ) );
+		$manifest['preview_reload'] = (bool) $manifest['preview_reload'];
+
+		return $manifest;
 	}
 
 	/**
@@ -359,10 +422,15 @@ class PH_Template_Set_Catalog {
 		}
 
 		foreach ( $search_templates as $slug => $label ) {
+			$manifest = self::get_search_template_manifest( $slug );
 			$catalog[ $slug ] = array(
-				'type'  => 'search',
-				'group' => __( 'Search result templates', 'propertyhive' ),
-				'label' => $label,
+				'type'              => 'search',
+				'group'             => __( 'Search result templates', 'propertyhive' ),
+				'label'             => $label,
+				'default_layout'    => $manifest['default_layout'],
+				'supported_layouts' => $manifest['supported_layouts'],
+				'enhanced_by'       => $manifest['enhanced_by'],
+				'preview_reload'    => $manifest['preview_reload'],
 			);
 			$typed_catalog[ $slug ] = $catalog[ $slug ];
 			$allowed_slugs[ $slug ] = true;

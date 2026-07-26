@@ -57,10 +57,18 @@ class PH_Template_Set_Options {
 	 * @return array
 	 */
 	public static function get_search_layouts() {
+		return apply_filters( 'propertyhive_template_set_search_layouts', self::get_search_card_layouts() );
+	}
+
+	/**
+	 * Search card layouts. Map state belongs to the Map Search add-on.
+	 *
+	 * @return array
+	 */
+	public static function get_search_card_layouts() {
 		return array(
 			'list' => __( 'List', 'propertyhive' ),
 			'grid' => __( 'Grid', 'propertyhive' ),
-			'map'  => __( 'Map', 'propertyhive' ),
 		);
 	}
 

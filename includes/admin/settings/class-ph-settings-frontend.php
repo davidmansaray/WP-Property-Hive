@@ -1457,10 +1457,31 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
         $template_set_settings = PH_Template_Set::get_settings();
         $settings         = array();
-        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'Property Templates include standard sales detail and portal-style search results examples. Use the preview links or the Visual Editor to review either example in context.', 'propertyhive' ) . '</p><ul>';
+        $map_state        = PH_Template_Set_Request_Context::get_map_search_state();
+        $map_messages     = array(
+            'unavailable'  => __( 'Map Atlas remains selectable and will use its normal listing fallback until Map Search is installed and active.', 'propertyhive' ),
+            'unusable'     => __( 'Map Search is installed but is not currently licensed for use. Map Atlas will use its normal listing fallback.', 'propertyhive' ),
+            'unconfigured' => __( 'Map Search is available but its view switcher or split format is not configured. Map Atlas will use its normal listing fallback.', 'propertyhive' ),
+            'list-state'   => __( 'Map Search is ready. Map Atlas can use the configured list/map view.', 'propertyhive' ),
+        );
+        if ( $map_state['usable'] && 'split' === $map_state['format'] ) {
+            $map_status = __( 'Map Search is ready in split-map format.', 'propertyhive' );
+        } elseif ( $map_state['usable'] && 'view' === $map_state['format'] ) {
+            $map_status = __( 'Map Search is ready with its list/map view switcher.', 'propertyhive' );
+        } else {
+            $map_status = isset( $map_messages[ $map_state['fallback_reason'] ] ) ? $map_messages[ $map_state['fallback_reason'] ] : $map_messages['unavailable'];
+        }
+        $map_status_html = esc_html( $map_status );
+        if ( $map_state['available'] ) {
+            $map_status_html .= ' <a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=mapsearch' ) ) . '">' . esc_html__( 'Map Search settings', 'propertyhive' ) . '</a>';
+        }
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'Keep Portal-Style Search Results for the existing presentation, choose Portal Grid for an image-led listing, or use Map Atlas for a location-led experience. All three keep Property Hive search controls and theme templates in charge.', 'propertyhive' ) . '</p><ul>';
 
         foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
             $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
+            if ( 'map-led-search-results' === $slug ) {
+                $catalog_html .= '<li class="description">' . wp_kses_post( $map_status_html ) . '</li>';
+            }
         }
 
         $catalog_html .= '</ul></div>';
@@ -1504,8 +1525,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'title'   => __( 'Search Listing Layout', 'propertyhive' ),
             'id'      => 'template_set_search_layout',
             'type'    => 'select',
-            'default' => isset( $current_settings['template_set_search_layout'] ) && '' !== $current_settings['template_set_search_layout'] ? $current_settings['template_set_search_layout'] : 'list',
-            'options' => PH_Template_Set::get_search_layouts(),
+            'default' => $template_set_settings['template_set_search_layout'],
+            'options' => PH_Template_Set::get_search_card_layouts(),
         );
 
         $settings[] = array(

@@ -63,6 +63,13 @@ class PH_Template_Set_Settings {
 			$settings['template_set_search_template'] = PH_Template_Set_Catalog::get_default_search_template();
 		}
 
+		$search_manifest = PH_Template_Set_Catalog::get_search_template_manifest( $settings['template_set_search_template'] );
+		$search_layout   = sanitize_title( $settings['template_set_search_layout'] );
+		if ( ! in_array( $search_layout, $search_manifest['supported_layouts'], true ) ) {
+			$search_layout = $search_manifest['default_layout'];
+		}
+		$settings['template_set_search_layout'] = $search_layout;
+
 		// Fold any retired Standard Sales overrides into Portal Split.
 		if ( isset( $settings['template_overrides']['standard-sales-detail'] ) && is_array( $settings['template_overrides']['standard-sales-detail'] ) ) {
 			$portal_overrides = isset( $settings['template_overrides']['conversion-first-sales-detail'] ) && is_array( $settings['template_overrides']['conversion-first-sales-detail'] )
@@ -76,6 +83,34 @@ class PH_Template_Set_Settings {
 		}
 
 		return $settings;
+	}
+
+	/**
+	 * Get the cards-per-row setting for one search template.
+	 *
+	 * Legacy global values remain assigned to the template that was active when
+	 * they were saved. Other templates use their catalogue default until edited.
+	 *
+	 * @param string $template_slug Search template slug.
+	 * @param array  $settings Optional settings.
+	 * @return int
+	 */
+	public static function get_search_grid_columns_for_template( $template_slug, $settings = null ) {
+		$settings      = is_array( $settings ) ? $settings : self::get_settings();
+		$template_slug = sanitize_title( $template_slug );
+		$available     = PH_Template_Set_Options::get_search_grid_column_options();
+		$per_template  = isset( $settings['template_set_search_grid_columns_by_template'] ) && is_array( $settings['template_set_search_grid_columns_by_template'] ) ? $settings['template_set_search_grid_columns_by_template'] : array();
+
+		if ( isset( $per_template[ $template_slug ] ) && isset( $available[ absint( $per_template[ $template_slug ] ) ] ) ) {
+			return absint( $per_template[ $template_slug ] );
+		}
+
+		if ( $template_slug === sanitize_title( $settings['template_set_search_template'] ) && isset( $available[ absint( $settings['template_set_search_grid_columns'] ) ] ) ) {
+			return absint( $settings['template_set_search_grid_columns'] );
+		}
+
+		$manifest = PH_Template_Set_Catalog::get_search_template_manifest( $template_slug );
+		return absint( $manifest['default_columns'] );
 	}
 
 	/**
@@ -195,11 +230,10 @@ class PH_Template_Set_Settings {
 			$search_template = PH_Template_Set_Catalog::get_default_search_template();
 		}
 
-		$search_layout = isset( $raw_settings['template_set_search_layout'] ) ? sanitize_title( $raw_settings['template_set_search_layout'] ) : sanitize_title( $current['template_set_search_layout'] );
-		if ( 'compact-list-search-results' === $search_template ) {
-			$search_layout = 'list';
-		} elseif ( ! isset( PH_Template_Set_Options::get_search_layouts()[ $search_layout ] ) ) {
-			$search_layout = '';
+		$search_manifest = PH_Template_Set_Catalog::get_search_template_manifest( $search_template );
+		$search_layout   = isset( $raw_settings['template_set_search_layout'] ) ? sanitize_title( $raw_settings['template_set_search_layout'] ) : sanitize_title( $current['template_set_search_layout'] );
+		if ( ! in_array( $search_layout, $search_manifest['supported_layouts'], true ) ) {
+			$search_layout = $search_manifest['default_layout'];
 		}
 
 		$gallery_layout = isset( $raw_settings['template_set_gallery_layout'] ) ? sanitize_title( $raw_settings['template_set_gallery_layout'] ) : sanitize_title( $current['template_set_gallery_layout'] );
@@ -235,7 +269,7 @@ class PH_Template_Set_Settings {
 			$search_card_size = 'standard';
 		}
 
-		$search_grid_columns = isset( $raw_settings['template_set_search_grid_columns'] ) ? absint( $raw_settings['template_set_search_grid_columns'] ) : absint( $current['template_set_search_grid_columns'] );
+		$search_grid_columns = isset( $raw_settings['template_set_search_grid_columns'] ) ? absint( $raw_settings['template_set_search_grid_columns'] ) : self::get_search_grid_columns_for_template( $search_template, $current );
 		if ( ! isset( PH_Template_Set_Options::get_search_grid_column_options()[ $search_grid_columns ] ) ) {
 			$search_grid_columns = 3;
 		}
@@ -288,6 +322,7 @@ class PH_Template_Set_Settings {
 			'template_set_button_style'               => $button_style,
 			'template_set_search_card_size'           => $search_card_size,
 			'template_set_search_grid_columns'        => $search_grid_columns,
+			'template_set_search_grid_columns_by_template' => isset( $current['template_set_search_grid_columns_by_template'] ) && is_array( $current['template_set_search_grid_columns_by_template'] ) ? $current['template_set_search_grid_columns_by_template'] : array(),
 			'template_set_image_style'                => $image_style,
 			'template_set_contact_card_style'         => $contact_card_style,
 			'template_set_show_branch'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
@@ -300,6 +335,7 @@ class PH_Template_Set_Settings {
 			'template_set_recommended_layout'         => $recommended_layout,
 			'template_set_recommended_image_size'     => $recommended_image_size,
 		);
+		$template_set_settings['template_set_search_grid_columns_by_template'][ $search_template ] = $search_grid_columns;
 
 		$template_scoped_keys = array_keys( PH_Template_Set_Catalog::get_detail_shared_controls() );
 		$editor_context       = isset( $raw_settings['template_set_editor_context'] ) ? sanitize_title( $raw_settings['template_set_editor_context'] ) : '';
