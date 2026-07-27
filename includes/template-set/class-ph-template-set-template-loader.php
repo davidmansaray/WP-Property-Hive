@@ -96,6 +96,17 @@ class PH_Template_Set_Template_Loader {
 
 			if ( ! $located ) {
 				foreach ( self::get_fallback_template_names( $type, $slug, $part ) as $fallback_template_name ) {
+					$located = locate_template(
+						array(
+							trailingslashit( $template_path ) . $fallback_template_name,
+							$fallback_template_name,
+						)
+					);
+
+					if ( $located ) {
+						break;
+					}
+
 					$template = $default_path . $fallback_template_name;
 
 					if ( file_exists( $template ) ) {

@@ -2,7 +2,7 @@
 /**
  * Template Set Property Context Panel.
  *
- * Override this template by copying it to yourtheme/propertyhive/template-set/detail/standard-sales-detail/context-panel.php
+ * Reachable only when a detail slug is registered via the `propertyhive_template_set_detail_templates` filter (e.g. lettings/new-homes); no shipped catalog slug renders this file.
  *
  * Available variables: $property, $template, $panel.
  *
