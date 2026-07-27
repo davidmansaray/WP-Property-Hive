@@ -151,7 +151,7 @@ trait PH_Template_Set_Detail {
 	 * templates without duplicating core document and enquiry controls.
 	 */
 	public static function prepare_detail_actions() {
-		if ( ! self::is_enabled() || self::is_demo_preview() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+		if ( ! self::is_enabled() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
 			return;
 		}
 
@@ -168,7 +168,7 @@ trait PH_Template_Set_Detail {
 	 * Output the prepared action surface after the single-property summary.
 	 */
 	public static function render_detail_actions() {
-		if ( ! self::is_enabled() || self::is_demo_preview() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+		if ( ! self::is_enabled() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
 			return;
 		}
 
