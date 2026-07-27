@@ -737,9 +737,21 @@
 	margin-inline: calc(50% - 50vw);
 }
 
-.ph-template-search.ph-search-template-map-led-search-results.ph-search-map-panel-suppressed:not(.ph-search-map-split) {
+.ph-template-search.ph-search-template-map-led-search-results:is(.ph-search-map-panel-suppressed, .ph-search-map-panel-absent):not(.ph-search-map-split) {
 	grid-template-columns: minmax(0, 1fr);
 	background: #fff;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results.ph-search-map-map-only:not(.ph-search-map-split) {
+	grid-template-columns: minmax(0, 1fr);
+	background: #fff;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results.ph-search-map-map-only:not(.ph-search-map-split) > .propertyhive-map-canvas-wrapper {
+	grid-column: 1 / -1;
+	grid-row: 3;
+	min-inline-size: 0;
+	inline-size: 100%;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .propertyhive-pagination {
@@ -791,6 +803,14 @@ body.ph-search-template-map-led-search-results {
 	grid-row: 5;
 }
 
+.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .no-results-message {
+	grid-column: 1;
+	grid-row: 5;
+	inline-size: auto;
+	margin: 0;
+	padding: 1.5rem;
+}
+
 .ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .ph-template-map-panel {
 	grid-column: 2;
 	grid-row: 3 / span 3;
@@ -823,12 +843,17 @@ body.ph-search-template-map-led-search-results {
 	min-inline-size: 8.5rem;
 }
 
-/* Borderless form cells — no focus ring; caret indicates focus. */
-.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form :is(input:not([type='submit']), select):is(:focus, :focus-visible),
-.ph-template-search.ph-search-template-map-led-search-results .property-search-form :is(input:not([type='submit']), select):is(:focus, :focus-visible) {
+/* Keep the borderless form cells while retaining a visible keyboard focus indicator. */
+.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form :is(input:not([type='submit']), select):focus,
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form :is(input:not([type='submit']), select):focus {
 	border: 0;
-	outline: none;
 	box-shadow: none;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form :is(input:not([type='submit']), select):focus-visible,
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form :is(input:not([type='submit']), select):focus-visible {
+	outline: 2px solid var(--ph-search-focus-color, currentColor);
+	outline-offset: 3px;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) ul.properties {
@@ -1023,11 +1048,26 @@ body.admin-bar .ph-template-search {
 	}
 
 	.ph-template-search .ph-template-results-toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		min-block-size: 0;
+		inline-size: 100%;
+		padding-block: 0.75rem;
 		padding-inline: 1rem;
 	}
 
+	.ph-template-search .ph-template-results-count {
+		flex: 1 1 100%;
+	}
+
+	.ph-template-search .ph-template-results-toolbar-actions {
+		inline-size: 100%;
+		justify-content: flex-start;
+	}
+
 	.ph-template-search .ph-template-ordering-label {
-		display: none;
+		display: inline-flex;
 	}
 
 	.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) {
@@ -1051,7 +1091,8 @@ body.admin-bar .ph-template-search {
 	}
 
 	.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .ph-template-map-dependency,
-	.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > ul.properties {
+	.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > ul.properties,
+	.ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .no-results-message {
 		order: 3;
 	}
 
@@ -1059,7 +1100,4 @@ body.admin-bar .ph-template-search {
 		order: 4;
 	}
 
-	.ph-template-search.ph-search-template-map-led-search-results .ph-template-results-toolbar {
-		display: none;
-	}
 }

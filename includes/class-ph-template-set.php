@@ -48,6 +48,13 @@ class PH_Template_Set {
 	private static $search_render_contexts = array();
 
 	/**
+	 * Contexts entered by generic content-property template-part renders.
+	 *
+	 * @var array
+	 */
+	private static $template_part_search_contexts = array();
+
+	/**
 	 * Configured custom field keyed by its result-hook priority.
 	 *
 	 * @var array
@@ -79,6 +86,7 @@ class PH_Template_Set {
 		add_filter( 'loop_search_results_columns', array( __CLASS__, 'search_result_columns' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'preserve_template_preview_on_property_links' ), 20, 2 );
 		add_filter( 'propertyhive_search_form_fields', array( __CLASS__, 'prepare_search_form_fields' ), 20 );
+		add_filter( 'propertyhive_search_form_fields_final', array( __CLASS__, 'prepare_search_form_fields' ), 20 );
 		add_filter( 'propertyhive_search_form_fields_after_default', array( __CLASS__, 'normalize_map_search_hidden_fields' ), 20, 2 );
 		add_filter( 'propertyhive_taxonomy_hide_empty_args', array( __CLASS__, 'filter_search_taxonomy_empty_check_args' ), 20, 3 );
 

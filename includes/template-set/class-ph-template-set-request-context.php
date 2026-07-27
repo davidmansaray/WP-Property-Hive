@@ -486,7 +486,17 @@ class PH_Template_Set_Request_Context {
 	 * @return bool
 	 */
 	public static function can_manage_template_set() {
-		return current_user_can( 'manage_options' ) || current_user_can( 'manage_propertyhive' );
+		/**
+		 * Filters the capability required to preview, edit, and save global
+		 * Template Set settings from the front end.
+		 *
+		 * @since 2.2.7
+		 *
+		 * @param string $capability Required capability.
+		 */
+		$capability = apply_filters( 'propertyhive_template_set_editor_capability', 'manage_options' );
+
+		return is_string( $capability ) && '' !== trim( $capability ) && current_user_can( $capability );
 	}
 
 	/**

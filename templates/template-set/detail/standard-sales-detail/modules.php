@@ -55,7 +55,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php endforeach; ?>
 			</div>
 			<?php if ( $office ) : ?>
-				<p class="ph-template-module-foot"><?php echo esc_html( sprintf( __( 'Available from %s.', 'propertyhive' ), $office ) ); ?></p>
+				<p class="ph-template-module-foot"><?php
+					echo esc_html( sprintf(
+						/* translators: %s: office name */
+						__( 'Available from %s.', 'propertyhive' ),
+						$office
+					) );
+				?></p>
 			<?php endif; ?>
 		</article>
 	<?php endif; ?>

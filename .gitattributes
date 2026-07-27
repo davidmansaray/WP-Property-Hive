@@ -13,6 +13,22 @@
 *.png binary
 *.jpg binary
 
-# Keep internal design prototypes and review artifacts out of release archives.
+# Keep repository metadata, local tooling, and internal design/review artifacts
+# out of release archives.
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.wp-env.json export-ignore
+/.github export-ignore
+/.github/** export-ignore
 /.design export-ignore
 /.design/** export-ignore
+/dev-tools export-ignore
+/dev-tools/** export-ignore
+/docs export-ignore
+/docs/** export-ignore
+/output export-ignore
+/output/** export-ignore
+/plans export-ignore
+/plans/** export-ignore
+/prototypes export-ignore
+/prototypes/** export-ignore

@@ -3,7 +3,6 @@
 /AGENTS.md
 /docs/
 prototypes/
-/.github/workflows/deploy-propertyhive.yml
 .playwright-cli/
 dev-tools/
 includes/divi-extensions/node_modules/

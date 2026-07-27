@@ -84,6 +84,10 @@ trait PH_Template_Set_Search {
 				$classes[] = 'ph-template-map-search-real-map';
 			}
 
+			if ( 'map-led-search-results' === self::get_search_template() && ! $presentation['has_map'] && ! self::should_render_map_fallback_panel() ) {
+				$classes[] = 'ph-search-map-panel-absent';
+			}
+
 			if ( '' !== $map_state['fallback_reason'] && self::can_show_template_switcher() ) {
 				$classes[] = 'ph-search-map-fallback-' . sanitize_html_class( $map_state['fallback_reason'] );
 			}
@@ -609,6 +613,10 @@ trait PH_Template_Set_Search {
 			$classes[] = 'ph-template-map-search-real-map';
 		}
 
+		if ( 'map-led-search-results' === self::get_search_template() && ! $presentation['has_map'] && ! self::should_render_map_fallback_panel() ) {
+			$classes[] = 'ph-search-map-panel-absent';
+		}
+
 		if ( in_array( $map_state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
 			$classes[] = 'ph-search-map-panel-suppressed';
 		}
@@ -834,20 +842,13 @@ trait PH_Template_Set_Search {
 	 * Render the decorative Map Atlas rail when Map Search is unavailable.
 	 */
 	public static function render_map_fallback_panel() {
-		if ( ! PH_Template_Set_Request_Context::is_search_results_request() || self::is_module_preview() || 'map-led-search-results' !== self::get_search_template() ) {
+		if ( ! self::should_render_map_fallback_panel() ) {
 			return;
 		}
 
 		$state = PH_Template_Set_Request_Context::get_map_search_state();
-		if ( $state['shows_real_map'] ) {
-			return;
-		}
-
-		if ( in_array( $state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
-			return;
-		}
-
 		global $wp_query;
+
 		$properties  = array();
 		$area_labels = array();
 		$positions   = array(
@@ -859,21 +860,19 @@ trait PH_Template_Set_Search {
 			array( 85, 45 ),
 		);
 
-		if ( $wp_query instanceof WP_Query && ! empty( $wp_query->posts ) ) {
-			foreach ( array_slice( $wp_query->posts, 0, count( $positions ) ) as $index => $post ) {
-				$property = new PH_Property( $post );
-				$price    = trim( wp_strip_all_tags( (string) $property->get_formatted_price( true ) ) );
-				$area     = self::get_map_property_area( $property );
-				$properties[] = array(
-					'id'       => absint( $property->id ),
-					'title'    => get_the_title( $property->id ),
-					'price'    => '' !== $price ? self::abbreviate_map_pin_price( $price ) : __( 'Price on request', 'propertyhive' ),
-					'position' => $positions[ $index ],
-				);
+		foreach ( array_slice( $wp_query->posts, 0, count( $positions ) ) as $index => $post ) {
+			$property = new PH_Property( $post );
+			$price    = trim( wp_strip_all_tags( (string) $property->get_formatted_price( true ) ) );
+			$area     = self::get_map_property_area( $property );
+			$properties[] = array(
+				'id'       => absint( $property->id ),
+				'title'    => get_the_title( $property->id ),
+				'price'    => '' !== $price ? self::abbreviate_map_pin_price( $price ) : __( 'Price on request', 'propertyhive' ),
+				'position' => $positions[ $index ],
+			);
 
-				if ( '' !== $area && ! in_array( $area, $area_labels, true ) && count( $area_labels ) < 3 ) {
-					$area_labels[] = $area;
-				}
+			if ( '' !== $area && ! in_array( $area, $area_labels, true ) && count( $area_labels ) < 3 ) {
+				$area_labels[] = $area;
 			}
 		}
 
@@ -887,6 +886,33 @@ trait PH_Template_Set_Search {
 				'state'       => $state,
 			)
 		);
+	}
+
+	/**
+	 * Whether the current request will output the decorative Map Atlas panel.
+	 *
+	 * Keeping this decision shared with the wrapper classes prevents an empty
+	 * map column being reserved when a search has no results.
+	 *
+	 * @return bool
+	 */
+	private static function should_render_map_fallback_panel() {
+		if ( ! PH_Template_Set_Request_Context::is_search_results_request() || self::is_module_preview() || 'map-led-search-results' !== self::get_search_template() ) {
+			return false;
+		}
+
+		$state = PH_Template_Set_Request_Context::get_map_search_state();
+		if ( $state['shows_real_map'] ) {
+			return false;
+		}
+
+		if ( in_array( $state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
+			return false;
+		}
+
+		global $wp_query;
+
+		return $wp_query instanceof WP_Query && ! empty( $wp_query->posts );
 	}
 
 	/**
@@ -969,20 +995,36 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
-	 * Enter the Infinite Scroll AJAX card render seam.
+	 * Enter a content-property template-part card render seam.
+	 *
+	 * The main-query path keeps existing theme archive overrides compatible
+	 * even when they predate the dedicated main-result actions.
 	 *
 	 * @param string $template Located template.
 	 * @param string $slug     Template slug.
 	 * @param string $name     Template name.
 	 */
 	public static function begin_infinite_search_result_render( $template, $slug, $name ) {
-		if ( ! self::is_infinite_scroll_property_render( $slug, $name ) || ! self::is_enabled() ) {
+		if ( 'content' !== $slug || 'property' !== $name || ! self::is_enabled() ) {
 			return;
 		}
 
-		self::$search_render_contexts[] = 'infinite-search-result';
+		$context = false;
+		if ( self::is_infinite_scroll_property_render( $slug, $name ) ) {
+			$context = 'infinite-search-result';
+		} elseif ( ! self::is_search_card_rendering() && self::is_main_search_result_template_part_render() ) {
+			$context = 'main-search-result';
+		}
 
-		if ( ! self::$infinite_search_hooks_prepared ) {
+		self::$template_part_search_contexts[] = $context;
+
+		if ( false === $context ) {
+			return;
+		}
+
+		self::$search_render_contexts[] = $context;
+
+		if ( 'infinite-search-result' === $context && ! self::$infinite_search_hooks_prepared ) {
 			if ( function_exists( 'template_assistant_search_result_field_changes' ) ) {
 				template_assistant_search_result_field_changes();
 			}
@@ -993,14 +1035,19 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
-	 * Leave the Infinite Scroll AJAX card render seam.
+	 * Leave a content-property template-part card render seam.
 	 *
 	 * @param string $template Located template.
 	 * @param string $slug     Template slug.
 	 * @param string $name     Template name.
 	 */
 	public static function end_infinite_search_result_render( $template, $slug, $name ) {
-		if ( self::is_infinite_scroll_property_render( $slug, $name ) && 'infinite-search-result' === end( self::$search_render_contexts ) ) {
+		if ( 'content' !== $slug || 'property' !== $name || empty( self::$template_part_search_contexts ) ) {
+			return;
+		}
+
+		$context = array_pop( self::$template_part_search_contexts );
+		if ( false !== $context && $context === end( self::$search_render_contexts ) ) {
 			array_pop( self::$search_render_contexts );
 		}
 	}
@@ -1012,6 +1059,32 @@ trait PH_Template_Set_Search {
 	 */
 	private static function is_search_card_rendering() {
 		return in_array( end( self::$search_render_contexts ), array( 'main-search-result', 'infinite-search-result' ), true );
+	}
+
+	/**
+	 * Is this template part rendering the current post from the main archive loop?
+	 *
+	 * Checking the actual main-query post prevents nested shortcodes and
+	 * secondary queries from inheriting Template Set card presentation.
+	 *
+	 * @return bool
+	 */
+	private static function is_main_search_result_template_part_render() {
+		if ( ! PH_Template_Set_Request_Context::is_search_results_request() || ! in_the_loop() ) {
+			return false;
+		}
+
+		global $post, $wp_query;
+
+		if ( ! $post instanceof WP_Post || ! $wp_query instanceof WP_Query ) {
+			return false;
+		}
+
+		$current_post = (int) $wp_query->current_post;
+
+		return isset( $wp_query->posts[ $current_post ] )
+			&& $wp_query->posts[ $current_post ] instanceof WP_Post
+			&& (int) $wp_query->posts[ $current_post ]->ID === (int) $post->ID;
 	}
 
 	/**

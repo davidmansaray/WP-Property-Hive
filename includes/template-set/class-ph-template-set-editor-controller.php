@@ -282,7 +282,9 @@ class PH_Template_Set_Editor_Controller {
 				'saved'             => __( 'Saved', 'propertyhive' ),
 				'error'             => __( 'Could not save', 'propertyhive' ),
 				'unsavedNavigation' => __( 'You have unsaved changes. Leave this page without saving?', 'propertyhive' ),
-				'resultsProgress'   => __( 'Showing %1$s of %2$s', 'propertyhive' ),
+				'resultsProgress'   =>
+					/* translators: 1: number of currently displayed results, 2: total number of results */
+					__( 'Showing %1$s of %2$s', 'propertyhive' ),
 			),
 		);
 	}

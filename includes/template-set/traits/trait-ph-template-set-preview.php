@@ -281,7 +281,15 @@ trait PH_Template_Set_Preview {
 		self::render_card_gallery_data_script( $images );
 
 		if ( 'portal-grid-search-results' === self::get_search_template() && count( $images ) > 1 ) {
-			echo '<span class="ph-template-card-gallery-controls" aria-label="' . esc_attr( sprintf( __( '%d property photos', 'propertyhive' ), count( $images ) ) ) . '">' . esc_html( sprintf( __( '1 / %d', 'propertyhive' ), count( $images ) ) ) . '</span>';
+			echo '<span class="ph-template-card-gallery-controls" aria-label="' . esc_attr( sprintf(
+				/* translators: %d: number of property photos */
+				__( '%d property photos', 'propertyhive' ),
+				count( $images )
+			) ) . '">' . esc_html( sprintf(
+				/* translators: %d: total number of property photos */
+				__( '1 / %d', 'propertyhive' ),
+				count( $images )
+			) ) . '</span>';
 		}
 	}
 

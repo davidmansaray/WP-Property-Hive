@@ -120,7 +120,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php PH_Template_Set::render_detail_location_map( $property ); ?>
 					<?php else : ?>
 					<span class="ph-template-map-pin" aria-hidden="true"></span>
-					<span class="ph-template-map-label"><?php echo esc_html( sprintf( __( '%s — precise location shared on enquiry', 'propertyhive' ), $location_label ? $location_label : $address ) ); ?></span>
+					<span class="ph-template-map-label"><?php
+						echo esc_html( sprintf(
+							/* translators: %s: property location */
+							__( '%s — precise location shared on enquiry', 'propertyhive' ),
+							$location_label ? $location_label : $address
+						) );
+					?></span>
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>

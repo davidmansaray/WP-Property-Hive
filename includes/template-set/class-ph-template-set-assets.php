@@ -87,6 +87,37 @@ class PH_Template_Set_Assets {
 		}
 
 		$script_base_url = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/frontend/';
+		$search_form_builder_dependencies = array( 'propertyhive-template-set-editor-sidebar' );
+
+		/*
+		 * Search-form previews are replaced after the page has loaded. A slider
+		 * added in the editor therefore cannot rely on the renderer enqueueing
+		 * its dependencies during the later AJAX request: those enqueue calls
+		 * happen too late to print assets into the original page. Load the
+		 * WordPress slider dependencies up front for authorized editor sessions
+		 * so the returned inline initializer is always safe to run.
+		 */
+		if (
+			PH_Template_Set_Request_Context::is_search_results_request()
+			&& PH_Template_Set_Request_Context::is_template_editor_active()
+			&& PH_Template_Set_Search_Form_Editor::can_manage()
+		) {
+			if ( ! wp_script_is( 'jquery-ui-touch-punch', 'registered' ) ) {
+				wp_register_script(
+					'jquery-ui-touch-punch',
+					PH()->plugin_url() . '/assets/js/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js',
+					array( 'jquery', 'jquery-ui-slider' ),
+					'0.2.3',
+					true
+				);
+			}
+
+			wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
+
+			$search_form_builder_dependencies[] = 'jquery-ui-slider';
+			$search_form_builder_dependencies[] = 'jquery-ui-touch-punch';
+		}
+
 		$module_scripts  = array(
 			'propertyhive-template-set-gallery'             => array(
 				'path' => 'assets/js/frontend/template-set/gallery.js',
@@ -102,7 +133,7 @@ class PH_Template_Set_Assets {
 			),
 			'propertyhive-template-set-search-form-builder' => array(
 				'path' => 'assets/js/frontend/template-set/search-form-builder.js',
-				'deps' => array( 'propertyhive-template-set-editor-sidebar' ),
+				'deps' => $search_form_builder_dependencies,
 			),
 			'propertyhive-template-set-search-map-rail'     => array(
 				'path' => 'assets/js/frontend/template-set/search-map-rail.js',

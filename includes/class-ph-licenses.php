@@ -68,20 +68,6 @@ class PH_Licenses {
 
 	public function ph_check_add_on_can_be_used( $can, $slug )
 	{
-		$feature = get_ph_pro_feature( $slug );
-
-		if ( false === $feature || ! is_array( $feature ) )
-		{
-			return $can;
-		}
-
-		$plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
-
-		if ( in_array( 'free', $plans, true ) )
-		{
-			return $can;
-		}
-
 		// Check add on wasn't active before
 		$pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
 
@@ -106,6 +92,23 @@ class PH_Licenses {
             return $can;
         }
 
+		// Only retrieve the remote feature catalogue when a Pro licence is configured.
+		$feature = get_ph_pro_feature( $slug );
+
+		if ( false === $feature )
+		{
+			// A configured Pro licence must not bypass plan enforcement when
+			// the feature catalogue is unavailable, malformed, or incomplete.
+			return false;
+		}
+
+		$plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
+
+		if ( in_array( 'free', $plans, true ) )
+		{
+			return $can;
+		}
+
         if ( !$this->is_valid_pro_license_key() )
         {
             // show warning
@@ -129,7 +132,9 @@ class PH_Licenses {
             return false;
         }
 
-        return $can;
+		// The licence package could not be verified. Fail closed so a temporary
+		// upstream failure cannot unlock a paid add-on.
+		return false;
 	}
 
 	public function ph_check_add_on_can_be_updated( $can, $slug )

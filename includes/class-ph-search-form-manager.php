@@ -13,6 +13,21 @@ class PH_Search_Form_Manager {
 	const REVISION_LIMIT = 10;
 
 	/**
+	 * Whether third-party fields are being discovered without applying a saved
+	 * form configuration.
+	 *
+	 * @var bool
+	 */
+	private static $discovering_live_fields = false;
+
+	/**
+	 * Unsaved form entries currently being rendered as server-side previews.
+	 *
+	 * @var array
+	 */
+	private static $preview_entries = array();
+
+	/**
 	 * Field catalog.
 	 *
 	 * @var PH_Search_Form_Field_Catalog
@@ -97,9 +112,20 @@ class PH_Search_Form_Manager {
 	 * @return array
 	 */
 	public function apply_form_settings_to_fields( $fields, $form_id, $settings = null ) {
+		if ( self::$discovering_live_fields ) {
+			return is_array( $fields ) ? $fields : array();
+		}
+
 		$settings = is_array( $settings ) ? $settings : $this->get_settings();
 		$form_id  = $this->normalize_form_id( $form_id );
+		if ( isset( self::$preview_entries[ $form_id ] ) && is_array( self::$preview_entries[ $form_id ] ) ) {
+			if ( ! isset( $settings['search_forms'] ) || ! is_array( $settings['search_forms'] ) ) {
+				$settings['search_forms'] = array();
+			}
+			$settings['search_forms'][ $form_id ] = self::$preview_entries[ $form_id ];
+		}
 		$form     = isset( $settings['search_forms'][ $form_id ] ) && is_array( $settings['search_forms'][ $form_id ] ) ? $settings['search_forms'][ $form_id ] : array();
+		$catalog  = $this->catalog->get_fields( $settings );
 
 		$new_fields = isset( $form['active_fields'] ) && is_array( $form['active_fields'] ) ? $form['active_fields'] : $fields;
 
@@ -115,7 +141,23 @@ class PH_Search_Form_Manager {
 		}
 
 		foreach ( $new_fields as $field_id => $new_field ) {
-			$fields[ $field_id ] = array_merge( isset( $fields[ $field_id ] ) ? $fields[ $field_id ] : array(), is_array( $new_field ) ? $new_field : array() );
+			$base_field = isset( $fields[ $field_id ] ) && is_array( $fields[ $field_id ] ) ? $fields[ $field_id ] : array();
+			if ( empty( $base_field ) && isset( $catalog[ $field_id ] ) && is_array( $catalog[ $field_id ] ) ) {
+				$base_field = $catalog[ $field_id ];
+			}
+
+			$new_field = is_array( $new_field ) ? $new_field : array();
+			if ( 'department' === $field_id ) {
+				/*
+				 * Forms saved before 2.2.7 contain a snapshot of the available
+				 * departments and primary department. Those values are global,
+				 * runtime-generated settings, so let the current live field win
+				 * while retaining the form's presentation choices.
+				 */
+				unset( $new_field['options'], $new_field['value'] );
+			}
+
+			$fields[ $field_id ] = array_merge( $base_field, $new_field );
 		}
 
 		$ordered_fields = array();
@@ -126,6 +168,48 @@ class PH_Search_Form_Manager {
 		}
 
 		return $this->apply_custom_field_options( $ordered_fields, $settings );
+	}
+
+	/**
+	 * Apply the deterministic final render pass only to configured forms or an
+	 * unsaved form currently being previewed.
+	 *
+	 * @param array  $fields Existing fields.
+	 * @param string $form_id Form id.
+	 * @return array
+	 */
+	public function apply_final_form_settings_to_fields( $fields, $form_id ) {
+		$form_id = $this->normalize_form_id( $form_id );
+		$forms   = $this->get_forms();
+
+		if ( ! isset( self::$preview_entries[ $form_id ] ) && ! array_key_exists( $form_id, $forms ) ) {
+			return is_array( $fields ) ? $fields : array();
+		}
+
+		return $this->apply_form_settings_to_fields( $fields, $form_id );
+	}
+
+	/**
+	 * Discover fields supplied through the form-specific and global extension
+	 * hooks without allowing the saved-form filter to hide them.
+	 *
+	 * @param string $form_id Form id.
+	 * @return array
+	 */
+	private function get_live_filtered_fields( $form_id ) {
+		$was_discovering = self::$discovering_live_fields;
+		self::$discovering_live_fields = true;
+
+		try {
+			$fields = apply_filters( 'propertyhive_search_form_fields_' . $form_id, ph_get_search_form_fields() );
+			$fields = apply_filters( 'propertyhive_search_form_fields', $fields );
+			$fields = apply_filters( 'propertyhive_search_form_fields_after_' . $form_id, $fields );
+			$fields = apply_filters( 'propertyhive_search_form_fields_after', $fields );
+		} finally {
+			self::$discovering_live_fields = $was_discovering;
+		}
+
+		return is_array( $fields ) ? $fields : array();
 	}
 
 	/**
@@ -174,26 +258,35 @@ class PH_Search_Form_Manager {
 	 * @return array
 	 */
 	public function get_field_sets( $form_id ) {
-		$form_id  = $this->normalize_form_id( $form_id );
-		$settings = $this->get_settings();
-		$form     = $this->get_form( $form_id );
-		$catalog  = $this->catalog->get_fields( $settings );
-		$active   = apply_filters( 'propertyhive_search_form_fields_' . $form_id, ph_get_search_form_fields() );
+		$form_id   = $this->normalize_form_id( $form_id );
+		$settings  = $this->get_settings();
+		$form      = $this->get_form( $form_id );
+		$catalog   = $this->catalog->get_fields( $settings );
+		$live      = $this->get_live_filtered_fields( $form_id );
+		$active    = $this->apply_form_settings_to_fields( $live, $form_id, $settings );
+		$available = array_merge( $catalog, $live );
 
-		foreach ( $catalog as $field_id => $field ) {
-			if ( ! isset( $active[ $field_id ] ) && isset( $form['active_fields'][ $field_id ] ) ) {
-				$active[ $field_id ] = array_merge( $field, $form['active_fields'][ $field_id ] );
+		foreach ( array( 'active_fields', 'inactive_fields' ) as $list_key ) {
+			if ( empty( $form[ $list_key ] ) || ! is_array( $form[ $list_key ] ) ) {
+				continue;
+			}
+
+			foreach ( $form[ $list_key ] as $field_id => $field ) {
+				if ( ! is_array( $field ) ) {
+					continue;
+				}
+
+				$available[ $field_id ] = array_merge(
+					isset( $available[ $field_id ] ) && is_array( $available[ $field_id ] ) ? $available[ $field_id ] : array(),
+					$field
+				);
 			}
 		}
 
 		$inactive = array();
-		foreach ( $catalog as $field_id => $field ) {
+		foreach ( $available as $field_id => $field ) {
 			if ( isset( $active[ $field_id ] ) ) {
 				continue;
-			}
-
-			if ( isset( $form['inactive_fields'][ $field_id ] ) && is_array( $form['inactive_fields'][ $field_id ] ) ) {
-				$field = array_merge( $field, $form['inactive_fields'][ $field_id ] );
 			}
 
 			$inactive[ $field_id ] = $field;
@@ -842,12 +935,15 @@ class PH_Search_Form_Manager {
 	 * @return array|WP_Error
 	 */
 	public function sanitize_editor_payload( $form_id, $payload ) {
+		$form_id  = $this->normalize_form_id( $form_id );
 		$payload  = is_array( $payload ) ? $payload : array();
 		$current  = $this->get_form( $form_id );
 		$settings = $this->get_settings();
 		$catalog  = $this->catalog->get_fields( $settings );
+		$live     = $this->get_live_filtered_fields( $form_id );
 		$known    = array_merge(
 			$catalog,
+			$live,
 			isset( $current['active_fields'] ) && is_array( $current['active_fields'] ) ? $current['active_fields'] : array(),
 			isset( $current['inactive_fields'] ) && is_array( $current['inactive_fields'] ) ? $current['inactive_fields'] : array()
 		);
@@ -875,7 +971,7 @@ class PH_Search_Form_Manager {
 				}
 
 				$seen[ $field_id ] = true;
-				$base              = $this->get_existing_or_catalog_field( $field_id, $current, $catalog );
+				$base              = $this->get_existing_or_catalog_field( $field_id, $current, $live, $catalog );
 				$settings_payload  = isset( $raw_field['settings'] ) && is_array( $raw_field['settings'] ) ? $raw_field['settings'] : array();
 				$entry[ $list_key ][ $field_id ] = $this->sanitize_field_settings( $field_id, $base, $settings_payload );
 			}
@@ -903,10 +999,11 @@ class PH_Search_Form_Manager {
 	 *
 	 * @param string $field_id Field id.
 	 * @param array  $current Current form.
+	 * @param array  $live Live filtered fields.
 	 * @param array  $catalog Catalog.
 	 * @return array
 	 */
-	private function get_existing_or_catalog_field( $field_id, $current, $catalog ) {
+	private function get_existing_or_catalog_field( $field_id, $current, $live, $catalog ) {
 		if ( isset( $current['active_fields'][ $field_id ] ) && is_array( $current['active_fields'][ $field_id ] ) ) {
 			return $current['active_fields'][ $field_id ];
 		}
@@ -915,11 +1012,16 @@ class PH_Search_Form_Manager {
 			return $current['inactive_fields'][ $field_id ];
 		}
 
+		if ( isset( $live[ $field_id ] ) && is_array( $live[ $field_id ] ) ) {
+			return $live[ $field_id ];
+		}
+
 		return isset( $catalog[ $field_id ] ) && is_array( $catalog[ $field_id ] ) ? $catalog[ $field_id ] : array();
 	}
 
 	/**
-	 * Sanitize one field settings object while preserving unsupported existing data.
+	 * Sanitize settings controlled by the visual editor while preserving
+	 * advanced field data supplied by forms and third-party integrations.
 	 *
 	 * @param string $field_id Field id.
 	 * @param array  $base Existing/catalog field.
@@ -927,8 +1029,9 @@ class PH_Search_Form_Manager {
 	 * @return array
 	 */
 	private function sanitize_field_settings( $field_id, $base, $raw ) {
-		$field = is_array( $base ) ? $base : array();
-		$type  = isset( $field['type'] ) ? sanitize_title( $field['type'] ) : '';
+		$base  = is_array( $base ) ? $base : array();
+		$field = $base;
+		$type  = isset( $base['type'] ) ? sanitize_title( $base['type'] ) : '';
 
 		if ( 'department' === $field_id && isset( $raw['type'] ) && in_array( $raw['type'], array( 'radio', 'select' ), true ) ) {
 			$field['type'] = sanitize_title( $raw['type'] );
@@ -962,10 +1065,16 @@ class PH_Search_Form_Manager {
 		}
 
 		$field['display_contexts'] = $this->sanitize_display_contexts(
-			isset( $raw['display_contexts'] ) && is_array( $raw['display_contexts'] ) ? $raw['display_contexts'] : $this->get_field_display_contexts( $field )
+			isset( $raw['display_contexts'] ) && is_array( $raw['display_contexts'] ) ? $raw['display_contexts'] : $this->get_field_display_contexts( $base )
 		);
 
-		return $this->apply_display_contexts_to_field( $field );
+		$field = $this->apply_display_contexts_to_field( $field );
+
+		if ( 'department' === $field_id ) {
+			unset( $field['options'], $field['value'] );
+		}
+
+		return $field;
 	}
 
 	/**
@@ -987,13 +1096,34 @@ class PH_Search_Form_Manager {
 			return $this->apply_entry_to_fields( $fields, $form_id, $entry );
 		};
 
+		$had_preview_entry      = array_key_exists( $form_id, self::$preview_entries );
+		$previous_preview_entry = $had_preview_entry ? self::$preview_entries[ $form_id ] : null;
+		$previous_request       = $_REQUEST;
+		$preview_request        = $_REQUEST;
+		foreach ( array( 'action', 'security', 'payload', 'base_hash' ) as $transport_key ) {
+			unset( $preview_request[ $transport_key ] );
+		}
+		$_REQUEST = $preview_request;
+		self::$preview_entries[ $form_id ] = $entry;
 		add_filter( 'propertyhive_search_form_fields_' . $form_id, $callback, 1000, 1 );
 
+		$buffer_level = ob_get_level();
 		ob_start();
-		ph_get_search_form( $form_id );
-		$html = ob_get_clean();
-
-		remove_filter( 'propertyhive_search_form_fields_' . $form_id, $callback, 1000 );
+		try {
+			ph_get_search_form( $form_id );
+			$html = ob_get_clean();
+		} finally {
+			while ( ob_get_level() > $buffer_level ) {
+				ob_end_clean();
+			}
+			remove_filter( 'propertyhive_search_form_fields_' . $form_id, $callback, 1000 );
+			if ( $had_preview_entry ) {
+				self::$preview_entries[ $form_id ] = $previous_preview_entry;
+				} else {
+					unset( self::$preview_entries[ $form_id ] );
+				}
+				$_REQUEST = $previous_request;
+			}
 
 		return $html;
 	}

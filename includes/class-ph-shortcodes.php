@@ -98,6 +98,12 @@ class PH_Shortcodes {
 		$form_controls = apply_filters( 'propertyhive_search_form_fields_after_' . $atts['id'], $form_controls, $atts );
 		$form_controls = apply_filters( 'propertyhive_search_form_fields_after', $form_controls, $atts );
 
+		$search_form_manager = new PH_Search_Form_Manager();
+		$form_controls = $search_form_manager->apply_final_form_settings_to_fields( $form_controls, $atts['id'] );
+
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_final_' . $atts['id'], $form_controls, $atts );
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_final', $form_controls, $atts );
+
 	    if (
 	    	isset($atts['default_department']) && in_array($atts['default_department'], array_keys( ph_get_departments() )) &&
 	    	( !isset($_REQUEST['department']) )

@@ -26,7 +26,15 @@ class PH_Template_Set_Search_Form_Editor {
 	 * @return bool
 	 */
 	public static function can_manage() {
-		$capability = apply_filters( 'propertyhive_template_set_search_form_editor_capability', '' );
+		/**
+		 * Filters the capability required to preview and save the global search
+		 * form from the visual editor.
+		 *
+		 * @since 2.2.7
+		 *
+		 * @param string $capability Required capability.
+		 */
+		$capability = apply_filters( 'propertyhive_template_set_search_form_editor_capability', 'manage_options' );
 
 		if ( is_string( $capability ) && '' !== $capability ) {
 			return current_user_can( $capability );
@@ -86,7 +94,7 @@ class PH_Template_Set_Search_Form_Editor {
 
 		$payload = self::get_payload_from_request();
 		$manager = new PH_Search_Form_Manager();
-		$html    = $manager->render_preview_from_payload( self::FORM_ID, $payload );
+		$html    = self::render_preview( $manager, $payload );
 
 		if ( is_wp_error( $html ) ) {
 			wp_send_json_error( array( 'message' => $html->get_error_message() ), 400 );
@@ -114,8 +122,8 @@ class PH_Template_Set_Search_Form_Editor {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ), 400 );
 		}
 
-		$html = $manager->render_preview_from_payload(
-			self::FORM_ID,
+		$html = self::render_preview(
+			$manager,
 			array(
 				'active_fields'   => $result['active'],
 				'inactive_fields' => $result['inactive'],
@@ -129,6 +137,40 @@ class PH_Template_Set_Search_Form_Editor {
 				'html'    => is_wp_error( $html ) ? '' : $html,
 			)
 		);
+	}
+
+	/**
+	 * Render a visual-editor preview using the same field context as the public
+	 * search-results template.
+	 *
+	 * @param PH_Search_Form_Manager $manager Search form manager.
+	 * @param array                  $payload Unsaved editor payload.
+	 * @return string|WP_Error
+	 */
+	public static function render_preview( $manager, $payload ) {
+		$payload = is_array( $payload ) ? $payload : array();
+
+		if ( isset( $payload['active_fields'] ) && is_array( $payload['active_fields'] ) ) {
+			foreach ( $payload['active_fields'] as &$field ) {
+				if (
+					! is_array( $field )
+					|| empty( $field['id'] )
+					|| ! in_array( $field['id'], array( 'property_type', 'commercial_property_type' ), true )
+				) {
+					continue;
+				}
+
+				if ( ! isset( $field['settings'] ) || ! is_array( $field['settings'] ) ) {
+					$field['settings'] = array();
+				}
+
+				$field['settings']['hide_empty']    = true;
+				$field['settings']['blank_option'] = __( 'All property types', 'propertyhive' );
+			}
+			unset( $field );
+		}
+
+		return $manager->render_preview_from_payload( self::FORM_ID, $payload );
 	}
 
 	/**

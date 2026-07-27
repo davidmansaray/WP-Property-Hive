@@ -2085,7 +2085,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                                 <?php if ( ! empty( $builder['version'] ) ) : ?>
                                     <li><?php echo esc_html( $builder['name'] . ' v' . $builder['version'] ); ?></li>
                                 <?php else : ?>
-                                    <li><?php echo esc_html( sprintf( __( '%s active', 'propertyhive' ), $builder['name'] ) ); ?></li>
+                                    <li><?php
+                                        echo esc_html( sprintf(
+                                            /* translators: %s: page builder name */
+                                            __( '%s active', 'propertyhive' ),
+                                            $builder['name']
+                                        ) );
+                                    ?></li>
                                 <?php endif; ?>
                                 <?php if ( ! empty( $builder['theme_builder'] ) ) : ?>
                                     <li><?php esc_html_e( 'Theme Builder active', 'propertyhive' ); ?></li>
@@ -2104,7 +2110,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         <h3><?php esc_html_e( 'Getting started', 'propertyhive' ); ?></h3>
                         <ol class="ph-tx-steps">
                             <?php if ( $builder_ready ) : ?>
-                                <li><strong><?php esc_html_e( 'Open Theme Builder', 'propertyhive' ); ?></strong><br><?php echo esc_html( sprintf( __( 'Open the Theme Builder provided by %s.', 'propertyhive' ), $builder['name'] ) ); ?></li>
+                                <li><strong><?php esc_html_e( 'Open Theme Builder', 'propertyhive' ); ?></strong><br><?php
+                                    echo esc_html( sprintf(
+                                        /* translators: %s: page builder name */
+                                        __( 'Open the Theme Builder provided by %s.', 'propertyhive' ),
+                                        $builder['name']
+                                    ) );
+                                ?></li>
                                 <li><strong><?php esc_html_e( 'Create a Property Detail template', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Choose the single-property display conditions described in the integration guide.', 'propertyhive' ); ?></li>
                                 <li><strong><?php esc_html_e( 'Publish your changes', 'propertyhive' ); ?></strong><br><?php esc_html_e( 'Your detail-template changes will be applied to matching properties.', 'propertyhive' ); ?></li>
                             <?php else : ?>
@@ -2119,7 +2131,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         <div class="ph-tx-resources">
                             <a class="ph-tx-resource" href="<?php echo esc_url( $builder_docs_url ); ?>" target="_blank" rel="noopener">
                                 <span class="ph-tx-resource-text">
-                                    <strong><?php echo esc_html( sprintf( __( 'How to use %s with Property Hive', 'propertyhive' ), $builder['name'] ) ); ?></strong>
+                                    <strong><?php
+                                        echo esc_html( sprintf(
+                                            /* translators: %s: page builder name */
+                                            __( 'How to use %s with Property Hive', 'propertyhive' ),
+                                            $builder['name']
+                                        ) );
+                                    ?></strong>
                                     <span><?php esc_html_e( 'Step-by-step guide to getting started.', 'propertyhive' ); ?></span>
                                 </span>
                                 <span class="ph-tx-btn-glyph" aria-hidden="true">&#8599;</span>
@@ -2127,7 +2145,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                             <a class="ph-tx-resource" href="<?php echo esc_url( $builder_docs_url ); ?>" target="_blank" rel="noopener">
                                 <span class="ph-tx-resource-text">
                                     <strong><?php esc_html_e( 'Which templates can I edit?', 'propertyhive' ); ?></strong>
-                                    <span><?php echo esc_html( sprintf( __( 'See how %s integrates with Property Detail templates.', 'propertyhive' ), $builder['name'] ) ); ?></span>
+                                    <span><?php
+                                        echo esc_html( sprintf(
+                                            /* translators: %s: page builder name */
+                                            __( 'See how %s integrates with Property Detail templates.', 'propertyhive' ),
+                                            $builder['name']
+                                        ) );
+                                    ?></span>
                                 </span>
                                 <span class="ph-tx-btn-glyph" aria-hidden="true">&#8599;</span>
                             </a>
@@ -2135,7 +2159,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                                 <a class="ph-tx-resource" href="<?php echo esc_url( $builder_video_url ); ?>" target="_blank" rel="noopener">
                                     <span class="ph-tx-resource-text">
                                         <strong><?php esc_html_e( 'Watch video tutorial', 'propertyhive' ); ?></strong>
-                                        <span><?php echo esc_html( sprintf( __( 'Learn how to customise templates with %s.', 'propertyhive' ), $builder['name'] ) ); ?></span>
+                                        <span><?php
+                                            echo esc_html( sprintf(
+                                                /* translators: %s: page builder name */
+                                                __( 'Learn how to customise templates with %s.', 'propertyhive' ),
+                                                $builder['name']
+                                            ) );
+                                        ?></span>
                                     </span>
                                     <span class="ph-tx-btn-glyph" aria-hidden="true">&#9654;</span>
                                 </a>
@@ -2173,7 +2203,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         <p class="ph-tx-actions ph-tx-actions--stacked">
                             <a class="button button-primary" href="<?php echo esc_url( 'https://docs.wp-property-hive.com/article/282-an-introduction-to-integrating-property-hive-to-your-website' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View our documentation', 'propertyhive' ); ?> <span class="ph-tx-btn-glyph" aria-hidden="true">&#8599;</span></a>
                             <?php foreach ( $supported_builders as $supported ) : ?>
-                                <a class="button" href="<?php echo esc_url( $supported['url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( sprintf( __( 'Explore %s', 'propertyhive' ), $supported['name'] ) ); ?></a>
+                                <a class="button" href="<?php echo esc_url( $supported['url'] ); ?>" target="_blank" rel="noopener"><?php
+                                    echo esc_html( sprintf(
+                                        /* translators: %s: page builder name */
+                                        __( 'Explore %s', 'propertyhive' ),
+                                        $supported['name']
+                                    ) );
+                                ?></a>
                             <?php endforeach; ?>
                         </p>
                     </div>

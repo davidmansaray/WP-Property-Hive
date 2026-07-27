@@ -48,7 +48,13 @@ $hero_content = apply_filters( 'propertyhive_template_set_gallery_item_html', $h
 <div class="images ph-template-gallery ph-template-gallery-<?php echo esc_attr( sanitize_html_class( $template ) ); ?> ph-template-gallery-<?php echo esc_attr( sanitize_html_class( $public_template ) ); ?> ph-gallery-variant-<?php echo esc_attr( sanitize_html_class( $gallery_layout ) ); ?>" data-ph-template-gallery data-ph-gallery-current-variant="<?php echo esc_attr( $gallery_layout ); ?>">
 	<?php do_action( 'propertyhive_before_single_property_images' ); ?>
 	<figure class="ph-template-gallery-hero">
-		<button type="button" class="ph-template-gallery-photo-trigger" data-ph-gallery-open aria-label="<?php echo esc_attr( sprintf( __( 'Open larger photo: %s', 'propertyhive' ), $hero['caption'] ) ); ?>"><?php echo $hero_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered gallery item content. ?></button>
+		<button type="button" class="ph-template-gallery-photo-trigger" data-ph-gallery-open aria-label="<?php
+			echo esc_attr( sprintf(
+				/* translators: %s: photo caption */
+				__( 'Open larger photo: %s', 'propertyhive' ),
+				$hero['caption']
+			) );
+		?>"><?php echo $hero_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered gallery item content. ?></button>
 
 		<?php if ( $show_floor_panel ) : ?>
 			<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="<?php esc_attr_e( 'Floor map preview', 'propertyhive' ); ?>">
@@ -83,7 +89,13 @@ $hero_content = apply_filters( 'propertyhive_template_set_gallery_item_html', $h
 	<?php if ( ! empty( $rail ) ) : ?>
 		<div class="ph-template-gallery-rail">
 			<?php foreach ( $rail as $index => $image ) : $is_active = ( 0 === $index ); $item_content = '<img src="' . esc_url( $image['thumb'] ) . '" alt="' . esc_attr( $image['alt'] ) . '" loading="lazy">' . ( $is_editorial ? '<span>' . esc_html( $image['caption'] ) . '</span>' : '' ); $item_content = apply_filters( 'propertyhive_template_set_gallery_item_html', $item_content, absint( $image['attachment_id'] ), 'rail', $image ); ?>
-				<button type="button" class="ph-template-gallery-thumb<?php echo $is_active ? ' is-active' : ''; ?>" data-ph-gallery-thumb data-src="<?php echo esc_url( $image['src'] ); ?>" data-alt="<?php echo esc_attr( $image['alt'] ); ?>" data-caption="<?php echo esc_attr( $image['caption'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show %s', 'propertyhive' ), $image['caption'] ) ); ?>"<?php echo $is_active ? ' aria-current="true"' : ''; ?>><?php echo $item_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered gallery item content. ?></button>
+				<button type="button" class="ph-template-gallery-thumb<?php echo $is_active ? ' is-active' : ''; ?>" data-ph-gallery-thumb data-src="<?php echo esc_url( $image['src'] ); ?>" data-alt="<?php echo esc_attr( $image['alt'] ); ?>" data-caption="<?php echo esc_attr( $image['caption'] ); ?>" aria-label="<?php
+					echo esc_attr( sprintf(
+						/* translators: %s: photo caption */
+						__( 'Show %s', 'propertyhive' ),
+						$image['caption']
+					) );
+				?>"<?php echo $is_active ? ' aria-current="true"' : ''; ?>><?php echo $item_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered gallery item content. ?></button>
 			<?php endforeach; ?>
 		</div>
 	<?php endif; ?>

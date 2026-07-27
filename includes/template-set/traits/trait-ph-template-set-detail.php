@@ -1070,7 +1070,11 @@ trait PH_Template_Set_Detail {
 		$tenure = trim( wp_strip_all_tags( (string) $property->tenure ) );
 		$labels = array(
 			'standard-sales-detail'         => __( 'For sale', 'propertyhive' ),
-			'conversion-first-sales-detail' => $tenure ? sprintf( __( 'For sale · %s', 'propertyhive' ), $tenure ) : __( 'For sale', 'propertyhive' ),
+			'conversion-first-sales-detail' => $tenure ? sprintf(
+				/* translators: %s: property tenure */
+				__( 'For sale · %s', 'propertyhive' ),
+				$tenure
+			) : __( 'For sale', 'propertyhive' ),
 			'immersive-cinema-detail'       => __( 'For sale', 'propertyhive' ),
 			'premium-editorial-detail'      => $tenure ? sprintf( __( 'For sale · %s', 'propertyhive' ), $tenure ) : __( 'For sale', 'propertyhive' ),
 			'new-homes-development-detail'  => __( 'New homes release', 'propertyhive' ),
@@ -1579,7 +1583,11 @@ trait PH_Template_Set_Detail {
 		}
 
 		$years = absint( $property->_leasehold_years_remaining );
-		$add( __( 'Lease remaining', 'propertyhive' ), $years ? sprintf( _n( '%d year', '%d years', $years, 'propertyhive' ), $years ) : '' );
+		$add( __( 'Lease remaining', 'propertyhive' ), $years ? sprintf(
+			/* translators: %d: number of years */
+			_n( '%d year', '%d years', $years, 'propertyhive' ),
+			$years
+		) : '' );
 		$add( __( 'Ground rent', 'propertyhive' ), $property->_ground_rent );
 		$add( __( 'Ground-rent review', 'propertyhive' ), $property->_ground_rent_review_years ? sprintf( _n( '%d year', '%d years', absint( $property->_ground_rent_review_years ), 'propertyhive' ), absint( $property->_ground_rent_review_years ) ) : '' );
 		$add( __( 'Service charge', 'propertyhive' ), $property->_service_charge );
@@ -2006,7 +2014,11 @@ trait PH_Template_Set_Detail {
 			foreach ( $property->get_virtual_tours() as $index => $tour ) {
 				$label = isset( $tour['label'] ) ? trim( wp_strip_all_tags( (string) $tour['label'] ) ) : '';
 				$documents[] = array(
-					'label' => $label ? $label : sprintf( __( 'Virtual tour %d', 'propertyhive' ), (int) $index + 1 ),
+					'label' => $label ? $label : sprintf(
+						/* translators: %d: virtual tour number */
+						__( 'Virtual tour %d', 'propertyhive' ),
+						(int) $index + 1
+					),
 					'type'  => 'virtual-tour',
 					'url'   => self::is_demo_preview() || empty( $tour['url'] ) ? '' : esc_url_raw( $tour['url'] ),
 				);
@@ -2016,7 +2028,11 @@ trait PH_Template_Set_Detail {
 		$epc_urls = self::get_property_document_urls( $property, 'epc' );
 		foreach ( $epc_urls as $index => $epc_url ) {
 			$documents[] = array(
-				'label' => 0 === $index ? __( 'EPC', 'propertyhive' ) : sprintf( __( 'EPC %d', 'propertyhive' ), (int) $index + 1 ),
+				'label' => 0 === $index ? __( 'EPC', 'propertyhive' ) : sprintf(
+					/* translators: %d: EPC document number */
+					__( 'EPC %d', 'propertyhive' ),
+					(int) $index + 1
+				),
 				'type'  => 'epc',
 				'url'   => $epc_url,
 			);
