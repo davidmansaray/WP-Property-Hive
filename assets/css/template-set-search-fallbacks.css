@@ -50,6 +50,25 @@
 		box-shadow: inset 3px 0 0 color-mix(in srgb, currentColor 32%, transparent);
 	}
 
+	:where(.ph-template-search.ph-search-template-portal-grid-search-results) ul.properties > li.ph-template-search-promo {
+		border: 1px solid #dfe3e4;
+		border-radius: 0;
+		background: #fff;
+	}
+
+	:where(.ph-template-search.ph-search-template-map-led-search-results) ul.properties > li.ph-template-search-promo {
+		border: 1px solid #dfe2de;
+		border-radius: 0;
+		background: #fff;
+	}
+
+	:where(.ph-template-search.ph-search-template-map-led-search-results) ul.properties > li.ph-template-search-promo img {
+		inline-size: 100%;
+		block-size: 11.25rem;
+		max-block-size: 11.25rem;
+		object-fit: cover;
+	}
+
 	:where(.ph-template-search) .ph-template-badge {
 		border: 1px solid currentColor;
 		border-radius: 999px;
@@ -813,6 +832,35 @@
 		background: transparent;
 		font-weight: 700;
 		text-decoration: none;
+	}
+
+	:where(.ph-template-search.ph-search-template-map-led-search-results.ph-search-map-panel-suppressed) {
+		background: #fff;
+	}
+
+	:where(.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results)) .ph-infinite-scroll-button a.button {
+		border-color: var(--ph-search-accent);
+		color: #fff;
+		background: var(--ph-search-accent);
+	}
+
+	:where(.ph-template-search) .ph-infinite-scroll-loading {
+		padding-block: 1rem;
+		color: var(--ph-search-muted);
+		font-size: 0.875rem;
+		text-align: center;
+	}
+
+	:where(.ph-template-search) .autocomplete-results,
+	:where(.ph-template-search-form) .autocomplete-results {
+		border-color: var(--ph-search-line);
+		background: #fff;
+	}
+
+	:where(.ph-template-search) .autocomplete-results li:is(:hover, .active),
+	:where(.ph-template-search-form) .autocomplete-results li:is(:hover, .active) {
+		color: var(--ph-search-accent);
+		background: var(--ph-search-paper);
 	}
 
 	@media (max-width: 48.75rem) {

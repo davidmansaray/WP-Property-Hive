@@ -22,6 +22,10 @@
 				return;
 			}
 
+			if (!surface.querySelector('.ph-template-map-panel')) {
+				return;
+			}
+
 			surface.phTemplateMapRailReady = true;
 			surface.querySelectorAll('ul.properties > li.ph-template-card').forEach(function (card) {
 				var home = card.querySelector('[data-home]');

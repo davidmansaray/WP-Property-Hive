@@ -6826,6 +6826,136 @@ body.ph-detail-template-immersive-cinema-detail .wp-site-blocks > footer a {
 	}
 }
 
+/* Rooms add-on output is appended after the template-set detail summary. */
+.ph-template-detail .room-breakdown {
+	box-sizing: border-box;
+	background: #fff;
+	border: 1px solid var(--ph-template-line);
+	border-radius: var(--ph-template-radius);
+	color: var(--ph-template-text);
+	margin: 28px 0 0;
+	padding: 20px;
+}
+
+.ph-template-detail .room-breakdown > h4 {
+	color: var(--ph-template-ink);
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.25;
+	margin: 0 0 14px;
+}
+
+.ph-template-detail .room-breakdown .room {
+	display: grid;
+	gap: 0.75rem;
+	margin: 0;
+}
+
+.ph-template-detail .room-breakdown .room + .room {
+	margin-block-start: 1rem;
+	padding-block-start: 1rem;
+	border-block-start: 1px solid var(--ph-template-line);
+}
+
+.ph-template-detail .room-breakdown .room .image img {
+	display: block;
+	max-inline-size: 100%;
+	block-size: auto;
+	object-fit: contain;
+}
+
+.ph-template-detail .room-breakdown .room .name {
+	color: inherit;
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.ph-template-detail .room-breakdown .room > :is(.rent, .availability, .available-date, .description) {
+	color: inherit;
+	font-size: 0.9375rem;
+	line-height: 1.5;
+}
+
+.ph-template-detail .room-breakdown .room hr {
+	display: none;
+}
+
+.ph-detail-template-conversion-first-sales-detail .ph-template-detail .room-breakdown,
+.ph-detail-template-conversion-first-sales-detail.ph-template-detail .room-breakdown {
+	background: transparent;
+	border: 0;
+	border-block-end: 1px solid var(--ph-template-line);
+	border-radius: 0;
+	color: #4a5559;
+	margin: 0 0 28px;
+	padding: 0 0 28px;
+}
+
+.ph-detail-template-conversion-first-sales-detail .ph-template-detail .room-breakdown > h4,
+.ph-detail-template-conversion-first-sales-detail.ph-template-detail .room-breakdown > h4 {
+	color: var(--ph-template-text);
+	font-size: 1.15rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	margin: 0 0 16px;
+}
+
+.ph-detail-template-immersive-cinema-detail .ph-template-detail .room-breakdown,
+.ph-detail-template-immersive-cinema-detail.ph-template-detail .room-breakdown {
+	background: transparent;
+	border: 0;
+	border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 0;
+	color: rgba(243, 244, 246, 0.72);
+	margin: 0 0 40px;
+	padding: 0 0 36px;
+}
+
+.ph-detail-template-immersive-cinema-detail .ph-template-detail .room-breakdown > h4,
+.ph-detail-template-immersive-cinema-detail.ph-template-detail .room-breakdown > h4 {
+	color: #fff;
+	font-size: 1.35rem;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	margin: 0 0 14px;
+}
+
+.ph-detail-template-immersive-cinema-detail .ph-template-detail .room-breakdown .room + .room,
+.ph-detail-template-immersive-cinema-detail.ph-template-detail .room-breakdown .room + .room {
+	border-block-start-color: rgba(255, 255, 255, 0.08);
+}
+
+.ph-detail-template-premium-editorial-detail .ph-template-detail .room-breakdown,
+.ph-detail-template-premium-editorial-detail.ph-template-detail .room-breakdown {
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	color: #211d19;
+	margin: 0;
+	padding: 72px 0;
+}
+
+.ph-detail-template-premium-editorial-detail .ph-template-detail .room-breakdown > h4,
+.ph-detail-template-premium-editorial-detail.ph-template-detail .room-breakdown > h4 {
+	color: #211d19;
+	font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+	font-size: 25px;
+	font-weight: 500;
+	line-height: 1.2;
+	margin: 0 0 24px;
+}
+
+.ph-detail-template-premium-editorial-detail .ph-template-detail .room-breakdown .room + .room,
+.ph-detail-template-premium-editorial-detail.ph-template-detail .room-breakdown .room + .room {
+	border-block-start-color: #e6e0d6;
+}
+
+/* Fancybox v3 uses the 9999x range; keep the body-appended jQuery UI widget above it. */
+body.ph-template-set-active #ui-datepicker-div {
+	z-index: 100000 !important;
+}
+
 /* Rich template enquiry forms are shown inside Fancybox rather than the page. */
 .fancybox-container .ph-template-enquiry-modal {
 	background: #fff;

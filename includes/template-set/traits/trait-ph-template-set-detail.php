@@ -1900,6 +1900,11 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_primary_cta_label( $property, $template ) {
+		$viewing_request_active = class_exists( 'PH_Viewing_Request' ) && self::is_add_on_usable( 'propertyhive-viewing-request' );
+		if ( ! $viewing_request_active ) {
+			return __( 'Make Enquiry', 'propertyhive' );
+		}
+
 		if ( 'lettings-detail' === $template || 'residential-lettings' === self::get_detail_department( $property ) ) {
 			return __( 'Arrange viewing', 'propertyhive' );
 		}

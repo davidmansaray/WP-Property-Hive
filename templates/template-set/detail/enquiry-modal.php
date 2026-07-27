@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <div id="makeEnquiry<?php echo (int) $post_id; ?>" class="ph-template-enquiry-modal" style="display:none;">
-	<h2><?php esc_html_e( 'Make Enquiry', 'propertyhive' ); ?></h2>
+	<h2><?php esc_html_e( 'Contact the agent', 'propertyhive' ); ?></h2>
 	<p><?php esc_html_e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
 	<?php propertyhive_enquiry_form(); ?>
 </div>

@@ -389,6 +389,32 @@
 		window.jQuery(document)
 			.on('ph:infinite_scroll_loading_properties.phTemplateSet', captureInfiniteScrollStart)
 			.on('ph:infinite_scroll_loaded_properties.phTemplateSet', refreshInfiniteScrollResults);
+
+		window.jQuery(document).on('focus.phTemplateSetDatepicker', '.ph-template-enquiry-modal input[name="preferred_viewing_date"]', function () {
+			var input = this;
+
+			// The Viewing Request add-on initialises and positions its datepicker on click.
+			// Queue after that handler so its body-scroll calculation cannot override the modal anchor.
+			window.setTimeout(function () {
+				window.setTimeout(function () {
+					var $input = window.jQuery(input);
+
+					if (typeof $input.datepicker !== 'function') {
+						return;
+					}
+
+					try {
+						$input.datepicker('widget').position({
+							my: 'left top',
+							at: 'left bottom',
+							of: input
+						});
+					} catch (error) {
+						// The add-on is absent or has not initialised this field yet.
+					}
+				}, 0);
+			}, 0);
+		});
 	}
 
 	window.phTemplateSetGallery = window.phTemplateSetGallery || {};

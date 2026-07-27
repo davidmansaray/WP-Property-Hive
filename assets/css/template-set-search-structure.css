@@ -44,6 +44,44 @@
 	block-size: auto;
 }
 
+.ph-template-search .property-search-form .control-address_keyword .autocomplete-container {
+	position: relative;
+}
+
+.ph-template-search .autocomplete-results,
+.ph-template-search-form .autocomplete-results {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-start: 100% !important;
+	z-index: 30;
+	max-block-size: 20rem;
+	overflow-y: auto;
+	border: 1px solid var(--ph-search-line, #d7d8d2);
+	border-radius: 0.5rem;
+	box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+	background: var(--ph-search-surface, #fff);
+}
+
+.ph-template-search .autocomplete-results ul,
+.ph-template-search-form .autocomplete-results ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ph-template-search .autocomplete-results li,
+.ph-template-search-form .autocomplete-results li {
+	cursor: pointer;
+	padding: 0.625rem 0.75rem;
+	color: var(--ph-search-ink, inherit);
+}
+
+.ph-template-search .autocomplete-results li:is(:hover, .active),
+.ph-template-search-form .autocomplete-results li:is(:hover, .active) {
+	color: var(--ph-search-accent, inherit);
+	background: var(--ph-search-paper, #f5f7f8);
+}
+
 .ph-template-search .ph-template-search-intro-copy {
 	max-inline-size: 52rem;
 }
@@ -98,6 +136,40 @@
 
 .ph-template-search ul.properties > li {
 	min-inline-size: 0;
+}
+
+.ph-template-search ul.properties > li.ph-template-search-promo {
+	min-inline-size: 0;
+	overflow: hidden;
+}
+
+.ph-template-search ul.properties > li.ph-template-search-promo img {
+	display: block;
+	max-inline-size: 100%;
+	block-size: auto;
+}
+
+.ph-template-search ul.properties > li.ph-template-search-promo-full {
+	grid-column: 1 / -1;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results ul.properties > li.ph-template-search-promo {
+	border: 1px solid #dfe3e4;
+	border-radius: 0;
+	background: #fff;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-search-promo {
+	border: 1px solid #dfe2de;
+	border-radius: 0;
+	background: #fff;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-search-promo img {
+	inline-size: 100%;
+	block-size: 11.25rem;
+	max-block-size: 11.25rem;
+	object-fit: cover;
 }
 
 .ph-template-search ul.properties > li.ph-template-card {
@@ -633,6 +705,11 @@
 	margin-inline: calc(50% - 50vw);
 }
 
+.ph-template-search.ph-search-template-map-led-search-results.ph-search-map-panel-suppressed:not(.ph-search-map-split) {
+	grid-template-columns: minmax(0, 1fr);
+	background: #fff;
+}
+
 .ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .propertyhive-pagination {
 	grid-column: 1;
 	grid-row: 6;
@@ -739,6 +816,41 @@ body.ph-search-template-map-led-search-results {
 	font-size: 2.375rem;
 	font-weight: 400;
 	line-height: 1;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-infinite-scroll-button {
+	margin-block: 0 1rem;
+	text-align: center;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-infinite-scroll-button a.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-block-size: 2.75rem;
+	padding: 0.6875rem 1.125rem;
+	border: 1px solid var(--ph-search-accent, var(--ph-template-brand, #174a42));
+	border-radius: 0;
+	color: #fff;
+	background: var(--ph-search-accent, var(--ph-template-brand, #174a42));
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 700;
+	line-height: 1.2;
+	text-decoration: none;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-infinite-scroll-button a.button:is(:hover, :focus-visible) {
+	border-color: var(--ph-search-ink, #17211d);
+	color: #fff;
+	background: var(--ph-search-ink, #17211d);
+}
+
+.ph-template-search .ph-infinite-scroll-loading {
+	padding-block: 1rem;
+	color: var(--ph-search-muted);
+	font-size: 0.875rem;
+	text-align: center;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .details h3 {

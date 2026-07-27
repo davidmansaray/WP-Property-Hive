@@ -88,6 +88,10 @@ trait PH_Template_Set_Search {
 				$classes[] = 'ph-search-map-fallback-' . sanitize_html_class( $map_state['fallback_reason'] );
 			}
 
+			if ( in_array( $map_state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
+				$classes[] = 'ph-search-map-panel-suppressed';
+			}
+
 			if ( class_exists( 'PH_Radial_Search' ) && self::is_add_on_usable( 'propertyhive-radial-search' ) ) {
 				$classes[] = 'ph-template-radial-search-active';
 			}
@@ -581,6 +585,10 @@ trait PH_Template_Set_Search {
 			$classes[] = 'ph-template-map-search-real-map';
 		}
 
+		if ( in_array( $map_state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
+			$classes[] = 'ph-search-map-panel-suppressed';
+		}
+
 		if ( self::is_module_preview() ) {
 			$classes[] = 'ph-template-module-preview-shell';
 			$classes[] = 'ph-module-template-' . sanitize_html_class( self::get_module_template() );
@@ -733,6 +741,10 @@ trait PH_Template_Set_Search {
 
 		$state = PH_Template_Set_Request_Context::get_map_search_state();
 		if ( $state['shows_real_map'] ) {
+			return;
+		}
+
+		if ( in_array( $state['fallback_reason'], array( 'unavailable', 'unusable', 'unconfigured' ), true ) && ! self::can_manage_template_set() ) {
 			return;
 		}
 
@@ -1474,6 +1486,12 @@ trait PH_Template_Set_Search {
 				),
 			),
 		);
+
+		$map_state = PH_Template_Set_Request_Context::get_map_search_state();
+		if ( 'portal-style-search-results' === $template && ! $map_state['manages_archive'] ) {
+			$content[ $template ]['body']     = __( 'Compare listings with filters, sorting and clear results.', 'propertyhive' );
+			$content[ $template ]['items'][2] = __( 'Sorted results', 'propertyhive' );
+		}
 
 		if ( 'map-led-search-results' === $template ) {
 			$content[ $template ]['kicker'] = self::get_map_search_kicker( $content[ $template ]['kicker'] );
