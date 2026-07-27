@@ -101,7 +101,9 @@ trait PH_Template_Set_Preview {
 			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_features', 20 );
 			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_summary', 30 );
 			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_description', 40 );
+			add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'prepare_detail_actions' ), 9 );
 			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_enquiry_modal' ), 10 );
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_actions' ), 12 );
 		}
 
 		if ( 'premium-editorial-detail' === self::get_detail_template() ) {

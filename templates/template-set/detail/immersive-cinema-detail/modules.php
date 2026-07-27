@@ -89,7 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$doc_class = 'ph-template-doc-pill' . ( $doc_type ? ' ph-template-doc-pill-' . $doc_type : '' );
 					?>
 					<?php if ( ! empty( $document['url'] ) ) : ?>
-						<a class="<?php echo esc_attr( $doc_class ); ?>" href="<?php echo esc_url( $document['url'] ); ?>"><?php echo esc_html( $document['label'] ); ?></a>
+						<a class="<?php echo esc_attr( $doc_class ); ?>" href="<?php echo esc_url( $document['url'] ); ?>"<?php if ( ! empty( $document['attributes'] ) && is_array( $document['attributes'] ) ) : ?><?php foreach ( $document['attributes'] as $name => $value ) : ?> <?php echo esc_attr( $name ); ?>="<?php echo esc_attr( $value ); ?>"<?php endforeach; ?><?php endif; ?>><?php echo esc_html( $document['label'] ); ?></a>
 					<?php else : ?>
 						<span class="<?php echo esc_attr( $doc_class ); ?>"><?php echo esc_html( $document['label'] ); ?></span>
 					<?php endif; ?>

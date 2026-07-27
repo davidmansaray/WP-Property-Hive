@@ -10,6 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 trait PH_Template_Set_Detail {
 
 	/**
+	 * Captured classic action data for the current detail page.
+	 *
+	 * @var array
+	 */
+	private static $detail_actions_data = array();
+
+	/**
 	 * Render supporting property modules in preview mode.
 	 */
 	public static function render_detail_modules() {
@@ -101,6 +108,310 @@ trait PH_Template_Set_Detail {
 				'show_purchase_costs' => $is_sales && ( 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() || self::is_template_editor_active() ) && ( shortcode_exists( 'stamp_duty_calculator' ) || shortcode_exists( 'mortgage_calculator' ) ),
 			)
 		);
+	}
+
+	/**
+	 * Re-render the classic property-actions extension points inside rich detail
+	 * templates without duplicating core document and enquiry controls.
+	 */
+	public static function prepare_detail_actions() {
+		if ( ! self::is_enabled() || self::is_demo_preview() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+			return;
+		}
+
+		ob_start();
+		self::render_detail_actions();
+		$markup = ob_get_clean();
+
+		if ( isset( self::$detail_actions_data['property_id'] ) ) {
+			self::$detail_actions_data['markup'] = $markup;
+		}
+	}
+
+	/**
+	 * Output the prepared action surface after the single-property summary.
+	 */
+	public static function render_detail_actions() {
+		if ( ! self::is_enabled() || self::is_demo_preview() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+			return;
+		}
+
+		$property = self::get_current_property();
+
+		if ( ! $property ) {
+			return;
+		}
+
+		if ( isset( self::$detail_actions_data['property_id'], self::$detail_actions_data['markup'] ) && absint( self::$detail_actions_data['property_id'] ) === absint( $property->id ) ) {
+			echo self::$detail_actions_data['markup']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- prepared template output.
+			return;
+		}
+
+		$enquiry_priority   = has_action( 'propertyhive_property_actions_list_start', 'propertyhive_make_enquiry_button' );
+		$shortlist_callback = null;
+		$shortlist_priority = false;
+
+		if ( class_exists( 'PH_Shortlist' ) && method_exists( 'PH_Shortlist', 'instance' ) ) {
+			$shortlist_callback = array( PH_Shortlist::instance(), 'add_shortlist_action' );
+			$shortlist_priority = has_filter( 'propertyhive_single_property_actions', $shortlist_callback );
+		}
+
+		try {
+			if ( false !== $enquiry_priority ) {
+				remove_action( 'propertyhive_property_actions_list_start', 'propertyhive_make_enquiry_button', $enquiry_priority );
+			}
+
+			if ( $shortlist_callback && false !== $shortlist_priority ) {
+				remove_filter( 'propertyhive_single_property_actions', $shortlist_callback, $shortlist_priority );
+			}
+
+			ob_start();
+			$actions       = apply_filters( 'propertyhive_single_property_actions', array() );
+			$filter_output = ob_get_clean();
+
+			$actions    = self::normalise_detail_home_report_actions( is_array( $actions ) ? $actions : array() );
+			$start      = self::capture_detail_action_hook( 'propertyhive_property_actions_start' );
+			$list_start = self::capture_detail_action_hook( 'propertyhive_property_actions_list_start' );
+			$list_end   = self::capture_detail_action_hook( 'propertyhive_property_actions_list_end' );
+			$end        = self::capture_detail_action_hook( 'propertyhive_property_actions_end' );
+		} finally {
+			if ( false !== $enquiry_priority ) {
+				add_action( 'propertyhive_property_actions_list_start', 'propertyhive_make_enquiry_button', $enquiry_priority );
+			}
+
+			if ( $shortlist_callback && false !== $shortlist_priority ) {
+				add_filter( 'propertyhive_single_property_actions', $shortlist_callback, $shortlist_priority );
+			}
+		}
+
+		$list_start_parts = self::detach_detail_action_modals( $list_start );
+		$list_end_parts   = self::detach_detail_action_modals( $list_end );
+		$filter_output    = self::deduplicate_detail_action_forms( $filter_output );
+
+		self::$detail_actions_data = array(
+			'property_id'           => absint( $property->id ),
+			'actions'               => $actions,
+			'has_home_report'       => self::detail_actions_include_home_report( $actions ),
+			'has_send_to_friend'    => false !== strpos( $list_start_parts['modals'] . $list_end_parts['modals'], 'id="sendToFriend' . absint( $property->id ) . '"' ),
+		);
+
+		PH_Template_Set_Template_Loader::render(
+			'detail',
+			self::get_detail_template(),
+			'actions',
+			array(
+				'actions'             => $actions,
+				'start'               => $start,
+				'list_start'          => $list_start_parts['list'],
+				'list_end'            => $list_end_parts['list'],
+				'end'                 => $end,
+				'extracted_modals'    => $list_start_parts['modals'] . $list_end_parts['modals'],
+				'filter_output'       => $filter_output,
+				'list_outside_markup' => $list_start_parts['outside'] . $list_end_parts['outside'],
+			)
+		);
+	}
+
+	/**
+	 * Capture one classic action phase without changing its structural position.
+	 *
+	 * @param string $hook Action hook name.
+	 * @return string
+	 */
+	private static function capture_detail_action_hook( $hook ) {
+		ob_start();
+		do_action( $hook );
+		return ob_get_clean();
+	}
+
+	/**
+	 * Coalesce Home Report controls to the add-on's supported target model.
+	 *
+	 * @param array $actions Filtered classic action data.
+	 * @return array
+	 */
+	private static function normalise_detail_home_report_actions( $actions ) {
+		$normalised = array();
+		$seen       = array();
+
+		foreach ( $actions as $action ) {
+			if ( ! is_array( $action ) ) {
+				continue;
+			}
+
+			$class = isset( $action['class'] ) ? (string) $action['class'] : '';
+
+			if ( false === strpos( $class, 'action-home-report' ) ) {
+				$normalised[] = $action;
+				continue;
+			}
+
+			$data_src = isset( $action['attributes']['data-src'] ) ? (string) $action['attributes']['data-src'] : '';
+			$url      = isset( $action['href'] ) ? esc_url_raw( $action['href'] ) : '';
+			$key      = $data_src ? 'target:' . $data_src : 'url:' . $url;
+
+			if ( isset( $seen[ $key ] ) ) {
+				continue;
+			}
+
+			$seen[ $key ] = true;
+			$normalised[]  = $action;
+		}
+
+		return $normalised;
+	}
+
+	/**
+	 * Split modal divs out of action list items before they reach the toolbar.
+	 *
+	 * @param string $markup Captured list-hook markup.
+	 * @return array
+	 */
+	private static function detach_detail_action_modals( $markup ) {
+		$parts = array(
+			'list'    => '',
+			'modals'  => '',
+			'outside' => '',
+		);
+
+		if ( '' === trim( $markup ) || ! class_exists( 'DOMDocument' ) ) {
+			$parts['list'] = $markup;
+			return $parts;
+		}
+
+		$previous_errors = libxml_use_internal_errors( true );
+		$document        = new DOMDocument();
+		$loaded          = $document->loadHTML( '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body><div id="ph-template-action-fragment">' . $markup . '</div></body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_errors );
+
+		if ( ! $loaded ) {
+			$parts['list'] = $markup;
+			return $parts;
+		}
+
+		$wrapper = $document->getElementById( 'ph-template-action-fragment' );
+
+		if ( ! $wrapper ) {
+			$parts['list'] = $markup;
+			return $parts;
+		}
+
+		$list_items = array();
+		foreach ( $wrapper->childNodes as $child ) {
+			if ( XML_ELEMENT_NODE === $child->nodeType && 'li' === strtolower( $child->nodeName ) ) {
+				$list_items[] = $child;
+			}
+		}
+
+		foreach ( $list_items as $list_item ) {
+			$modal_children = array();
+			foreach ( $list_item->childNodes as $child ) {
+				if ( XML_ELEMENT_NODE === $child->nodeType && 'div' === strtolower( $child->nodeName ) && $child->hasAttribute( 'id' ) ) {
+					$modal_children[] = $child;
+				}
+			}
+
+			foreach ( $modal_children as $modal ) {
+				$parts['modals'] .= $document->saveHTML( $modal );
+				$list_item->removeChild( $modal );
+			}
+		}
+
+		foreach ( $wrapper->childNodes as $child ) {
+			if ( XML_ELEMENT_NODE === $child->nodeType && 'li' === strtolower( $child->nodeName ) ) {
+				$parts['list'] .= $document->saveHTML( $child );
+			} else {
+				$parts['outside'] .= $document->saveHTML( $child );
+			}
+		}
+
+		return $parts;
+	}
+
+	/**
+	 * Keep the first form target for every id emitted during a filter harvest.
+	 *
+	 * @param string $markup Filter-side echoed markup.
+	 * @return string
+	 */
+	private static function deduplicate_detail_action_forms( $markup ) {
+		if ( '' === trim( $markup ) || ! class_exists( 'DOMDocument' ) ) {
+			return $markup;
+		}
+
+		$previous_errors = libxml_use_internal_errors( true );
+		$document        = new DOMDocument();
+		$loaded          = $document->loadHTML( '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body><div id="ph-template-action-filter-output">' . $markup . '</div></body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_errors );
+
+		if ( ! $loaded ) {
+			return $markup;
+		}
+
+		$wrapper = $document->getElementById( 'ph-template-action-filter-output' );
+
+		if ( ! $wrapper ) {
+			return $markup;
+		}
+
+		$seen  = array();
+		$nodes = array();
+		foreach ( $wrapper->getElementsByTagName( '*' ) as $node ) {
+			$nodes[] = $node;
+		}
+
+		foreach ( $nodes as $node ) {
+			if ( ! $node->hasAttribute( 'id' ) ) {
+				continue;
+			}
+
+			$id = $node->getAttribute( 'id' );
+			if ( '' === $id || ! isset( $seen[ $id ] ) ) {
+				$seen[ $id ] = true;
+				continue;
+			}
+
+			if ( $node->parentNode ) {
+				$node->parentNode->removeChild( $node );
+			}
+		}
+
+		$output = '';
+		foreach ( $wrapper->childNodes as $child ) {
+			$output .= $document->saveHTML( $child );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Check whether the main action harvest produced a Home Report control.
+	 *
+	 * @param array $actions Action data.
+	 * @return bool
+	 */
+	private static function detail_actions_include_home_report( $actions ) {
+		foreach ( $actions as $action ) {
+			if ( is_array( $action ) && isset( $action['class'] ) && false !== strpos( (string) $action['class'], 'action-home-report' ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether the canonical captured Send To Friend target exists for this page.
+	 *
+	 * @param int $post_id Property post ID.
+	 * @return bool
+	 */
+	private static function detail_actions_has_send_to_friend_form( $post_id ) {
+		return isset( self::$detail_actions_data['property_id'], self::$detail_actions_data['has_send_to_friend'] )
+			&& absint( self::$detail_actions_data['property_id'] ) === absint( $post_id )
+			&& self::$detail_actions_data['has_send_to_friend'];
 	}
 
 	/**
@@ -451,6 +762,7 @@ trait PH_Template_Set_Detail {
 
 		$office_alt = $office ? $office : __( 'Agent', 'propertyhive' );
 		$agent_role = self::get_contact_agent_role( $agent, $office_alt, $office );
+		$brochure_url = self::get_detail_brochure_url( $property );
 
 		$shortlist_class  = 'ph-template-button ph-template-button-secondary ph-template-shortlist-button';
 		$shortlist_labels = array();
@@ -490,6 +802,7 @@ trait PH_Template_Set_Detail {
 				'shortlist_button' => self::get_shortlist_button_markup( $shortlist_class, $shortlist_labels ),
 				'share_button'     => $share_button,
 				'has_brochure'     => self::has_brochure( $property ),
+				'brochure_url'     => $brochure_url,
 			)
 		);
 	}
@@ -1458,6 +1771,39 @@ trait PH_Template_Set_Detail {
 	}
 
 	/**
+	 * Resolve the premium-editorial brochure link from uploaded media first,
+	 * then from the already-captured Printable Brochures action.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return string
+	 */
+	private static function get_detail_brochure_url( $property ) {
+		if ( self::is_demo_preview() ) {
+			return '';
+		}
+
+		$brochure_url = self::get_first_property_document_url( $property, 'brochure' );
+
+		if ( $brochure_url ) {
+			return $brochure_url;
+		}
+
+		foreach ( isset( self::$detail_actions_data['actions'] ) ? self::$detail_actions_data['actions'] : array() as $action ) {
+			if ( ! is_array( $action ) || empty( $action['class'] ) || false === strpos( (string) $action['class'], 'action-printable-brochure' ) ) {
+				continue;
+			}
+
+			$url = isset( $action['href'] ) ? esc_url_raw( $action['href'] ) : '';
+
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Summarise available supporting documents.
 	 *
 	 * @param PH_Property $property Property object.
@@ -1626,11 +1972,12 @@ trait PH_Template_Set_Detail {
 			}
 		}
 
-		if ( self::has_epc( $property ) ) {
+		$epc_urls = self::get_property_document_urls( $property, 'epc' );
+		foreach ( $epc_urls as $index => $epc_url ) {
 			$documents[] = array(
-				'label' => __( 'EPC', 'propertyhive' ),
+				'label' => 0 === $index ? __( 'EPC', 'propertyhive' ) : sprintf( __( 'EPC %d', 'propertyhive' ), (int) $index + 1 ),
 				'type'  => 'epc',
-				'url'   => self::get_first_property_document_url( $property, 'epc' ),
+				'url'   => $epc_url,
 			);
 		}
 
@@ -1640,6 +1987,34 @@ trait PH_Template_Set_Detail {
 				'type'  => 'brochure',
 				'url'   => self::get_first_property_document_url( $property, 'brochure' ),
 			);
+		}
+
+		// Home Reports normally own the canonical action-region control. This
+		// fallback is intentionally ungated, matching classic hook output.
+		if ( class_exists( 'PH_Home_Reports' ) && ! empty( $property->_home_reports ) && ! self::detail_actions_include_home_report( isset( self::$detail_actions_data['actions'] ) ? self::$detail_actions_data['actions'] : array() ) ) {
+			$home_reports_settings = get_option( 'propertyhive_home_reports', array() );
+			$data_capture          = isset( $home_reports_settings['data_capture'] ) && '1' === (string) $home_reports_settings['data_capture'];
+			$home_report_urls      = array_values( array_unique( array_filter( array_map( 'wp_get_attachment_url', (array) $property->_home_reports ) ) ) );
+
+			if ( $data_capture ) {
+				$documents[] = array(
+					'label'      => __( 'View Home Report', 'propertyhive' ),
+					'type'       => 'home-report',
+					'url'        => 'javascript:;',
+					'attributes' => array(
+						'data-fancybox' => '',
+						'data-src'      => '#homeReport' . absint( $property->id ),
+					),
+				);
+			} else {
+				foreach ( $home_report_urls as $home_report_url ) {
+					$documents[] = array(
+						'label' => __( 'View Home Report', 'propertyhive' ),
+						'type'  => 'home-report',
+						'url'   => $home_report_url,
+					);
+				}
+			}
 		}
 
 		return $documents;
@@ -1656,8 +2031,21 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_first_property_document_url( $property, $document_type ) {
+		$urls = self::get_property_document_urls( $property, $document_type );
+
+		return empty( $urls ) ? '' : $urls[0];
+	}
+
+	/**
+	 * Get every usable URL for a supporting property document.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @param string      $document_type Document type.
+	 * @return array
+	 */
+	private static function get_property_document_urls( $property, $document_type ) {
 		if ( self::is_demo_preview() ) {
-			return '';
+			return array();
 		}
 
 		$document_type = sanitize_key( $document_type );
@@ -1681,13 +2069,15 @@ trait PH_Template_Set_Detail {
 
 		$document_sources = $stored_as_urls ? array( 'urls', 'attachments' ) : array( 'attachments', 'urls' );
 
+		$urls = array();
+
 		foreach ( $document_sources as $source ) {
 			if ( 'attachments' === $source ) {
 				foreach ( (array) $attachment_ids as $attachment_id ) {
 					$url = wp_get_attachment_url( absint( $attachment_id ) );
 
 					if ( $url ) {
-						return esc_url_raw( $url );
+						$urls[] = esc_url_raw( $url );
 					}
 				}
 				continue;
@@ -1698,11 +2088,11 @@ trait PH_Template_Set_Detail {
 				$url = esc_url_raw( $url );
 
 				if ( $url ) {
-					return $url;
+					$urls[] = $url;
 				}
 			}
 		}
 
-		return '';
+		return array_values( array_unique( array_filter( $urls ) ) );
 	}
 }

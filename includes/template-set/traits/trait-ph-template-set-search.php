@@ -1301,9 +1301,8 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
-	 * Get Share markup from the Send To Friend add-on (via propertyhive_single_property_actions).
-	 *
-	 * Returns empty string when the add-on is not active — no invented fallback.
+	 * Get Share markup for the Send To Friend target captured by the template-set
+	 * detail actions surface. It never invokes the actions filter itself.
 	 *
 	 * @param string $class Anchor class attribute.
 	 * @return string
@@ -1313,40 +1312,14 @@ trait PH_Template_Set_Search {
 			return '';
 		}
 
-		$actions = apply_filters( 'propertyhive_single_property_actions', array() );
+		$property = self::get_current_property();
+		$post_id  = $property && ! empty( $property->id ) ? absint( $property->id ) : absint( get_queried_object_id() );
 
-		if ( empty( $actions ) || ! is_array( $actions ) ) {
+		if ( ! $post_id ) {
 			return '';
 		}
 
-		$share_action = null;
-
-		foreach ( $actions as $action ) {
-			if ( empty( $action ) || ! is_array( $action ) ) {
-				continue;
-			}
-
-			$action_class = isset( $action['class'] ) ? (string) $action['class'] : '';
-			$label        = isset( $action['label'] ) ? (string) $action['label'] : '';
-			$data_src     = '';
-
-			if ( ! empty( $action['attributes'] ) && is_array( $action['attributes'] ) && isset( $action['attributes']['data-src'] ) ) {
-				$data_src = (string) $action['attributes']['data-src'];
-			}
-
-			if (
-				false !== stripos( $action_class, 'friend' )
-				|| false !== stripos( $action_class, 'send-to-friend' )
-				|| false !== stripos( $label, 'friend' )
-				|| false !== stripos( $data_src, 'friend' )
-				|| false !== stripos( $data_src, 'sendToFriend' )
-			) {
-				$share_action = $action;
-				break;
-			}
-		}
-
-		if ( ! $share_action ) {
+		if ( ! self::detail_actions_has_send_to_friend_form( $post_id ) ) {
 			return '';
 		}
 
@@ -1356,21 +1329,7 @@ trait PH_Template_Set_Search {
 			$class = 'ph-template-button ph-template-button-secondary ph-template-share-button';
 		}
 
-		$href  = isset( $share_action['href'] ) ? (string) $share_action['href'] : '';
-		$attrs = array();
-
-		if ( ! empty( $share_action['attributes'] ) && is_array( $share_action['attributes'] ) ) {
-			foreach ( $share_action['attributes'] as $key => $value ) {
-				$key = sanitize_key( $key );
-				if ( '' === $key ) {
-					continue;
-				}
-				$attrs[] = esc_attr( $key ) . '="' . esc_attr( (string) $value ) . '"';
-			}
-		}
-
-		return '<a href="' . esc_url( $href ? $href : 'javascript:;' ) . '" class="' . esc_attr( $class ) . '"'
-			. ( $attrs ? ' ' . implode( ' ', $attrs ) : '' )
+		return '<a href="javascript:;" class="' . esc_attr( $class ) . '" data-fancybox data-src="#sendToFriend' . absint( $post_id ) . '"'
 			. '>' . esc_html__( 'Share', 'propertyhive' ) . '</a>';
 	}
 

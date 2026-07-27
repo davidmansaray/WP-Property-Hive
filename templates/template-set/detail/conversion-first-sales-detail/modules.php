@@ -68,7 +68,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php foreach ( $documents as $document ) : ?>
 					<?php $document_class = 'ph-template-doc-pill ph-template-doc-pill-' . sanitize_html_class( $document['type'] ); ?>
 					<?php if ( ! empty( $document['url'] ) ) : ?>
-						<a class="<?php echo esc_attr( $document_class ); ?>" href="<?php echo esc_url( $document['url'] ); ?>"><?php echo esc_html( $document['label'] ); ?></a>
+						<a class="<?php echo esc_attr( $document_class ); ?>" href="<?php echo esc_url( $document['url'] ); ?>"<?php if ( ! empty( $document['attributes'] ) && is_array( $document['attributes'] ) ) : ?><?php foreach ( $document['attributes'] as $name => $value ) : ?> <?php echo esc_attr( $name ); ?>="<?php echo esc_attr( $value ); ?>"<?php endforeach; ?><?php endif; ?>><?php echo esc_html( $document['label'] ); ?></a>
 					<?php else : ?>
 						<span class="<?php echo esc_attr( $document_class ); ?>"><?php echo esc_html( $document['label'] ); ?></span>
 					<?php endif; ?>

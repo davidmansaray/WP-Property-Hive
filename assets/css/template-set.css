@@ -4664,6 +4664,28 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	padding: 8px 9px;
 }
 
+/* Classic add-on property actions relocated into rich detail templates. */
+.ph-template-addon-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	list-style: none;
+	margin: 20px 0;
+	padding: 0;
+}
+
+.ph-template-addon-actions > li {
+	margin: 0;
+	padding: 0;
+}
+
+.ph-template-addon-actions > li > a {
+	align-items: center;
+	display: inline-flex;
+	min-block-size: 2.5rem;
+	text-decoration: none;
+}
+
 .ph-template-doc-icon {
 	border: 1px solid currentColor;
 	display: inline-block;
