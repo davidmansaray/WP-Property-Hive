@@ -128,6 +128,14 @@ class PH_Template_Set_Catalog {
 						'default' => 'right',
 						'group'   => 'media',
 					),
+					'template_set_portal_show_costs' => array(
+						'type'                   => 'checkbox',
+						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
+						'options'                => self::get_checkbox_options(),
+						'default'                => 'yes',
+						'group'                  => 'modules',
+						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
+					),
 				);
 				break;
 
@@ -156,6 +164,14 @@ class PH_Template_Set_Catalog {
 						'options' => self::get_checkbox_options(),
 						'default' => 'yes',
 						'group'   => 'media',
+					),
+					'template_set_portal_show_costs' => array(
+						'type'                   => 'checkbox',
+						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
+						'options'                => self::get_checkbox_options(),
+						'default'                => 'yes',
+						'group'                  => 'modules',
+						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
 					),
 				);
 				break;

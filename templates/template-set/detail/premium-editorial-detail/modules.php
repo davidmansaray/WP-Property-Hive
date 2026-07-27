@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/template-set/detail/premium-editorial-detail/modules.php
  *
- * Available variables: $property, $template, $facts, $rooms, $material, $features, $description, $overview, $location_label, $address, $location_map_available, $documents, $office, $has_floorplan, $duet_images.
+ * Available variables: $property, $template, $facts, $rooms, $material, $features, $description, $overview, $location_label, $address, $location_map_available, $documents, $office, $has_floorplan, $duet_images, $calculator_price, $costs_shortcodes, $show_purchase_costs.
  *
  * @author  PropertyHive
  * @package PropertyHive/Templates/TemplateSet
@@ -72,6 +72,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div><dt><?php echo esc_html( $item['label'] ); ?></dt><dd><?php echo esc_html( $item['value'] ); ?></dd></div>
 				<?php endforeach; ?>
 			</dl>
+		</section>
+	<?php endif; ?>
+	<?php if ( $show_purchase_costs ) : ?>
+		<section class="ph-template-module ph-template-module-costs ph-template-editorial-costs">
+			<span><?php esc_html_e( 'Purchase costs', 'propertyhive' ); ?></span>
+			<div class="ph-template-costs-calculators">
+				<?php foreach ( $costs_shortcodes as $costs_shortcode ) : ?>
+					<?php
+					if ( ! is_string( $costs_shortcode ) || ! shortcode_exists( $costs_shortcode ) ) {
+						continue;
+					}
+
+					$calculator_price_attribute = '';
+					if ( '' !== $calculator_price && ( 0 === strpos( $costs_shortcode, 'stamp_duty_calculator' ) || 'mortgage_calculator' === $costs_shortcode ) ) {
+						$calculator_price_attribute = ' price="' . esc_attr( $calculator_price ) . '"';
+					}
+					?>
+					<div class="ph-template-costs-calc ph-template-costs-calc-<?php echo esc_attr( sanitize_html_class( $costs_shortcode ) ); ?>">
+						<?php echo do_shortcode( '[' . $costs_shortcode . $calculator_price_attribute . ']' ); ?>
+					</div>
+				<?php endforeach; ?>
+			</div>
 		</section>
 	<?php endif; ?>
 	<?php if ( $documents || $location_label || $address ) : ?>
