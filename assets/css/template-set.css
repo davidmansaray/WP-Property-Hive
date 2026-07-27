@@ -5487,7 +5487,9 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	border: 1px solid var(--ph-template-line-strong);
 	border-radius: var(--ph-template-radius);
 	box-sizing: border-box;
-	color: var(--ph-template-text);
+	/* Fixed dark ink: the background is forced white, and dark templates
+	   redefine --ph-template-text to a light colour. */
+	color: #333;
 	font-family: inherit;
 	font-size: 15px;
 	line-height: 1.25;
