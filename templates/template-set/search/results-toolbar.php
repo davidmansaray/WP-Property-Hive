@@ -5,7 +5,8 @@
  * Override in yourtheme/propertyhive/template-set/search/results-toolbar.php.
  *
  * Available variables: $template, $total, $ordering_markup, $map_state,
- * $map_toggle_url, $save_search_button, $save_search_popup.
+ * $map_toggle_url, $save_search_button, $save_search_popup, $shortlist_button,
+ * $shortlist_popup, $show_count and $is_shortlist_view.
  *
  * @package PropertyHive/Templates/TemplateSet
  * @version 1.0.0
@@ -20,13 +21,22 @@ $map_label = ! empty( $map_state['requested_view'] ) && 'map' === $map_state['re
 	: __( 'Map view', 'propertyhive' );
 ?>
 <div class="ph-template-results-toolbar">
-	<p class="ph-template-results-count" role="status" aria-live="polite" aria-atomic="true">
-		<strong><?php echo esc_html( number_format_i18n( absint( $total ) ) ); ?></strong>
-		<?php esc_html_e( 'homes match your search', 'propertyhive' ); ?>
-	</p>
+	<?php if ( ! isset( $show_count ) || $show_count ) : ?>
+		<p class="ph-template-results-count" role="status" aria-live="polite" aria-atomic="true">
+			<strong><?php echo esc_html( number_format_i18n( absint( $total ) ) ); ?></strong>
+			<?php if ( ! empty( $is_shortlist_view ) ) : ?>
+				<?php esc_html_e( 'shortlisted homes', 'propertyhive' ); ?>
+			<?php else : ?>
+				<?php esc_html_e( 'homes match your search', 'propertyhive' ); ?>
+			<?php endif; ?>
+		</p>
+	<?php endif; ?>
 	<div class="ph-template-results-toolbar-actions">
 		<?php if ( '' !== $save_search_button ) : ?>
 			<?php echo $save_search_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Save Search add-on anchor markup. ?>
+		<?php endif; ?>
+		<?php if ( '' !== $shortlist_button ) : ?>
+			<?php echo $shortlist_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Shortlist add-on anchor markup. ?>
 		<?php endif; ?>
 		<?php if ( '' !== $map_toggle_url ) : ?>
 			<a class="ph-template-map-toggle" href="<?php echo esc_url( $map_toggle_url ); ?>">
@@ -46,4 +56,7 @@ $map_label = ! empty( $map_state['requested_view'] ) && 'map' === $map_state['re
 </div>
 <?php if ( '' !== $save_search_popup ) : ?>
 	<?php echo $save_search_popup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Save Search add-on popup markup. ?>
+<?php endif; ?>
+<?php if ( '' !== $shortlist_popup ) : ?>
+	<?php echo $shortlist_popup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Shortlist add-on popup markup. ?>
 <?php endif; ?>

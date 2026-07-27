@@ -225,6 +225,37 @@
 		font-weight: 600;
 	}
 
+	:where(.ph-template-search) :is(.property-search-form .control-address_keyword, .ph-template-search-advanced-filters-panel .control-address_keyword) {
+		position: relative;
+	}
+
+	:where(.ph-template-search) :is(.property-search-form .control-address_keyword, .ph-template-search-advanced-filters-panel .control-address_keyword):has(.current-location) input {
+		padding-inline-end: 3rem;
+	}
+
+	:where(.ph-template-search) .current-location {
+		position: absolute !important;
+		inset-inline-start: auto !important;
+		inset-inline-end: 0.75rem !important;
+		inset-block-end: auto !important;
+		inset-block-start: 50% !important;
+		inline-size: 1.875rem !important;
+		translate: 0 -50%;
+		z-index: 2;
+	}
+
+	:where(.ph-template-search) .ph-template-card-attribution {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	:where(.ph-template-search) .ph-template-card-attribution img {
+		max-block-size: 1.75rem;
+		inline-size: auto;
+	}
+
 	:where(.ph-template-search.ph-search-template-portal-grid-search-results, .ph-template-search.ph-search-template-map-led-search-results) .property-search-form > input[type='submit'] {
 		margin: 0;
 		padding: 0.875rem 1.25rem;

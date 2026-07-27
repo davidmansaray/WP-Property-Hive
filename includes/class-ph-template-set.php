@@ -96,6 +96,8 @@ class PH_Template_Set {
 		add_action( 'wp_footer', array( __CLASS__, 'render_template_editor' ), 20 );
 		add_action( 'wp_ajax_propertyhive_template_set_save', array( __CLASS__, 'ajax_save_template_editor' ) );
 		add_action( 'wp_ajax_propertyhive_set_template_experience', array( __CLASS__, 'ajax_set_template_experience' ) );
+		add_action( 'wp_ajax_propertyhive_infinite_load_properties', array( __CLASS__, 'prime_infinite_scroll_portal_attribution' ), 9 );
+		add_action( 'wp_ajax_nopriv_propertyhive_infinite_load_properties', array( __CLASS__, 'prime_infinite_scroll_portal_attribution' ), 9 );
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'open_search_wrapper' ), 11 );
 		add_action( 'propertyhive_after_main_content', array( __CLASS__, 'close_search_wrapper' ), 9 );

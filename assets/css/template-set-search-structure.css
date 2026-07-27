@@ -377,6 +377,37 @@
 	align-items: center;
 }
 
+.ph-template-search .ph-template-card-attribution {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.ph-template-search .ph-template-card-attribution img {
+	max-block-size: 1.75rem;
+	inline-size: auto;
+}
+
+.ph-template-search :is(.property-search-form .control-address_keyword, .ph-template-search-advanced-filters-panel .control-address_keyword) {
+	position: relative;
+}
+
+.ph-template-search :is(.property-search-form .control-address_keyword, .ph-template-search-advanced-filters-panel .control-address_keyword):has(.current-location) input {
+	padding-inline-end: 3rem;
+}
+
+.ph-template-search .current-location {
+	position: absolute !important;
+	inset-inline-start: auto !important;
+	inset-inline-end: 0.75rem !important;
+	inset-block-end: auto !important;
+	inset-block-start: 50% !important;
+	inline-size: 1.875rem !important;
+	translate: 0 -50%;
+	z-index: 2;
+}
+
 .ph-template-search .ph-template-badges {
 	position: absolute;
 	z-index: 2;
@@ -632,7 +663,8 @@
 	justify-content: flex-end;
 }
 
-.ph-template-search.ph-search-template-map-led-search-results .ph-template-results-toolbar-actions > .propertyhive-save-search-button {
+.ph-template-search .ph-template-results-toolbar-actions > .propertyhive-save-search-button,
+.ph-template-search .ph-template-results-toolbar-actions > .propertyhive-shortlist-enquiry-button {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -651,13 +683,13 @@
 	text-decoration: none;
 }
 
-.ph-template-search.ph-search-template-map-led-search-results .ph-template-results-toolbar-actions > .propertyhive-save-search-button:is(:hover, :focus-visible) {
+.ph-template-search .ph-template-results-toolbar-actions > :is(.propertyhive-save-search-button, .propertyhive-shortlist-enquiry-button):is(:hover, :focus-visible) {
 	border-color: var(--ph-search-accent, #174a42);
 	color: var(--ph-search-accent, #174a42);
 	background: #fff;
 }
 
-.ph-template-search.ph-search-template-map-led-search-results .ph-template-save-search-icon {
+.ph-template-search .ph-template-save-search-icon {
 	flex: 0 0 auto;
 	inline-size: 1.125rem;
 	block-size: 1.125rem;

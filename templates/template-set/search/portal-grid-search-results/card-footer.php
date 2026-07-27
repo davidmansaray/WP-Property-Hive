@@ -32,6 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php if ( $phone ) : ?><a href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a><?php endif; ?>
 		</div>
 	<?php endif; ?>
+	<?php PH_Template_Set_Template_Loader::render( 'search', $template, 'card-attribution', array( 'property' => $property, 'attribution' => $portal_attribution ) ); ?>
 	<?php if ( ! empty( $shortlist_button ) ) : ?>
 		<div class="ph-template-card-actions"><?php echo wp_kses_post( $shortlist_button ); ?></div>
 	<?php endif; ?>

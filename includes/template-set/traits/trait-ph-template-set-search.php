@@ -197,7 +197,27 @@ trait PH_Template_Set_Search {
 			add_action( $hook, array( __CLASS__, 'render_linked_card_price' ), $priority );
 		}
 
-		self::remove_named_action_callbacks( $hook, 'propertyhive_template_loop_actions' );
+		$action_priorities = self::remove_named_action_callbacks( $hook, 'propertyhive_template_loop_actions' );
+		$template_assistant = get_option( 'propertyhive_template_assistant', array() );
+		$configured_fields  = is_array( $template_assistant ) && isset( $template_assistant['search_result_fields'] ) && is_array( $template_assistant['search_result_fields'] )
+			? $template_assistant['search_result_fields']
+			: array();
+
+		// Template Assistant is core functionality. Re-add its normal renderer at
+		// the saved priorities so theme overrides of search/actions.php still apply.
+		if ( in_array( 'actions', $configured_fields, true ) ) {
+			foreach ( $action_priorities as $priority ) {
+				add_action( $hook, 'propertyhive_template_loop_actions', $priority );
+			}
+		}
+
+		if ( self::is_portal_card_attribution_enabled() ) {
+			global $wp_query;
+
+			if ( $wp_query instanceof WP_Query ) {
+				self::prime_portal_card_attribution( wp_list_pluck( $wp_query->posts, 'ID' ) );
+			}
+		}
 
 		remove_action( $hook, array( __CLASS__, 'render_map_card_location' ), 8 );
 		if ( 'map-led-search-results' === self::get_search_template() ) {
@@ -535,6 +555,10 @@ trait PH_Template_Set_Search {
 
 		$department = self::get_search_department_for_taxonomy( $field['type'] );
 
+		if ( '' === $department && 'property_type' === $field['type'] && self::is_rooms_search_active() && 'rooms' === self::get_current_search_department() ) {
+			$department = 'rooms';
+		}
+
 		if ( '' === $department ) {
 			return $query_args;
 		}
@@ -622,11 +646,13 @@ trait PH_Template_Set_Search {
 
 		global $wp_query;
 
-		$state              = PH_Template_Set_Request_Context::get_map_search_state();
-		$ordering_markup    = '';
-		$save_search_markup = self::get_map_save_search_markup();
+		$state                  = PH_Template_Set_Request_Context::get_map_search_state();
+		$map_view               = ! empty( $state['manages_archive'] ) && 'map' === $state['requested_view'];
+		$ordering_markup        = '';
+		$save_search_markup     = self::get_toolbar_save_search_markup();
+		$shortlist_enquiry      = self::get_shortlist_enquiry_markup();
 
-		if ( function_exists( 'propertyhive_catalog_ordering' ) ) {
+		if ( ! $map_view && function_exists( 'propertyhive_catalog_ordering' ) ) {
 			ob_start();
 			propertyhive_catalog_ordering();
 			$ordering_markup = (string) ob_get_clean();
@@ -640,29 +666,33 @@ trait PH_Template_Set_Search {
 				'template'           => self::get_search_template(),
 				'total'              => $wp_query instanceof WP_Query ? absint( $wp_query->found_posts ) : 0,
 				'ordering_markup'    => $ordering_markup,
+				'show_count'         => ! $map_view,
+				'is_shortlist_view'  => self::is_shortlist_view(),
 				'map_state'          => $state,
 				'map_toggle_url'     => self::get_map_toggle_url( $state ),
 				'save_search_button' => $save_search_markup['button'],
 				'save_search_popup'  => $save_search_markup['popup'],
+				'shortlist_button'   => $shortlist_enquiry['button'],
+				'shortlist_popup'    => $shortlist_enquiry['popup'],
 			)
 		);
 	}
 
 	/**
-	 * Move the Save Search add-on's existing control into the Map Atlas toolbar.
+	 * Move the Save Search add-on's existing control into the prototype toolbar.
 	 *
 	 * Calling the add-on callback preserves its script enqueue, localized data,
 	 * popup markup and established JavaScript selectors.
 	 *
 	 * @return array
 	 */
-	private static function get_map_save_search_markup() {
+	private static function get_toolbar_save_search_markup() {
 		$markup = array(
 			'button' => '',
 			'popup'  => '',
 		);
 
-		if ( 'map-led-search-results' !== self::get_search_template() || ! class_exists( 'PH_Save_Search' ) ) {
+		if ( ! self::uses_prototype_search_chrome() || ! class_exists( 'PH_Save_Search' ) ) {
 			return $markup;
 		}
 
@@ -700,6 +730,50 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
+	 * Move the Shortlist mass-enquiry control into the prototype toolbar.
+	 *
+	 * @return array
+	 */
+	private static function get_shortlist_enquiry_markup() {
+		$markup = array(
+			'button' => '',
+			'popup'  => '',
+		);
+
+		if ( ! self::is_shortlist_view() ) {
+			return $markup;
+		}
+
+		$callback = array( PH_Shortlist::instance(), 'shortlist_enquiry_button' );
+		$priority = has_action( 'propertyhive_before_search_results_loop', $callback );
+
+		if ( false === $priority || ! is_callable( $callback ) ) {
+			return $markup;
+		}
+
+		remove_action( 'propertyhive_before_search_results_loop', $callback, $priority );
+
+		ob_start();
+		call_user_func( $callback );
+		$add_on_markup = (string) ob_get_clean();
+
+		if ( ! preg_match( '/(<a\b(?=[^>]*\bpropertyhive-shortlist-enquiry-button\b)[^>]*>.*?<\/a>)(.*)\z/is', $add_on_markup, $matches ) ) {
+			add_action( 'propertyhive_before_search_results_loop', $callback, $priority );
+			return $markup;
+		}
+
+		$markup['button'] = (string) preg_replace(
+			"/\\bclass=([\"'])([^\"']*)\\1/i",
+			'class=$1$2 ph-template-shortlist-enquiry-button$1',
+			$matches[1],
+			1
+		);
+		$markup['popup'] = $matches[2];
+
+		return $markup;
+	}
+
+	/**
 	 * Render a template-specific search header.
 	 */
 	public static function render_search_template_intro() {
@@ -708,6 +782,11 @@ trait PH_Template_Set_Search {
 		}
 
 		if ( self::is_module_preview() ) {
+			return;
+		}
+
+		$state = PH_Template_Set_Request_Context::get_map_search_state();
+		if ( self::is_shortlist_view() || ( ! empty( $state['manages_archive'] ) && 'map' === $state['requested_view'] ) ) {
 			return;
 		}
 
@@ -1019,7 +1098,7 @@ trait PH_Template_Set_Search {
 			return false;
 		}
 
-		if ( PH_Template_Set_Request_Context::is_search_results_request() && 'map-led-search-results' === self::get_search_template() ) {
+		if ( PH_Template_Set_Request_Context::is_search_results_request() && 'map-led-search-results' === self::get_search_template() && ! self::is_shortlist_view() ) {
 			return false;
 		}
 
@@ -1132,9 +1211,11 @@ trait PH_Template_Set_Search {
 
 		$phone            = $property->get_negotiator_telephone_number();
 		$show_branch      = 'yes' === $settings['template_set_show_branch'] || self::is_template_editor_active();
-		$shortlist_button = self::get_shortlist_button_markup();
+		$shortlist_button    = self::get_shortlist_button_markup();
+		$portal_attribution  = self::get_portal_card_attribution( $property );
+		$has_card_meta_hooks = false !== has_action( 'propertyhive_template_set_card_meta' );
 
-		if ( empty( $facts ) && ! $show_branch && '' === $shortlist_button ) {
+		if ( empty( $facts ) && ! $show_branch && '' === $shortlist_button && empty( $portal_attribution ) && ! $has_card_meta_hooks ) {
 			return;
 		}
 
@@ -1154,9 +1235,233 @@ trait PH_Template_Set_Search {
 				'office'           => $office,
 				'show_branch'      => $show_branch,
 				'shortlist_button' => $shortlist_button,
+				'portal_attribution' => $portal_attribution,
 				'template'         => self::get_search_template(),
 			)
 		);
+	}
+
+	/**
+	 * Whether the request is the Shortlist archive view.
+	 *
+	 * @return bool
+	 */
+	private static function is_shortlist_view() {
+		return class_exists( 'PH_Shortlist' )
+			&& self::is_add_on_usable( 'propertyhive-shortlist' )
+			&& isset( $_REQUEST['shortlisted'] )
+			&& 1 == $_REQUEST['shortlisted']; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Matches the add-on's request gate.
+	}
+
+	/**
+	 * Whether Rooms has registered its search department and fields.
+	 *
+	 * @return bool
+	 */
+	private static function is_rooms_search_active() {
+		return class_exists( 'PH_Rooms' ) && self::is_add_on_usable( 'propertyhive-rooms' );
+	}
+
+	/**
+	 * Whether Portal attribution may be rendered for this request.
+	 *
+	 * @return bool
+	 */
+	private static function is_portal_card_attribution_enabled() {
+		return class_exists( 'PH_Property_Portal' ) && self::is_add_on_usable( 'propertyhive-property-portal' );
+	}
+
+	/**
+	 * Get one property's already-primed Property Portal attribution data.
+	 *
+	 * @param PH_Property $property Property being rendered.
+	 * @return array
+	 */
+	private static function get_portal_card_attribution( $property ) {
+		if ( ! self::is_portal_card_attribution_enabled() || ! is_object( $property ) || empty( $property->id ) ) {
+			return array();
+		}
+
+		$agent_id  = absint( get_post_meta( $property->id, '_agent_id', true ) );
+		$branch_id = absint( get_post_meta( $property->id, '_branch_id', true ) );
+		$logo_id   = $agent_id ? absint( get_post_meta( $agent_id, '_logo', true ) ) : 0;
+		$agent     = $agent_id ? get_post( $agent_id ) : null;
+		$branch    = $branch_id ? get_post( $branch_id ) : null;
+
+		$attribution = array_filter(
+			array(
+				'logo_id'     => $logo_id,
+				'agent_name'  => $agent instanceof WP_Post ? wp_strip_all_tags( $agent->post_title ) : '',
+				'branch_name' => $branch instanceof WP_Post ? wp_strip_all_tags( $branch->post_title ) : '',
+			)
+		);
+
+		return $attribution;
+	}
+
+	/**
+	 * Prime Portal attribution posts and metadata for a full card set.
+	 *
+	 * @param array $property_ids Property post IDs.
+	 * @return void
+	 */
+	private static function prime_portal_card_attribution( $property_ids ) {
+		$property_ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $property_ids ) ) ) );
+
+		if ( empty( $property_ids ) ) {
+			return;
+		}
+
+		self::prime_portal_post_caches( $property_ids, 'property' );
+
+		$agent_ids  = array();
+		$branch_ids = array();
+		foreach ( $property_ids as $property_id ) {
+			$agent_id  = absint( get_post_meta( $property_id, '_agent_id', true ) );
+			$branch_id = absint( get_post_meta( $property_id, '_branch_id', true ) );
+
+			if ( $agent_id ) {
+				$agent_ids[] = $agent_id;
+			}
+
+			if ( $branch_id ) {
+				$branch_ids[] = $branch_id;
+			}
+		}
+
+		$related_ids = array_values( array_unique( array_merge( $agent_ids, $branch_ids ) ) );
+		if ( empty( $related_ids ) ) {
+			return;
+		}
+
+		self::prime_portal_post_caches( $related_ids );
+
+		$logo_ids = array();
+		foreach ( array_unique( $agent_ids ) as $agent_id ) {
+			$logo_id = absint( get_post_meta( $agent_id, '_logo', true ) );
+			if ( $logo_id ) {
+				$logo_ids[] = $logo_id;
+			}
+		}
+
+		if ( ! empty( $logo_ids ) ) {
+			self::prime_portal_post_caches( $logo_ids, 'attachment' );
+		}
+	}
+
+	/**
+	 * Prime post objects and metadata in one request-level batch.
+	 *
+	 * @param array  $post_ids Post IDs.
+	 * @param string $post_type Expected post type.
+	 * @return void
+	 */
+	private static function prime_portal_post_caches( $post_ids, $post_type = 'any' ) {
+		$post_ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $post_ids ) ) ) );
+		if ( empty( $post_ids ) ) {
+			return;
+		}
+
+		get_posts(
+			array(
+				'post_type'              => $post_type,
+				'post_status'            => 'attachment' === $post_type ? 'inherit' : 'any',
+				'post__in'               => $post_ids,
+				'posts_per_page'         => count( $post_ids ),
+				'orderby'                => 'post__in',
+				'no_found_rows'          => true,
+				'suppress_filters'       => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			)
+		);
+		update_meta_cache( 'post', $post_ids );
+	}
+
+	/**
+	 * Prime Infinite Scroll's page before its priority-10 renderer starts.
+	 *
+	 * @return void
+	 */
+	public static function prime_infinite_scroll_portal_attribution() {
+		if ( ! self::is_portal_card_attribution_enabled() ) {
+			return;
+		}
+
+		self::restore_infinite_scroll_request_state();
+		self::prime_portal_card_attribution( self::get_infinite_scroll_property_ids() );
+	}
+
+	/**
+	 * Mirror Infinite Scroll's query-string state restoration before rebuilding its page.
+	 *
+	 * @return void
+	 */
+	private static function restore_infinite_scroll_request_state() {
+		if ( empty( $_POST['query_string'] ) || ! is_scalar( $_POST['query_string'] ) ) {
+			return;
+		}
+
+		$request = json_decode( stripslashes( $_POST['query_string'] ), true );
+		if ( is_array( $request ) ) {
+			$_REQUEST = array_merge( $_REQUEST, $request );
+			$_GET     = array_merge( $_GET, $request );
+		}
+	}
+
+	/**
+	 * Reconstruct the property IDs that Infinite Scroll will render next.
+	 *
+	 * @return array
+	 */
+	private static function get_infinite_scroll_property_ids() {
+		if ( ! empty( $_POST['query_transient'] ) && is_scalar( $_POST['query_transient'] ) ) {
+			global $wpdb;
+
+			$query = get_transient( sanitize_text_field( wp_unslash( $_POST['query_transient'] ) ) );
+			if ( is_string( $query ) && '' !== $query ) {
+				$per_page = isset( $_POST['posts_per_page'] ) ? absint( $_POST['posts_per_page'] ) : 0;
+				$paged    = isset( $_POST['paged'] ) ? max( 1, absint( $_POST['paged'] ) ) : 1;
+
+				if ( $per_page ) {
+					$limit = $per_page * ( $paged - 1 );
+					$results = $wpdb->get_results( $query . ' LIMIT ' . $limit . ', ' . $per_page ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The trusted transient is generated by Infinite Scroll.
+					return array_map( 'absint', wp_list_pluck( (array) $results, 'ID' ) );
+				}
+			}
+
+			return array();
+		}
+
+		if ( empty( $_POST['query_vars'] ) || ! is_scalar( $_POST['query_vars'] ) ) {
+			return array();
+		}
+
+		$query_vars = json_decode( stripslashes( $_POST['query_vars'] ), true );
+		if ( ! is_array( $query_vars ) ) {
+			return array();
+		}
+
+		if ( isset( $_POST['paged'] ) ) {
+			$query_vars['paged'] = absint( $_POST['paged'] );
+		}
+
+		foreach ( $query_vars as $key => $value ) {
+			if ( taxonomy_exists( $key ) ) {
+				unset( $query_vars[ $key ] );
+			}
+		}
+
+		$query_vars['post_status']            = 'publish';
+		$query_vars['post_password']          = '';
+		$query_vars['fields']                 = 'ids';
+		$query_vars['no_found_rows']          = true;
+		$query_vars['update_post_meta_cache'] = false;
+		$query_vars['update_post_term_cache'] = false;
+
+		$query = new WP_Query( $query_vars );
+
+		return array_map( 'absint', (array) $query->posts );
 	}
 
 	/**

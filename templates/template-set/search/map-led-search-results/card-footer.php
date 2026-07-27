@@ -21,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endforeach; ?>
 		</ul>
 	<?php endif; ?>
+	<?php PH_Template_Set_Template_Loader::render( 'search', $template, 'card-attribution', array( 'property' => $property, 'attribution' => $portal_attribution ) ); ?>
 	<?php if ( ! empty( $shortlist_button ) ) : ?>
 		<div class="ph-template-card-actions">
 			<?php echo wp_kses_post( $shortlist_button ); ?>
