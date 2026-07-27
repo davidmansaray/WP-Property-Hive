@@ -62,6 +62,13 @@ trait PH_Template_Set_Detail {
 		$overview       = has_excerpt( $property->id ) ? get_the_excerpt( $property->id ) : '';
 		$location_label = self::get_property_location_label( $property );
 		$address        = $property->get_formatted_full_address();
+		$location_map_available = ! self::is_demo_preview()
+			&& 'real-map' === PH_Template_Set_Request_Context::get_location_map()
+			&& '' !== (string) get_option( 'propertyhive_maps_provider' )
+			&& '' !== (string) $property->latitude
+			&& '0' !== (string) $property->latitude
+			&& '' !== (string) $property->longitude
+			&& '0' !== (string) $property->longitude;
 		$documents      = self::get_property_document_labels( $property );
 		$office         = self::get_display_office_name( $property );
 		$has_floorplan  = self::should_render_floorplans( $property );
@@ -101,6 +108,7 @@ trait PH_Template_Set_Detail {
 				'overview'            => $overview,
 				'location_label'      => $location_label,
 				'address'             => $address,
+				'location_map_available' => $location_map_available,
 				'documents'           => $documents,
 				'office'              => $office,
 				'has_floorplan'       => $has_floorplan,
@@ -118,6 +126,24 @@ trait PH_Template_Set_Detail {
 				'show_purchase_costs' => $show_purchase_costs,
 			)
 		);
+	}
+
+	/**
+	 * Render the sole unsuffixed live map owned by a Template Set detail page.
+	 *
+	 * @param PH_Property $map_property Property displayed by the Location module.
+	 */
+	public static function render_detail_location_map( $map_property ) {
+		if ( ! $map_property ) {
+			return;
+		}
+
+		global $property;
+
+		$previous_property = $property;
+		$property          = $map_property;
+		get_property_map();
+		$property = $previous_property;
 	}
 
 	/**

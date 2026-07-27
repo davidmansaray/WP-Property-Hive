@@ -31,6 +31,7 @@ class PH_Template_Set_Settings {
 				'template_set_search_card_size'       => 'standard',
 				'template_set_search_grid_columns'    => 3,
 				'template_set_gallery_layout'         => 'mosaic',
+				'template_set_location_map'           => 'illustration',
 				'template_set_brand_colour'           => '#155e63',
 				'template_set_accent_colour'          => '#b7791f',
 				'template_set_button_style'           => 'filled',

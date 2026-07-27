@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/template-set/detail/premium-editorial-detail/modules.php
  *
- * Available variables: $property, $template, $facts, $rooms, $material, $features, $description, $overview, $location_label, $address, $documents, $office, $has_floorplan, $duet_images.
+ * Available variables: $property, $template, $facts, $rooms, $material, $features, $description, $overview, $location_label, $address, $location_map_available, $documents, $office, $has_floorplan, $duet_images.
  *
  * @author  PropertyHive
  * @package PropertyHive/Templates/TemplateSet
@@ -93,9 +93,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 			<?php endif; ?>
 			<?php if ( $location_label || $address ) : ?>
-				<div class="ph-template-module-map-surface">
+				<div class="ph-template-module-map-surface<?php echo $location_map_available ? ' ph-template-module-map-surface-live' : ''; ?>">
+					<?php if ( $location_map_available ) : ?>
+						<?php PH_Template_Set::render_detail_location_map( $property ); ?>
+					<?php else : ?>
 					<span class="ph-template-map-pin" aria-hidden="true"></span>
 					<span class="ph-template-map-label"><?php echo esc_html( sprintf( __( '%s — precise location shared on enquiry', 'propertyhive' ), $location_label ? $location_label : $address ) ); ?></span>
+					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 		</section>

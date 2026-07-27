@@ -181,6 +181,7 @@ class PH_Template_Set_Catalog {
 	public static function get_detail_shared_controls() {
 		return array(
 			'template_set_gallery_layout' => array( 'type' => 'select', 'label' => __( 'Gallery layout', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_gallery_layouts(), 'default' => 'showcase', 'group' => 'media' ),
+			'template_set_location_map' => array( 'type' => 'select', 'label' => __( 'Location map', 'propertyhive' ), 'options' => array( 'illustration' => __( 'Illustration', 'propertyhive' ), 'real-map' => __( 'Real map', 'propertyhive' ) ), 'default' => 'illustration', 'group' => 'media' ),
 			'template_set_show_floorplans' => array( 'type' => 'checkbox', 'label' => __( 'Show floorplans', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'media' ),
 			'template_set_show_virtual_tours' => array( 'type' => 'checkbox', 'label' => __( 'Show virtual tours', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => '', 'group' => 'media' ),
 			'template_set_button_style' => array( 'type' => 'select', 'label' => __( 'Button style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_button_styles(), 'default' => 'filled', 'group' => 'enquiry' ),

@@ -87,6 +87,14 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 [Support and documentation](https://wp-property-hive.com/support/)
 [Support policy](https://wp-property-hive.com/support/support-policy/)
 
+= Template Set integration notes =
+
+The Template Set Location module defaults to its illustration treatment. A real map is an explicit opt-in in the Location map control. Only enable it when no other property-map widget on the same page outputs the default map ID. On mixed builder pages, keep the Template Set module in illustration mode or configure the builder widget with a unique map ID; two unsuffixed maps are not supported.
+
+After an AJAX Template Set editor preview swap, the document emits the `ph:template_set_preview_swapped` event. Native listeners receive the imported preview root as `event.detail.root`; a matching jQuery event is also triggered. Add-ons needing a full browser load, including Viewing Request, continue to use the editor's full-navigation whitelist.
+
+The Template Set gallery is overrideable at `propertyhive/template-set/detail/gallery.php`. It intentionally replaces the classic `propertyhive_product_thumbnails` action. Use the `propertyhive_template_set_gallery_item_html` filter to change gallery item content without replacing its interactive button wrappers.
+
 = Testimonials: =
 
 Don't just take our word for it! [Read our reviews here](https://wordpress.org/support/plugin/propertyhive/reviews/).

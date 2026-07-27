@@ -173,6 +173,12 @@
 		refresh(importedPreview);
 
 		initTemplateEditor();
+		document.dispatchEvent(new window.CustomEvent('ph:template_set_preview_swapped', {
+			detail: { root: importedPreview }
+		}));
+		if (window.jQuery) {
+			window.jQuery(document).trigger('ph:template_set_preview_swapped', [{ root: importedPreview }]);
+		}
 		window.scrollTo(scrollPosition.x, scrollPosition.y);
 	}
 
@@ -226,6 +232,59 @@
 		if (typeof window.ph_check_if_shortlisted === 'function') {
 			window.ph_check_if_shortlisted();
 		}
+
+		initShortlistButtonLabels(scope);
+	}
+
+	function applyShortlistButtonLabel(button) {
+		var shortlist = window.propertyhive_shortlist || {};
+		var addLabel = button.getAttribute('data-add-label');
+		var removeLabel = button.getAttribute('data-remove-label');
+		var currentLabel = (button.textContent || '').trim();
+
+		if (!addLabel || !removeLabel) {
+			return;
+		}
+
+		if (shortlist.add_link_text && currentLabel === shortlist.add_link_text.trim()) {
+			button.textContent = addLabel;
+		} else if (shortlist.remove_link_text && currentLabel === shortlist.remove_link_text.trim()) {
+			button.textContent = removeLabel;
+		}
+	}
+
+	function initShortlistButtonLabels(scope) {
+		var buttons = [];
+
+		if (scope && scope.matches && scope.matches('a[data-add-to-shortlist][data-add-label][data-remove-label]')) {
+			buttons.push(scope);
+		}
+
+		if (scope && scope.querySelectorAll) {
+			buttons = buttons.concat(Array.prototype.slice.call(scope.querySelectorAll('a[data-add-to-shortlist][data-add-label][data-remove-label]')));
+		}
+
+		buttons.forEach(function (button) {
+			applyShortlistButtonLabel(button);
+
+			if (button.getAttribute('data-ph-template-shortlist-label-observer') === 'true' || !window.MutationObserver) {
+				return;
+			}
+
+			button.setAttribute('data-ph-template-shortlist-label-observer', 'true');
+			new window.MutationObserver(function () {
+				applyShortlistButtonLabel(button);
+			}).observe(button, { childList: true, characterData: true, subtree: true });
+		});
+	}
+
+	function shouldForceLocationMapNavigation(form) {
+		var control = form.querySelector('[name="template_set_location_map"]');
+
+		return !!control
+			&& control.value === 'real-map'
+			&& control.getAttribute('data-ph-template-editor-saved-value') !== 'real-map'
+			&& !!config.locationMapProviderConfigured;
 	}
 
 	function initTemplateEditor() {
@@ -268,6 +327,7 @@
 
 		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
 			control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+			control.setAttribute('data-ph-template-editor-saved-value', getControlValue(control));
 
 			control.addEventListener('change', function () {
 				var previousValue = control.getAttribute('data-ph-template-editor-previous-value') || '';
@@ -306,6 +366,7 @@
 
 		form.addEventListener('submit', function (event) {
 			var saveButton = form.querySelector('[data-ph-template-editor-save]');
+			var forceLocationMapNavigation = shouldForceLocationMapNavigation(form);
 
 			event.preventDefault();
 
@@ -341,6 +402,10 @@
 					control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
 				});
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
+
+				if (forceLocationMapNavigation) {
+					window.location.reload();
+				}
 			}).catch(function (error) {
 				setEditorStatus(editor, error && error.message ? error.message : (labels.error || 'Could not save'), 'error');
 			}).finally(function () {
@@ -353,6 +418,7 @@
 
 	document.addEventListener('DOMContentLoaded', function () {
 		refresh(document);
+		updateInfiniteScrollProgress();
 
 		initTemplateEditor();
 
@@ -382,13 +448,44 @@
 		});
 	}
 
+	function replaceResultsProgressPlaceholders(format, loaded, total) {
+		return format.replace('%1$s', String(loaded)).replace('%2$s', String(total));
+	}
+
+	function updateInfiniteScrollProgress() {
+		var list = document.querySelector('.ph-template-search ul.properties');
+		var progress = document.querySelector('.ph-template-results-progress');
+		var total;
+		var loaded;
+		var format;
+
+		if (!list || !progress) {
+			return;
+		}
+
+		total = parseInt(progress.getAttribute('data-total') || '0', 10);
+		loaded = list.querySelectorAll('li.ph-template-card').length;
+		format = (config.labels && config.labels.resultsProgress) || 'Showing %1$s of %2$s';
+		progress.textContent = replaceResultsProgressPlaceholders(format, Math.min(loaded, total), total);
+	}
+
+	function handleInfiniteScrollLoaded() {
+		refreshInfiniteScrollResults();
+		updateInfiniteScrollProgress();
+	}
+
 	document.addEventListener('ph:infinite_scroll_loading_properties', captureInfiniteScrollStart);
-	document.addEventListener('ph:infinite_scroll_loaded_properties', refreshInfiniteScrollResults);
+	document.addEventListener('ph:infinite_scroll_loaded_properties', handleInfiniteScrollLoaded);
+	window.addEventListener('pageshow', function (event) {
+		if (event.persisted) {
+			updateInfiniteScrollProgress();
+		}
+	});
 
 	if (window.jQuery) {
 		window.jQuery(document)
 			.on('ph:infinite_scroll_loading_properties.phTemplateSet', captureInfiniteScrollStart)
-			.on('ph:infinite_scroll_loaded_properties.phTemplateSet', refreshInfiniteScrollResults);
+			.on('ph:infinite_scroll_loaded_properties.phTemplateSet', handleInfiniteScrollLoaded);
 
 		window.jQuery(document).on('focus.phTemplateSetDatepicker', '.ph-template-enquiry-modal input[name="preferred_viewing_date"]', function () {
 			var input = this;

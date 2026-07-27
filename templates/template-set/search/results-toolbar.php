@@ -29,6 +29,9 @@ $map_label = ! empty( $map_state['requested_view'] ) && 'map' === $map_state['re
 			<?php else : ?>
 				<?php esc_html_e( 'homes match your search', 'propertyhive' ); ?>
 			<?php endif; ?>
+			<?php if ( ! empty( $show_progress ) && ! empty( $total ) ) : ?>
+				<span class="ph-template-results-progress" data-total="<?php echo esc_attr( absint( $total ) ); ?>"><?php echo esc_html( sprintf( __( 'Showing %1$s of %2$s', 'propertyhive' ), number_format_i18n( min( absint( $loaded_count ), absint( $total ) ) ), number_format_i18n( absint( $total ) ) ) ); ?></span>
+			<?php endif; ?>
 		</p>
 	<?php endif; ?>
 	<div class="ph-template-results-toolbar-actions">

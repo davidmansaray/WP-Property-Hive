@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/template-set/detail/standard-sales-detail/modules.php
  *
- * Available variables: $property, $template, $facts, $location_label, $address, $documents, $office, $has_floorplan.
+ * Available variables: $property, $template, $facts, $location_label, $address, $location_map_available, $documents, $office, $has_floorplan.
  *
  * @author  PropertyHive
  * @package PropertyHive/Templates/TemplateSet
@@ -36,8 +36,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $location_label || $address ) : ?>
 		<article class="ph-template-module-card ph-template-module-map">
 			<h4><?php esc_html_e( 'Location', 'propertyhive' ); ?></h4>
-			<?php if ( $location_label ) : ?>
-				<div class="ph-template-module-map-surface" aria-hidden="true"><span class="ph-template-map-pin"></span><span class="ph-template-map-label"><?php echo esc_html( $location_label ); ?></span></div>
+			<?php if ( $location_map_available ) : ?>
+				<div class="ph-template-module-map-surface ph-template-module-map-surface-live"><?php PH_Template_Set::render_detail_location_map( $property ); ?></div>
+			<?php elseif ( $location_label || $address ) : ?>
+				<div class="ph-template-module-map-surface" aria-hidden="true"><span class="ph-template-map-pin"></span><span class="ph-template-map-label"><?php echo esc_html( $location_label ? $location_label : $address ); ?></span></div>
 			<?php endif; ?>
 			<?php if ( $address ) : ?>
 				<p class="ph-template-module-foot"><?php echo esc_html( $address ); ?></p>

@@ -215,6 +215,7 @@ trait PH_Template_Set_Preview {
 				);
 
 				$images[] = array(
+					'attachment_id' => 0,
 					'src'     => $photo['url'],
 					'thumb'   => $photo['url'],
 					'alt'     => $label,
@@ -251,6 +252,7 @@ trait PH_Template_Set_Preview {
 			}
 
 			$images[] = array(
+				'attachment_id' => absint( $attachment_id ),
 				'src'     => $src[0],
 				'thumb'   => ! empty( $thumb[0] ) ? $thumb[0] : $src[0],
 				'alt'     => $alt,
@@ -324,153 +326,26 @@ trait PH_Template_Set_Preview {
 	 */
 	public static function render_detail_gallery() {
 		$property = self::get_current_property();
-
 		$template = self::get_detail_template();
 		$images   = self::get_property_gallery_images( $property );
 
-		if ( empty( $images ) ) {
-			return;
-		}
-
-		$is_preview          = self::is_demo_preview();
-		$is_editorial        = ( 'premium-editorial-detail' === $template );
-		$gallery_layout      = self::get_gallery_layout();
-		$use_cinema_controls = ( 'immersive-cinema-detail' === $template ) || ( 'cinema' === $gallery_layout );
-		$hero                = reset( $images );
-		$rail                = $use_cinema_controls ? $images : array_slice( $images, 0, 5 );
-		$count               = count( $images );
-		$location            = self::get_property_location_label( $property );
-		$has_floor_map       = self::should_render_floorplans( $property );
-		$has_virtual_tour    = self::should_render_virtual_tours( $property );
-		$virtual_tours       = ( $has_virtual_tour && $property ) ? $property->get_virtual_tours() : array();
-		$show_floor_panel    = $is_preview && $has_floor_map;
-		$show_tour_panel     = $is_preview && $has_virtual_tour;
-		$show_map_panel      = ! $use_cinema_controls && $location;
-		$floorplan_url       = ( $has_floor_map && ! $is_preview ) ? self::get_first_property_document_url( $property, 'floorplan' ) : '';
-
-			$public_template = PH_Template_Set_Catalog::get_detail_template_public_slug( $template );
-
-			echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-template-gallery-' . esc_attr( sanitize_html_class( $public_template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
-
-			echo '<figure class="ph-template-gallery-hero">';
-				echo '<button type="button" class="ph-template-gallery-photo-trigger" data-ph-gallery-open aria-label="' . esc_attr( sprintf(
-					/* translators: %s: image label */
-					__( 'Open larger photo: %s', 'propertyhive' ),
-					$hero['caption']
-				) ) . '">';
-					echo '<img src="' . esc_url( $hero['src'] ) . '" alt="' . esc_attr( $hero['alt'] ) . '" loading="lazy" data-ph-gallery-hero-image>';
-					echo '<span class="ph-template-gallery-expand-label" aria-hidden="true">' . esc_html__( 'View larger', 'propertyhive' ) . '</span>';
-				echo '</button>';
-				if ( $show_floor_panel ) {
-					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floor map preview', 'propertyhive' ) . '">';
-						echo '<div class="ph-template-floorplan" aria-hidden="true">';
-							echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-floorplan-room ph-template-room-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-floorplan-room ph-template-room-bed-one">' . esc_html__( 'Bed 1', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-floorplan-room ph-template-room-bed-two">' . esc_html__( 'Bed 2', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-floorplan-room ph-template-room-bath">' . esc_html__( 'Bath', 'propertyhive' ) . '</span>';
-						echo '</div>';
-					echo '</div>';
-				}
-				if ( $show_tour_panel ) {
-					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-virtual-tour" hidden data-ph-gallery-panel="virtual-tour" aria-label="' . esc_attr__( 'Virtual tour preview', 'propertyhive' ) . '">';
-						echo '<div class="ph-template-virtual-tour-preview" aria-hidden="true">';
-							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-living">' . esc_html__( 'Living room', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-bedroom">' . esc_html__( 'Bedroom', 'propertyhive' ) . '</span>';
-							echo '<span class="ph-template-virtual-tour-hotspot ph-template-virtual-tour-hotspot-one"></span>';
-							echo '<span class="ph-template-virtual-tour-hotspot ph-template-virtual-tour-hotspot-two"></span>';
-							echo '<span class="ph-template-virtual-tour-label">' . esc_html__( '360 virtual tour', 'propertyhive' ) . '</span>';
-						echo '</div>';
-					echo '</div>';
-				}
-				if ( $show_map_panel ) {
-					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-map" hidden data-ph-gallery-panel="map" aria-label="' . esc_attr__( 'Map preview', 'propertyhive' ) . '"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( $location ) . '</span></div>';
-				}
-
-				if ( $is_editorial ) {
-					echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero['caption'] ) . '</figcaption>';
-				} elseif ( $use_cinema_controls ) {
-					echo '<div class="ph-template-cinema-controls" role="toolbar" aria-label="' . esc_attr__( 'Gallery controls', 'propertyhive' ) . '">';
-						echo '<button type="button" data-ph-gallery-prev aria-label="' . esc_attr__( 'Previous photo', 'propertyhive' ) . '"><span aria-hidden="true">&#9664;</span></button>';
-						echo '<button type="button" data-ph-gallery-next aria-label="' . esc_attr__( 'Next photo', 'propertyhive' ) . '"><span aria-hidden="true">&#9654;</span></button>';
-						echo '<span class="ph-template-cinema-counter" data-ph-gallery-counter aria-live="polite">' . esc_html( '1 / ' . (int) $count ) . '</span>';
-						if ( $has_floor_map ) {
-							if ( $show_floor_panel ) {
-								echo '<button type="button" class="ph-template-cinema-control-floorplan" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</button>';
-							} elseif ( $floorplan_url ) {
-								echo '<a class="ph-template-cinema-control-link ph-template-cinema-control-floorplan" href="' . esc_url( $floorplan_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</a>';
-							}
-						}
-						if ( $has_virtual_tour ) {
-							if ( ! empty( $virtual_tours ) ) {
-								foreach ( $virtual_tours as $index => $tour ) {
-									$tour_label = isset( $tour['label'] ) ? trim( wp_strip_all_tags( (string) $tour['label'] ) ) : '';
-									if ( '' === $tour_label ) {
-										$tour_label = sprintf(
-											/* translators: %d: virtual tour number */
-											__( 'Virtual tour %d', 'propertyhive' ),
-											(int) $index + 1
-										);
-									}
-									$tour_url = ( ! $is_preview && ! empty( $tour['url'] ) ) ? esc_url_raw( $tour['url'] ) : '';
-									if ( $tour_url ) {
-										echo '<a class="ph-template-cinema-control-link ph-template-cinema-control-virtual-tour" href="' . esc_url( $tour_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $tour_label ) . '</a>';
-									} elseif ( $show_tour_panel ) {
-										echo '<button type="button" class="ph-template-cinema-control-virtual-tour" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html( $tour_label ) . '</button>';
-									}
-								}
-							} elseif ( $show_tour_panel ) {
-								echo '<button type="button" class="ph-template-cinema-control-virtual-tour" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
-							}
-						}
-					echo '</div>';
-				} else {
-					echo '<span class="ph-template-gallery-count"><span class="ph-template-gallery-count-icon" aria-hidden="true"></span>' . esc_html( sprintf(
-						/* translators: %d: number of property photos */
-						_n( '%d photo', '%d photos', $count, 'propertyhive' ),
-						(int) $count
-					) ) . '</span>';
-
-					echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
-						echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
-						if ( $show_floor_panel ) {
-							echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floor map', 'propertyhive' ) . '</button>';
-						}
-						if ( $show_tour_panel ) {
-							echo '<button type="button" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
-						}
-						if ( $show_map_panel ) {
-							echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';
-						}
-					echo '</div>';
-				}
-
-				if ( 'immersive-cinema-detail' === $template ) {
-					self::render_detail_contact_panel();
-				}
-
-				echo '</figure>';
-
-				if ( ! empty( $rail ) ) {
-					echo '<div class="ph-template-gallery-rail">';
-					foreach ( $rail as $index => $image ) {
-						$is_active = ( 0 === $index );
-						echo '<button type="button" class="ph-template-gallery-thumb' . ( $is_active ? ' is-active' : '' ) . '" data-ph-gallery-thumb data-src="' . esc_url( $image['src'] ) . '" data-alt="' . esc_attr( $image['alt'] ) . '" data-caption="' . esc_attr( $image['caption'] ) . '" aria-label="' . esc_attr( sprintf(
-							/* translators: %s: image label */
-							__( 'Show %s', 'propertyhive' ),
-							$image['caption']
-						) ) . '"' . ( $is_active ? ' aria-current="true"' : '' ) . '>';
-							echo '<img src="' . esc_url( $image['thumb'] ) . '" alt="' . esc_attr( $image['alt'] ) . '" loading="lazy">';
-							if ( $is_editorial ) {
-								echo '<span>' . esc_html( $image['caption'] ) . '</span>';
-							}
-						echo '</button>';
-					}
-					echo '</div>';
-				}
-
-		echo '</div>';
+		PH_Template_Set_Template_Loader::render(
+			'detail',
+			$template,
+			'gallery',
+			array(
+				'property'            => $property,
+				'template'            => $template,
+				'images'              => $images,
+				'is_preview'          => self::is_demo_preview(),
+				'gallery_layout'      => self::get_gallery_layout(),
+				'location'            => self::get_property_location_label( $property ),
+				'has_floor_map'       => self::should_render_floorplans( $property ),
+				'has_virtual_tour'    => self::should_render_virtual_tours( $property ),
+				'virtual_tours'       => $property ? $property->get_virtual_tours() : array(),
+				'floorplan_url'       => $property ? self::get_first_property_document_url( $property, 'floorplan' ) : '',
+			)
+		);
 	}
 
 	/**

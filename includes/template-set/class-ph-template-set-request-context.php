@@ -528,6 +528,15 @@ class PH_Template_Set_Request_Context {
 		return 'yes' === self::get_detail_setting( 'template_set_show_floorplans' ) ? 'yes' : '';
 	}
 
+	/**
+	 * Get the selected Location module map treatment.
+	 *
+	 * @return string
+	 */
+	public static function get_location_map() {
+		return 'real-map' === self::get_detail_setting( 'template_set_location_map' ) ? 'real-map' : 'illustration';
+	}
+
 	public static function get_show_virtual_tours() {
 		return 'yes' === self::get_detail_setting( 'template_set_show_virtual_tours' ) ? 'yes' : '';
 	}

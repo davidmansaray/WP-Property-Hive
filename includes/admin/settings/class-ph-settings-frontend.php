@@ -1475,6 +1475,10 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         if ( $map_state['available'] ) {
             $map_status_html .= ' <a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=mapsearch' ) ) . '">' . esc_html__( 'Map Search settings', 'propertyhive' ) . '</a>';
         }
+        // Deliberately omit the licence gate: lapsed owners still need this admin-only guidance.
+        if ( function_exists( 'PHIS' ) ) {
+            $map_status_html .= ' ' . esc_html__( 'Infinite Scroll is replaced by pagination in split and map-only layouts.', 'propertyhive' );
+        }
         $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'Keep Portal-Style Search Results for the existing presentation, choose Portal Grid for an image-led listing, or use Map Atlas for a location-led experience. All three keep Property Hive search controls and theme templates in charge.', 'propertyhive' ) . '</p><ul>';
 
         foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {

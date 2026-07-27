@@ -665,6 +665,8 @@ trait PH_Template_Set_Search {
 			array(
 				'template'           => self::get_search_template(),
 				'total'              => $wp_query instanceof WP_Query ? absint( $wp_query->found_posts ) : 0,
+				'loaded_count'       => $wp_query instanceof WP_Query ? absint( $wp_query->post_count ) : 0,
+				'show_progress'      => self::is_infinite_scroll_active_for_request() && in_array( self::get_search_template(), array( 'portal-grid-search-results', 'map-led-search-results' ), true ) && ! $map_view,
 				'ordering_markup'    => $ordering_markup,
 				'show_count'         => ! $map_view,
 				'is_shortlist_view'  => self::is_shortlist_view(),
@@ -676,6 +678,24 @@ trait PH_Template_Set_Search {
 				'shortlist_popup'    => $shortlist_enquiry['popup'],
 			)
 		);
+	}
+
+	/**
+	 * Whether Infinite Scroll attached its component for this request.
+	 *
+	 * This is intentionally evaluated after the add-on's wp@20 callback, rather
+	 * than treating installation or licence state as proof that it is running.
+	 *
+	 * @return bool
+	 */
+	private static function is_infinite_scroll_active_for_request() {
+		if ( ! function_exists( 'PHIS' ) || ! PH_Template_Set_Request_Context::is_search_results_request() ) {
+			return false;
+		}
+
+		$infinite_scroll = PHIS();
+
+		return is_object( $infinite_scroll ) && false !== has_action( 'propertyhive_after_search_results_loop', array( $infinite_scroll, 'propertyhive_infinite_scroll_components' ) );
 	}
 
 	/**
@@ -1577,25 +1597,13 @@ trait PH_Template_Set_Search {
 			$markup
 		);
 
-		// Keep AJAX toggle labels in sync with custom microcopy.
-		// Prefer late localization so later default shortlist buttons do not clobber cinema labels.
-		$localize = static function() use ( $add_label, $remove_label ) {
-			wp_localize_script(
-				'ph-shortlist',
-				'propertyhive_shortlist',
-				array(
-					'ajax_url'         => admin_url( 'admin-ajax.php' ),
-					'add_link_text'    => $add_label,
-					'remove_link_text' => $remove_label,
-					'loading_text'     => __( 'Loading', 'propertyhive' ),
-				)
-			);
-		};
-		$localize();
-		// Late footer pass so default shortlist localizations cannot clobber cinema labels.
-		if ( ! has_action( 'wp_print_footer_scripts', $localize ) ) {
-			add_action( 'wp_print_footer_scripts', $localize, 99 );
-		}
+		// Scope cinema wording to this anchor; leave the add-on's shared localization intact.
+		$markup = preg_replace(
+			'/<a\b/',
+			'<a data-add-label="' . esc_attr( $add_label ) . '" data-remove-label="' . esc_attr( $remove_label ) . '"',
+			$markup,
+			1
+		);
 
 		return $markup;
 	}

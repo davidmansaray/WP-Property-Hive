@@ -255,6 +255,8 @@ class PH_Template_Set_Editor_Controller {
 	public static function get_script_data() {
 		$settings  = PH_Template_Set_Settings::get_settings();
 		$map_state = PH_Template_Set_Request_Context::get_map_search_state();
+		$location_map_provider_configured = '' !== (string) get_option( 'propertyhive_maps_provider' );
+		$location_map_is_real             = 'real-map' === PH_Template_Set_Request_Context::get_location_map();
 
 		return array(
 			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
@@ -265,10 +267,13 @@ class PH_Template_Set_Editor_Controller {
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'editorSidebarLayout' => self::get_editor_sidebar_layout(),
 			'mapSearchState'      => $map_state,
+			'locationMapProviderConfigured' => $location_map_provider_configured,
 			'requiresFullPreviewNavigation' => ( $map_state['available'] && $map_state['usable'] )
 				|| ( class_exists( 'PH_Location_Autocomplete' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-location-autocomplete' ) )
 				|| ( class_exists( 'PH_Radial_Search' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-radial-search' ) )
-				|| ( function_exists( 'PHIS' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-infinite-scroll' ) ),
+				|| ( function_exists( 'PHIS' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-infinite-scroll' ) )
+				|| ( class_exists( 'PH_Viewing_Request' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-viewing-request' ) )
+				|| ( $location_map_is_real && $location_map_provider_configured ),
 			'labels'              => array(
 				'ready'             => __( 'Ready', 'propertyhive' ),
 				'changed'           => __( 'Unsaved changes', 'propertyhive' ),
@@ -277,6 +282,7 @@ class PH_Template_Set_Editor_Controller {
 				'saved'             => __( 'Saved', 'propertyhive' ),
 				'error'             => __( 'Could not save', 'propertyhive' ),
 				'unsavedNavigation' => __( 'You have unsaved changes. Leave this page without saving?', 'propertyhive' ),
+				'resultsProgress'   => __( 'Showing %1$s of %2$s', 'propertyhive' ),
 			),
 		);
 	}

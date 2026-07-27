@@ -4571,6 +4571,19 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	position: absolute;
 }
 
+.ph-template-module-map-surface-live {
+	background: transparent;
+}
+
+.ph-template-module-map-surface-live:before,
+.ph-template-module-map-surface-live:after {
+	display: none;
+}
+
+.ph-template-module-map-surface-live #property_map_canvas {
+	min-height: 154px;
+}
+
 .ph-template-module-map-surface:before {
 	height: 1px;
 	left: 0;
