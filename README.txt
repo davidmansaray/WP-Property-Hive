@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 2.2.5
+Stable tag: 2.2.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -201,6 +201,14 @@ Search integrations can inspect `propertyhive_template_set_map_search_state`, ad
 Detail integrations can customise the purchase-cost calculators with `propertyhive_template_set_purchase_costs_shortcodes`. The filter receives the default shortcode array and property object; each returned shortcode is rendered only when it is registered. Calculator output is wrapped for template-set styling, but the add-ons' duplicate `id="results"` markup is intentionally retained because their scripts scope result lookups by calculator wrapper class; this is an accepted upstream validator warning.
 
 == Changelog ==
+
+= 2.2.6 - 2026-07-16 =
+* Added nonces and verify user capabilities on reset and deletion of search forms for improved security
+* Added basic anonymous search analytics in preparation of future features
+* Updated REST API to support a 'description' field being passed through as a field on property create/update requests
+* Corrected sanitisation of media URLs to use sanitize_url() instead of ph_clean() to ensure any encoding is retained
+* Corrected issue with mismatched HTML tags in Elementor Gallery widget when no photos existed for a property
+* Corrected undefined PHP warning when post thumbnail is requested but no photos exist
 
 = 2.2.5 - 2026-06-18 =
 * Corrected various translation strings
