@@ -190,6 +190,8 @@ Portal-Style Search Results continues to use the established `propertyhive-templ
 
 Search integrations can inspect `propertyhive_template_set_map_search_state`, adjust card facts with `propertyhive_template_set_search_facts`, adjust status badges with `propertyhive_template_set_search_badges`, and opt a promotion into a full grid row with `propertyhive_template_set_promo_grid_span`.
 
+Detail integrations can customise the purchase-cost calculators with `propertyhive_template_set_purchase_costs_shortcodes`. The filter receives the default shortcode array and property object; each returned shortcode is rendered only when it is registered. Calculator output is wrapped for template-set styling, but the add-ons' duplicate `id="results"` markup is intentionally retained because their scripts scope result lookups by calculator wrapper class; this is an accepted upstream validator warning.
+
 == Changelog ==
 
 = 2.2.5 - 2026-06-18 =

@@ -12,23 +12,25 @@ trait PH_Template_Set_Shortcodes {
 	/**
 	 * Featured/homepage module shortcode.
 	 *
-	 * @param array $atts Shortcode attributes.
+	 * @param array|string $atts Shortcode attributes.
 	 * @return string
 	 */
 	public static function featured_template_shortcode( $atts ) {
+		$known_defaults = array(
+			'title'       => __( 'Featured properties', 'propertyhive' ),
+			'intro'       => '',
+			'button_text' => __( 'View all properties', 'propertyhive' ),
+			'button_url'  => get_post_type_archive_link( 'property' ),
+			'per_page'    => 3,
+			'columns'     => 3,
+			'department'  => '',
+			'show_search' => '',
+			'source'      => 'featured',
+		);
+		$raw_atts = is_array( $atts ) ? $atts : array();
 		$atts = shortcode_atts(
-			array(
-				'title'       => __( 'Featured properties', 'propertyhive' ),
-				'intro'       => '',
-				'button_text' => __( 'View all properties', 'propertyhive' ),
-				'button_url'  => get_post_type_archive_link( 'property' ),
-				'per_page'    => 3,
-				'columns'     => 3,
-				'department'  => '',
-				'show_search' => '',
-				'source'      => 'featured',
-			),
-			$atts,
+			$known_defaults,
+			$raw_atts,
 			'propertyhive_featured_template'
 		);
 
@@ -60,6 +62,8 @@ trait PH_Template_Set_Shortcodes {
 					'department'        => sanitize_text_field( $atts['department'] ),
 					'no_results_output' => '',
 				);
+				$extra = array_diff_key( $raw_atts, $known_defaults );
+				$property_atts = array_merge( $property_atts, $extra );
 
 				if ( 'recent' === $source ) {
 					echo PH_Shortcodes::recent_properties( $property_atts );

@@ -5464,6 +5464,49 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	margin: 0 0 16px;
 }
 
+.ph-template-module-costs .ph-template-costs-calculators {
+	display: grid;
+	gap: 16px;
+}
+
+.ph-template-module-costs .ph-template-costs-calc :where(input[type="text"], input[type="number"], select) {
+	background: #fff;
+	border: 1px solid var(--ph-template-line-strong);
+	border-radius: var(--ph-template-radius);
+	box-sizing: border-box;
+	color: var(--ph-template-text);
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.25;
+	max-width: 100%;
+	min-height: 44px;
+	padding: 10px 12px;
+}
+
+.ph-template-module-costs .ph-template-costs-calc :where(button, input[type="submit"]) {
+	appearance: none;
+	background: var(--ph-template-brand);
+	border: 1px solid var(--ph-template-brand);
+	border-radius: var(--ph-template-radius);
+	box-shadow: none;
+	color: #fff;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.25;
+	min-height: 44px;
+	padding: 11px 18px;
+	transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.ph-template-module-costs .ph-template-costs-calc :where(button, input[type="submit"]):hover,
+.ph-template-module-costs .ph-template-costs-calc :where(button, input[type="submit"]):focus-visible {
+	background: #131b24;
+	border-color: #131b24;
+	color: #fff;
+}
+
 .ph-detail-template-conversion-first-sales-detail .ph-template-modules-portal p {
 	color: inherit;
 	line-height: inherit;

@@ -71,6 +71,14 @@ trait PH_Template_Set_Detail {
 		$portrait       = $property->get_negotiator_photo();
 		$agent_role     = self::get_contact_agent_role( $agent, $office ? $office : __( 'Agent', 'propertyhive' ), $office );
 		$button         = self::get_primary_cta_label( $property, $template );
+		$calculator_price = ( 'yes' !== $property->_poa ) ? preg_replace( '/[^0-9.]/', '', (string) $property->_price ) : '';
+		$costs_shortcodes = apply_filters(
+			'propertyhive_template_set_purchase_costs_shortcodes',
+			array( 'stamp_duty_calculator', 'mortgage_calculator', 'rental_yield_calculator' ),
+			$property
+		);
+		$costs_shortcodes = is_array( $costs_shortcodes ) ? $costs_shortcodes : array();
+		$show_purchase_costs = $is_sales && 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() && ! empty( array_filter( $costs_shortcodes, 'shortcode_exists' ) );
 
 		if ( empty( $facts ) && empty( $rooms ) && ! $description && empty( $features ) && ! $overview && empty( $material ) && ! $location_label && ! $address && empty( $documents ) && ! $has_floorplan && ! $agent && ! $office ) {
 			return;
@@ -105,7 +113,9 @@ trait PH_Template_Set_Detail {
 				'agent_role'          => $agent_role,
 				'agent_initials'      => self::get_contact_agent_initials( $agent ),
 				'portrait'            => $portrait,
-				'show_purchase_costs' => $is_sales && ( 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() || self::is_template_editor_active() ) && ( shortcode_exists( 'stamp_duty_calculator' ) || shortcode_exists( 'mortgage_calculator' ) ),
+				'calculator_price'    => $calculator_price,
+				'costs_shortcodes'    => $costs_shortcodes,
+				'show_purchase_costs' => $show_purchase_costs,
 			)
 		);
 	}

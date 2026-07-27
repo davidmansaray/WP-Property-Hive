@@ -94,7 +94,7 @@ class PH_Template_Set_Catalog {
 						'options'                => self::get_checkbox_options(),
 						'default'                => 'yes',
 						'group'                  => 'modules',
-						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'mortgage_calculator' ),
+						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
 					),
 				);
 				break;
