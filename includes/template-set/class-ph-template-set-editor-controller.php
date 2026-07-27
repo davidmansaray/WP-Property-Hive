@@ -21,12 +21,15 @@ class PH_Template_Set_Editor_Controller {
 		$context      = self::get_template_editor_context();
 		$exit_url     = add_query_arg( PH_Template_Set::EDIT_CLOSED_QUERY_ARG, '1', remove_query_arg( PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set_Request_Context::get_current_url() ) );
 		$settings_url = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
+		$logo_url     = apply_filters( 'propertyhive_template_editor_logo_url', PH()->plugin_url() . '/assets/images/admin/propertyhive-logo-onboarding.png' );
 
 		echo '<aside class="ph-template-editor ph-template-editor-' . esc_attr( sanitize_html_class( $context ) ) . '" data-ph-template-editor data-ph-template-editor-context="' . esc_attr( $context ) . '" aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
 			echo '<form class="ph-template-editor-form" data-ph-template-editor-form>';
 				echo '<header class="ph-template-editor-header">';
 					echo '<div class="ph-template-editor-brand">';
-						echo '<img src="' . esc_url( PH()->plugin_url() . '/assets/images/admin/propertyhive-logo-onboarding.png' ) . '" alt="' . esc_attr__( 'Property Hive', 'propertyhive' ) . '">';
+						if ( ! ( class_exists( 'PH_White_Label' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-white-label' ) && '' !== trim( (string) get_option( 'propertyhive_white_label', '' ) ) ) ) {
+							echo '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr__( 'Property Hive', 'propertyhive' ) . '">';
+						}
 						echo '<span>' . esc_html__( 'Template editor', 'propertyhive' ) . '</span>';
 						echo '<h2>' . esc_html( self::get_template_editor_title( $context ) ) . '</h2>';
 					echo '</div>';

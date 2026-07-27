@@ -1293,7 +1293,7 @@ trait PH_Template_Set_Detail {
 			return $office;
 		}
 
-		return __( 'Property Hive', 'propertyhive' );
+		return apply_filters( 'propertyhive_template_set_display_office_name', get_bloginfo( 'name' ), $property );
 	}
 
 	/**
