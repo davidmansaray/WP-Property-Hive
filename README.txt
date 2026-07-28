@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,6 +87,14 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 [Support and documentation](https://wp-property-hive.com/support/)
 [Support policy](https://wp-property-hive.com/support/support-policy/)
 
+= Template Set integration notes =
+
+The Template Set Location module defaults to its illustration treatment. A real map is an explicit opt-in in the Location map control. Only enable it when no other property-map widget on the same page outputs the default map ID. On mixed builder pages, keep the Template Set module in illustration mode or configure the builder widget with a unique map ID; two unsuffixed maps are not supported.
+
+After an AJAX Template Set editor preview swap, the document emits the `ph:template_set_preview_swapped` event. Native listeners receive the imported preview root as `event.detail.root`; a matching jQuery event is also triggered. Add-ons needing a full browser load, including Viewing Request, continue to use the editor's full-navigation whitelist.
+
+The Template Set gallery is overrideable at `propertyhive/template-set/detail/gallery.php`. It intentionally replaces the classic `propertyhive_product_thumbnails` action. Use the `propertyhive_template_set_gallery_item_html` filter to change gallery item content without replacing its interactive button wrappers.
+
 = Testimonials: =
 
 Don't just take our word for it! [Read our reviews here](https://wordpress.org/support/plugin/propertyhive/reviews/).
@@ -107,7 +115,7 @@ In the search field type "Property Hive" and click Search Plugins. Once you've f
 
 = Manual installation =
 
-The manual installation method involves downloading the Property Hive plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+The manual installation method involves downloading the Property Hive plugin and uploading it to your webserver via your favourite FTP application. WordPress has manual plugin installation instructions in its official documentation.
 
 = Updating =
 
@@ -180,7 +188,26 @@ The free core plugin contains the foundations that you need to create a property
 15. Specify the countries your operate in for full international support
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
+== Search Template Set customisation ==
+
+Portal-Style Search Results remains available as the existing search presentation. Portal Grid and Map Atlas add image-led and location-led choices while using the normal Property Hive archive, search form, result loop and theme override system. Map Atlas uses the Map Search add-on when it is available and correctly configured; otherwise it remains a complete list/grid search experience.
+
+Themes can override a slug-specific part under `propertyhive/template-set/search/{template-slug}/{part}.php`, or a part shared by all search templates under `propertyhive/template-set/search/{part}.php`. Slug-specific theme files win before shared theme files, and all theme files win before plugin templates.
+
+Portal-Style Search Results continues to use the established `propertyhive-template-set` stylesheet unchanged. Portal Grid and Map Atlas use the required structural handle `propertyhive-template-set-search-structure`; their optional, deliberately low-priority cosmetic fallbacks use `propertyhive-template-set-search-fallbacks`. Themes can disable those cosmetics with `propertyhive_template_set_enqueue_search_fallbacks`, or replace their registered definition with `propertyhive_template_set_search_styles`.
+
+Search integrations can inspect `propertyhive_template_set_map_search_state`, adjust card facts with `propertyhive_template_set_search_facts`, adjust status badges with `propertyhive_template_set_search_badges`, add card metadata with `propertyhive_template_set_card_meta` (receiving the property object), and opt a promotion into a full grid row with `propertyhive_template_set_promo_grid_span`.
+
+Detail integrations can customise the purchase-cost calculators with `propertyhive_template_set_purchase_costs_shortcodes`. The filter receives the default shortcode array and property object; each returned shortcode is rendered only when it is registered. Calculator output is wrapped for template-set styling, but the add-ons' duplicate `id="results"` markup is intentionally retained because their scripts scope result lookups by calculator wrapper class; this is an accepted upstream validator warning.
+
 == Changelog ==
+
+= 2.2.7 - 2026-07-27 =
+* Added a new Template Set system with visual editing for property details, search results and featured property modules
+* Added Portal Grid and Map Atlas search templates with theme override support and graceful add-on fallbacks
+* Added a visual search form builder with live previews, field ordering, display controls and guarded saves
+* Improved compatibility with Property Hive add-ons, theme integrations and existing template action hooks
+* Restricted global front-end template and visual search form editing to administrators by default, with capability filters for intentional delegation
 
 = 2.2.6 - 2026-07-16 =
 * Added nonces and verify user capabilities on reset and deletion of search forms for improved security

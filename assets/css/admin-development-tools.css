@@ -1,0 +1,181 @@
+/**
+ * Property Hive — development setup tools
+ *
+ * Styles the development-only floating control available to administrators on
+ * local, development, and staging Property Hive settings screens.
+ */
+
+.ph-development-tools {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    right: calc(24px + env(safe-area-inset-right));
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    z-index: 10000;
+    transition: bottom .2s ease;
+}
+
+.ph-development-tools,
+.ph-development-tools * {
+    box-sizing: border-box;
+}
+
+.ph-development-tools__toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #1d1d24;
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(20, 20, 30, 0.22);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.ph-development-tools__toggle:hover,
+.ph-development-tools__toggle[aria-expanded="true"] {
+    background: #1d1d24;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 32px rgba(20, 20, 30, 0.27);
+}
+
+.ph-development-tools__toggle:focus {
+    color: #fff;
+    outline: none;
+}
+
+.ph-development-tools__toggle:focus-visible {
+    box-shadow: 0 0 0 3px #f0f0f1, 0 0 0 6px #3d5fe7, 0 10px 32px rgba(20, 20, 30, 0.27);
+}
+
+.ph-development-tools__toggle .dashicons {
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+}
+
+.ph-development-tools__indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #f5c518;
+}
+
+.ph-development-tools__panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 12px);
+    width: min(292px, calc(100vw - 48px));
+    max-height: calc(100vh - 120px);
+    padding: 18px;
+    border: 1px solid #dcdcde;
+    border-radius: 12px;
+    background: #fff;
+    color: #1d1d24;
+    box-shadow: 0 12px 36px rgba(20, 20, 30, 0.18);
+    overflow-y: auto;
+}
+
+.ph-development-tools__panel[hidden] {
+    display: none;
+}
+
+.ph-development-tools__title {
+    display: block;
+    padding-right: 24px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.ph-development-tools__description {
+    margin: 7px 0 14px;
+    color: #646970;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.ph-development-tools__description code {
+    font-size: 11px;
+}
+
+.ph-development-tools__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #646970;
+    cursor: pointer;
+}
+
+.ph-development-tools__close:hover {
+    background: #f0f0f1;
+    color: #1d1d24;
+}
+
+.ph-development-tools__close:focus,
+.ph-development-tools__action:focus {
+    outline: 3px solid #3d5fe7;
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.ph-development-tools__close .dashicons {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.ph-development-tools__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+}
+
+@media (max-width: 960px) {
+    .ph-development-tools--save-tray-visible {
+        bottom: 108px;
+        bottom: calc(108px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 782px) {
+    .ph-development-tools {
+        right: 14px;
+        bottom: 14px;
+        right: calc(14px + env(safe-area-inset-right));
+        bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .ph-development-tools--save-tray-visible {
+        bottom: 108px;
+        bottom: calc(108px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ph-development-tools,
+    .ph-development-tools__toggle {
+        transition: none;
+    }
+}

@@ -154,6 +154,11 @@ class PH_Admin_Settings {
 		// Get current tab/section
 		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( $_GET['tab'] );
 		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( $_REQUEST['section'] );
+		if ( '' === $current_section ) {
+			$current_section = sanitize_title(
+				apply_filters( 'propertyhive_default_settings_section_' . $current_tab, '' )
+			);
+		}
 
 	    // Save settings if data has been posted
 	    //if ( ! empty( $_POST ) )
@@ -172,6 +177,58 @@ class PH_Admin_Settings {
 	    $tabs = apply_filters( 'propertyhive_settings_tabs_array', array() );
 
 	    include 'views/html-admin-settings.php';
+	}
+
+	/**
+	 * Icon + subtitle metadata for the top settings tab bar.
+	 *
+	 * Keyed by tab id. Third-party tabs without an entry fall back to a generic
+	 * icon and no subtitle.
+	 *
+	 * @return array
+	 */
+	public static function get_tab_meta() {
+		$meta = array(
+			'general'      => array( 'icon' => 'gear',     'subtitle' => __( 'Core settings', 'propertyhive' ), 'description' => __( 'Configure the core Property Hive settings for your site.', 'propertyhive' ) ),
+			'offices'      => array( 'icon' => 'building',  'subtitle' => __( 'Manage offices', 'propertyhive' ), 'description' => __( 'Manage your branches and office contact details.', 'propertyhive' ) ),
+			'customfields' => array( 'icon' => 'sliders',   'subtitle' => __( 'Customise fields', 'propertyhive' ), 'description' => __( 'Customise the fields available throughout Property Hive.', 'propertyhive' ) ),
+			'frontend'     => array( 'icon' => 'layout',    'subtitle' => __( 'Design templates', 'propertyhive' ), 'description' => __( 'Choose how you want to build and customise your property pages.', 'propertyhive' ) ),
+			'email'        => array( 'icon' => 'mail',      'subtitle' => __( 'Email templates', 'propertyhive' ), 'description' => __( 'Configure outgoing email settings and templates.', 'propertyhive' ) ),
+			'features'     => array( 'icon' => 'star',      'subtitle' => __( 'Extra features', 'propertyhive' ), 'description' => __( 'Enable and manage optional Property Hive features.', 'propertyhive' ) ),
+			'licensekey'   => array( 'icon' => 'key',       'subtitle' => __( 'Your license', 'propertyhive' ), 'description' => __( 'Manage your Property Hive license.', 'propertyhive' ) ),
+			'demo_data'    => array( 'icon' => 'database',  'subtitle' => __( 'Import sample data', 'propertyhive' ), 'description' => __( 'Fill Property Hive with sample data to explore how it works.', 'propertyhive' ) ),
+		);
+
+		return apply_filters( 'propertyhive_settings_tab_meta', $meta );
+	}
+
+	/**
+	 * Inline SVG for a settings tab icon, with a generic fallback.
+	 *
+	 * @param string $name Icon key.
+	 * @return string SVG markup.
+	 */
+	public static function get_tab_icon_svg( $name ) {
+		$icons = array(
+			// Scalloped six-lobe cog with centre circle (per design).
+			'gear'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>',
+			// Tall office block (left, with door) beside a shorter block, window dots.
+			'building' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 21h17"/><path d="M6 21V4.8a.8.8 0 0 1 .8-.8h5.4a.8.8 0 0 1 .8.8V21"/><path d="M13 11h4.2a.8.8 0 0 1 .8.8V21"/><path d="M8.4 7.2h.01M10.6 7.2h.01M8.4 10.2h.01M10.6 10.2h.01M8.4 13.2h.01M10.6 13.2h.01M15.2 14h.01M15.2 17h.01M8.5 21v-2.6h2V21"/></svg>',
+			// Three horizontal slider rows with round knobs at staggered positions.
+			'sliders'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11.2M19.4 6H20M4 12h.6M8.8 12H20M4 18h5.2M13.4 18H20"/><circle cx="17.3" cy="6" r="1.9"/><circle cx="6.7" cy="12" r="1.9"/><circle cx="11.3" cy="18" r="1.9"/></svg>',
+			// Browser window: rounded square with top bar.
+			'layout'   => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9h17"/></svg>',
+			'mail'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><path d="m4.5 6.5 7.5 5.8 7.5-5.8"/></svg>',
+			'star'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.6 2.47 5.15 5.63.7-4.15 3.9 1.09 5.6L12 16.2l-5.04 2.75 1.09-5.6-4.15-3.9 5.63-.7L12 3.6z"/></svg>',
+			// Diagonal spanner (per design).
+			'key'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+			// Stack of three layers (per design).
+			'database' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.17 2.44a2 2 0 0 1 1.66 0l7.57 3.44a1 1 0 0 1 0 1.82l-7.57 3.44a2 2 0 0 1-1.66 0L3.6 7.7a1 1 0 0 1 0-1.82l7.57-3.44Z"/><path d="m21 12.1-8.17 3.72a2 2 0 0 1-1.66 0L3 12.1"/><path d="m21 16.6-8.17 3.72a2 2 0 0 1-1.66 0L3 16.6"/></svg>',
+			// Puzzle piece fallback for add-on tabs.
+			'default'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 10.5V6a.8.8 0 0 1 .8-.8h12a.8.8 0 0 1 .8.8v4h.6a2.1 2.1 0 1 1 0 4.2h-.6v4a.8.8 0 0 1-.8.8h-4.3v-.5a2.1 2.1 0 1 0-4.2 0v.5H6a.8.8 0 0 1-.8-.8v-4.4"/></svg>',
+		);
+
+		return isset( $icons[ $name ] ) ? $icons[ $name ] : $icons['default'];
 	}
 
 	/**

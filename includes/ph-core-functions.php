@@ -20,6 +20,28 @@ include( 'ph-page-functions.php' );
 include( 'ph-property-functions.php' );
 
 /**
+ * Get the current WordPress environment type.
+ *
+ * @return string
+ */
+function ph_get_environment_type() {
+    if ( function_exists( 'wp_get_environment_type' ) ) {
+        return wp_get_environment_type();
+    }
+
+    return 'production';
+}
+
+/**
+ * Check whether development-only features should be available.
+ *
+ * @return bool
+ */
+function ph_is_development_environment() {
+    return in_array( ph_get_environment_type(), array( 'local', 'development', 'staging' ), true );
+}
+
+/**
  * Get template part (for templates like the single-property).
  *
  * @access public
@@ -49,7 +71,12 @@ function ph_get_template_part( $slug, $name = '' ) {
     $template = apply_filters( 'ph_get_template_part', $template, $slug, $name );
 
     if ( $template ) {
-        load_template( $template, false );
+        do_action( 'propertyhive_before_get_template_part_render', $template, $slug, $name );
+        try {
+            load_template( $template, false );
+        } finally {
+            do_action( 'propertyhive_after_get_template_part_render', $template, $slug, $name );
+        }
     }
 }
 

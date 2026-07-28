@@ -70,6 +70,12 @@ function ph_get_search_form( $id = 'default' ) {
     $form_controls = apply_filters( 'propertyhive_search_form_fields_after_' . $id, $form_controls );
     $form_controls = apply_filters( 'propertyhive_search_form_fields_after', $form_controls );
 
+    $search_form_manager = new PH_Search_Form_Manager();
+    $form_controls = $search_form_manager->apply_final_form_settings_to_fields( $form_controls, $id );
+
+    $form_controls = apply_filters( 'propertyhive_search_form_fields_final_' . $id, $form_controls );
+    $form_controls = apply_filters( 'propertyhive_search_form_fields_final', $form_controls );
+
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
 
 }

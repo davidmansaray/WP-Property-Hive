@@ -11,4 +11,4 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
-<p class="propertyhive-info no-results-message"><?php echo esc_html(__( 'No properties were found matching your criteria.', 'propertyhive' )); ?></p>
+<p class="propertyhive-info no-results-message" role="status"><?php echo esc_html(__( 'No properties were found matching your criteria.', 'propertyhive' )); ?></p>

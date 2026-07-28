@@ -42,7 +42,15 @@ class PH_Admin_Assets {
 
             // Admin styles for PH pages only
             wp_enqueue_style( 'propertyhive_admin_styles', PH()->plugin_url() . '/assets/css/admin.css', array(), PH_VERSION );
-            
+
+            // Frontend settings redesign (icon nav bar + template experience chooser).
+            wp_enqueue_style( 'propertyhive_frontend_redesign', PH()->plugin_url() . '/assets/css/admin-frontend-redesign.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
+
+            if ( false !== strpos( $screen->id, 'page_ph-settings' ) )
+            {
+                wp_enqueue_style( 'propertyhive_admin_development_tools', PH()->plugin_url() . '/assets/css/admin-development-tools.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
+            }
+
             wp_enqueue_style( 'font_awesome', PH()->plugin_url() . '/assets/css/font-awesome.min.css', array(), PH_VERSION );
             
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
@@ -61,6 +69,11 @@ class PH_Admin_Assets {
             {
                 wp_enqueue_style('mapbox', PH()->plugin_url() . '/assets/js/mapbox/mapbox-gl.css', array(), '3.8.0' );
             }
+        }
+
+        if ( in_array( $screen->id, array( 'dashboard_page_ph-onboarding' ), true ) )
+        {
+            wp_enqueue_style( 'propertyhive_admin_onboarding', PH()->plugin_url() . '/assets/css/admin-onboarding.css', array(), PH_VERSION );
         }
 
         if ( in_array( $screen->id, array( 'property' ) ) )
@@ -130,6 +143,8 @@ class PH_Admin_Assets {
         wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION );
 
         wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
+
+        wp_register_script( 'propertyhive_admin_onboarding', PH()->plugin_url() . '/assets/js/admin/onboarding' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
         wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
 
@@ -209,6 +224,11 @@ class PH_Admin_Assets {
                 'ajax_url'                      => admin_url('admin-ajax.php'),
             );
             wp_localize_script( 'propertyhive_dashboard', 'propertyhive_dashboard', $params );
+        }
+
+        if ( in_array( $screen->id, array( 'dashboard_page_ph-onboarding' ), true ) )
+        {
+            wp_enqueue_script( 'propertyhive_admin_onboarding' );
         }
 
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale', 'edit-key_date' ) ) )
@@ -398,6 +418,10 @@ class PH_Admin_Assets {
                 'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? sanitize_text_field($_GET['section']) : '' ),
                 'ajax_nonce'                                => wp_create_nonce("updates"),
                 'features_settings_url'                     => admin_url('admin.php?page=ph-settings&tab=features'),
+                'unsaved_changes_text'                      => __( 'Unsaved changes', 'propertyhive' ),
+                'action_ready_text'                         => __( 'Ready to continue', 'propertyhive' ),
+                'saving_text'                               => __( 'Saving…', 'propertyhive' ),
+                'saved_message'                             => __( 'Your settings have been saved.', 'propertyhive' ),
             );
             if ( isset($_GET['tab']) && ph_clean($_GET['tab']) == 'licensekey' )
             {

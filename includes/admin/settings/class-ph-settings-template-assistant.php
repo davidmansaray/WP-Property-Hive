@@ -93,7 +93,7 @@ class PH_Settings_Template_Assistant extends PH_Settings_Page {
                     <h3>Search Results</h3>
                     <p>Manage various aspects of the search results layout.</p>
                     <p>' . __( 'Now found in \'Property Hive > Settings > Frontend > Search Results\'.', 'propertyhive') . '</p>
-                    <p style="margin-top:12px;"><a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=frontend')) . '" class="button-primary">Take me there</a></p>
+                    <p style="margin-top:12px;"><a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=frontend&section=search-results')) . '" class="button-primary">Take me there</a></p>
                 </div>
             </div>
 

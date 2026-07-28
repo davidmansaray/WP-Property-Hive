@@ -3,7 +3,7 @@
  * Plugin Name: Property Hive
  * Plugin URI: https://wordpress.org/plugins/propertyhive/
  * Description: Property Hive has everything you need to build estate agency websites
- * Version: 2.2.6
+ * Version: 2.2.7
  * Author: PropertyHive
  * Author URI: https://wp-property-hive.com
  * Requires at least: 5.6
@@ -27,14 +27,14 @@ if ( ! class_exists( 'PropertyHive' ) )
     * Main PropertyHive Class
     *
     * @class PropertyHive
-    * @version 2.2.6
+    * @version 2.2.7
     */
     final class PropertyHive {
          
         /**
          * @var string
          */
-        public $version = '2.2.6';
+        public $version = '2.2.7';
          
         /**
          * @var PropertyHive The single instance of the class
@@ -285,8 +285,11 @@ if ( ! class_exists( 'PropertyHive' ) )
             }
             
             include_once( 'includes/ph-form-functions.php' );               // Form Renderers
+            include_once( 'includes/class-ph-search-form-field-catalog.php' ); // Search form field catalog
+            include_once( 'includes/class-ph-search-form-manager.php' );    // Search form settings manager
             include_once( 'includes/class-ph-form-handler.php' );           // Form Handlers
             include_once( 'includes/class-ph-shortcodes.php' );             // Shortcodes class
+            include_once( 'includes/class-ph-template-set.php' );           // Frontend template set
 
             include( 'includes/class-ph-query.php' );                // The main query class
     
