@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Buffer the tab content first: tabs may set $hide_save_button / button text
+// Buffer the settings tab content first: tabs may set $hide_save_button / button text
 // globals while rendering, and the header band (rendered above the content)
 // needs to know about them. Sections are buffered separately so the sub-nav
 // can sit between the tab bar and the page header, as per the design.
@@ -40,20 +40,44 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div>
 		<?php
-			// Split tabs into core (known meta) and add-on (registered dynamically).
-			$ph_core_tabs  = array();
-			$ph_addon_tabs = array();
+			// Keep day-to-day settings separate from the commercial tools. Add-on
+			// settings remain in the Pro group because they are license-managed
+			// extensions rather than core configuration.
+			$ph_settings_tabs = array();
+			$ph_pro_tabs      = array();
+			$ph_addon_tabs    = array();
+			$ph_pro_tab_ids   = apply_filters(
+				'propertyhive_settings_pro_tab_ids',
+				array( 'licensekey', 'features' )
+			);
+
 			foreach ( $tabs as $name => $label )
 			{
-				if ( isset( $ph_tab_meta[ $name ] ) )
+				if ( in_array( $name, $ph_pro_tab_ids, true ) )
 				{
-					$ph_core_tabs[ $name ] = $label;
+					$ph_pro_tabs[ $name ] = $label;
+				}
+				elseif ( isset( $ph_tab_meta[ $name ] ) )
+				{
+					$ph_settings_tabs[ $name ] = $label;
 				}
 				else
 				{
 					$ph_addon_tabs[ $name ] = $label;
 				}
 			}
+
+			// The Pro group has a deliberate hierarchy regardless of the order in
+			// which settings pages register themselves.
+			$ph_ordered_pro_tabs = array();
+			foreach ( $ph_pro_tab_ids as $name )
+			{
+				if ( isset( $ph_pro_tabs[ $name ] ) )
+				{
+					$ph_ordered_pro_tabs[ $name ] = $ph_pro_tabs[ $name ];
+				}
+			}
+			$ph_pro_tabs = $ph_ordered_pro_tabs;
 
 			$ph_active_is_addon = isset( $ph_addon_tabs[ $current_tab ] );
 
@@ -63,11 +87,10 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 				$ph_meta     = isset( $ph_tab_meta[ $name ] ) ? $ph_tab_meta[ $name ] : array();
 				$ph_icon     = PH_Admin_Settings::get_tab_icon_svg( isset( $ph_meta['icon'] ) ? $ph_meta['icon'] : 'default' );
 				$ph_subtitle = isset( $ph_meta['subtitle'] ) ? $ph_meta['subtitle'] : '';
-				$ph_is_core  = isset( $ph_tab_meta[ $name ] );
 
 				$classes = 'menu' === $context
 					? 'ph-nav-menu-item' . ( $current_tab == $name ? ' is-active' : '' )
-					: 'nav-tab ph-nav-tab ' . ( $ph_is_core ? 'ph-nav-core' : 'ph-nav-addon' ) . ' nav-tab-' . sanitize_title( $name ) . ( $current_tab == $name ? ' nav-tab-active' : '' );
+					: 'nav-tab ph-nav-tab ph-nav-core nav-tab-' . sanitize_title( $name ) . ( $current_tab == $name ? ' nav-tab-active' : '' );
 
 				echo '<a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=' . $name ) ) . '" class="' . esc_attr( $classes ) . '"' . ( 'row' === $context ? ' title="' . esc_attr( $label ) . '"' : '' ) . '>';
 					echo '<span class="ph-nav-icon">' . $ph_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -82,26 +105,27 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 			};
 		?>
 		<div class="ph-settings-nav-wrap">
-			<nav class="nav-tab-wrapper ph-settings-nav">
-				<?php
-					foreach ( $ph_core_tabs as $name => $label )
+			<nav class="nav-tab-wrapper ph-settings-nav" aria-label="<?php echo esc_attr__( 'Property Hive settings', 'propertyhive' ); ?>">
+				<div class="ph-settings-nav-group ph-settings-nav-group--settings" role="group" aria-label="<?php echo esc_attr__( 'Core settings', 'propertyhive' ); ?>">
+					<?php
+					foreach ( $ph_settings_tabs as $name => $label )
+					{
+						$ph_render_tab( $name, $label, 'row' );
+					}
+					?>
+				</div>
+
+				<div class="ph-settings-nav-group ph-settings-nav-group--pro" role="group" aria-label="<?php echo esc_attr__( 'Property Hive Pro', 'propertyhive' ); ?>">
+					<?php
+					foreach ( $ph_pro_tabs as $name => $label )
 					{
 						$ph_render_tab( $name, $label, 'row' );
 					}
 
 					if ( ! empty( $ph_addon_tabs ) )
 					{
-						// The active add-on tab renders inline so the current
-						// location is always visible; the rest live in the menu.
-						if ( $ph_active_is_addon )
-						{
-							$ph_render_tab( $current_tab, $ph_addon_tabs[ $current_tab ], 'row' );
-						}
-
-						echo '<span class="ph-nav-addons">';
-							// Compact toggle (icon + count) when an add-on tab is
-							// already visible inline, to keep the nav to one row.
-							echo '<button type="button" class="ph-nav-tab ph-nav-addons-toggle' . ( $ph_active_is_addon ? ' is-compact' : '' ) . '" aria-expanded="false" aria-haspopup="true" title="' . esc_attr__( 'Add-ons', 'propertyhive' ) . '">';
+						echo '<span class="ph-nav-addons' . ( $ph_active_is_addon ? ' is-active' : '' ) . '">';
+							echo '<button type="button" class="ph-nav-tab ph-nav-addons-toggle' . ( $ph_active_is_addon ? ' nav-tab-active' : '' ) . '" aria-expanded="false" aria-haspopup="true"' . ( $ph_active_is_addon ? ' aria-current="page"' : '' ) . ' title="' . esc_attr__( 'Add-ons', 'propertyhive' ) . '">';
 								echo '<span class="ph-nav-icon">' . PH_Admin_Settings::get_tab_icon_svg( 'default' ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo '<span class="ph-nav-text">';
 									echo '<span class="ph-nav-label">' . esc_html__( 'Add-ons', 'propertyhive' ) . ' <span class="ph-nav-count">' . count( $ph_addon_tabs ) . '</span></span>';
@@ -119,7 +143,8 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 					}
 
 					do_action( 'propertyhive_settings_tabs' );
-				?>
+					?>
+				</div>
 			</nav>
 		</div>
 

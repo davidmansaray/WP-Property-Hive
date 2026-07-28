@@ -176,7 +176,7 @@ class PH_Admin_Settings {
 	    // Get tabs for the settings page
 	    $tabs = apply_filters( 'propertyhive_settings_tabs_array', array() );
 
-	    include 'views/html-admin-settings.php';
+	    include 'views/admin-settings.php';
 	}
 
 	/**
