@@ -39,7 +39,7 @@ class PH_Settings_General extends PH_Settings_Page {
      */
     public function get_sections() {
         $sections = array(
-            ''              => __( 'General', 'propertyhive' ),
+            ''              => __( 'Overview', 'propertyhive' ),
             'modules'       => __( 'Modules', 'propertyhive' ),
             'map'           => __( 'Map', 'propertyhive' ),
             'media'         => __( 'Media', 'propertyhive' ),
@@ -67,7 +67,7 @@ class PH_Settings_General extends PH_Settings_Page {
 
 		$settings = array(
 
-			array( 'title' => __( 'General Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'general_options' ),
+			array( 'title' => __( 'Active Departments', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'general_options' ),
         
         );
 

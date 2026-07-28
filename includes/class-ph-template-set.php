@@ -357,7 +357,7 @@ class PH_Template_Set {
 
 	/**
 	 * Persist the chosen editing experience (Visual / Page Builder / Developer)
-	 * from the Frontend settings card chooser via AJAX.
+	 * from the Frontend settings workspace via AJAX.
 	 */
 	public static function ajax_set_template_experience() {
 		check_ajax_referer( self::EXPERIENCE_NONCE_ACTION, 'nonce' );
@@ -389,6 +389,17 @@ class PH_Template_Set {
 		}
 
 		update_option( 'propertyhive_template_assistant', $settings );
+
+		$stored_settings = get_option( 'propertyhive_template_assistant', array() );
+		$mode_saved      = is_array( $stored_settings ) &&
+			isset( $stored_settings['template_set_editor_mode'] ) &&
+			$requested_mode === $stored_settings['template_set_editor_mode'];
+		$visual_enabled  = self::EDITOR_MODE_VISUAL !== $requested_mode ||
+			( isset( $stored_settings[ self::OPTION_ENABLED ] ) && 'yes' === $stored_settings[ self::OPTION_ENABLED ] );
+
+		if ( ! $mode_saved || ! $visual_enabled ) {
+			wp_send_json_error( array( 'message' => __( 'Could not save. Please try again.', 'propertyhive' ) ), 500 );
+		}
 
 		wp_send_json_success( array( 'mode' => $requested_mode ) );
 	}

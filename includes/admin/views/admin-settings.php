@@ -5,16 +5,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Buffer the settings tab content first: tabs may set $hide_save_button / button text
 // globals while rendering, and the header band (rendered above the content)
-// needs to know about them. Sections are buffered separately so the sub-nav
-// can sit between the tab bar and the page header, as per the design.
+// needs to know about them. Sections are buffered separately so the shared
+// page hierarchy can place them between the stable page header and content.
 ob_start();
 do_action( 'propertyhive_sections_' . $current_tab );
 $ph_sections_html = ob_get_clean();
+
+$GLOBALS['propertyhive_settings_heading_level'] = 2;
 
 ob_start();
 do_action( 'propertyhive_settings_' . $current_tab );
 do_action( 'propertyhive_settings_tabs_' . $current_tab ); // @deprecated hook
 $ph_settings_content = ob_get_clean();
+
+unset( $GLOBALS['propertyhive_settings_heading_level'] );
 
 $ph_tab_meta     = PH_Admin_Settings::get_tab_meta();
 $ph_current_meta = isset( $ph_tab_meta[ $current_tab ] ) ? $ph_tab_meta[ $current_tab ] : array();
@@ -24,6 +28,7 @@ $ph_page_title          = apply_filters( 'propertyhive_settings_page_title', $ph
 $ph_page_desc           = apply_filters( 'propertyhive_settings_page_description', $ph_page_desc, $current_tab, $current_section );
 $ph_help_url            = PH_Admin_Settings::get_help_url( $current_tab, $current_section );
 $ph_has_contextual_help = PH_Admin_Settings::DOCUMENTATION_URL !== $ph_help_url;
+$ph_has_sections        = '' !== trim( $ph_sections_html );
 $ph_show_save           = ! isset( $GLOBALS['hide_save_button'] );
 $ph_show_cancel         = isset( $GLOBALS['show_cancel_button'] ) && true === $GLOBALS['show_cancel_button'];
 $ph_show_header         = '' !== $ph_page_title || '' !== $ph_page_desc || $ph_show_cancel || $ph_has_contextual_help;
@@ -187,10 +192,8 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 
 		<hr class="wp-header-end" style="display:none">
 
-		<?php echo $ph_sections_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-
 		<?php if ( $ph_show_header ) : ?>
-			<div class="ph-settings-header<?php echo '' === $ph_page_title && '' === $ph_page_desc ? ' ph-settings-header--actions-only' : ''; ?>">
+			<div class="ph-settings-header<?php echo '' === $ph_page_title && '' === $ph_page_desc ? ' ph-settings-header--actions-only' : ''; ?><?php echo $ph_has_sections ? ' ph-settings-header--has-sections' : ''; ?>">
 				<div class="ph-settings-header-text">
 					<?php if ( '' !== $ph_page_title ) : ?>
 						<h1><?php echo esc_html( $ph_page_title ); ?></h1>
@@ -217,6 +220,8 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 				</div>
 			</div>
 		<?php endif; ?>
+
+		<?php echo $ph_sections_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 		<?php echo $ph_settings_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 

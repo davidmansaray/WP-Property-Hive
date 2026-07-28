@@ -300,9 +300,8 @@ class PH_Template_Set_Settings {
 			$recommended_image_size = 'standard';
 		}
 
-		// The enabled flag is owned by the experience chooser (AJAX) rather than a
-		// form checkbox, so a save that doesn't post the key preserves the stored
-		// value instead of treating the absence as "unchecked".
+		// The enabled flag is owned by the editing-method workspace rather than a
+		// checkbox. Preserve the stored value if an older form does not post it.
 		if ( $activate ) {
 			$enabled = 'yes';
 		} elseif ( array_key_exists( PH_Template_Set::OPTION_ENABLED, $raw_settings ) ) {

@@ -88,10 +88,10 @@ msgstr ""
 msgid "Looking For"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:887
 #: includes/admin/class-ph-admin-applicant-list.php:77
 #: includes/admin/class-ph-admin-applicant-list.php:932
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:396
-#: includes/admin/settings/class-ph-settings-frontend.php:913
 #: includes/admin/views/html-admin-matching-applicants.php:100
 #: includes/admin/views/html-admin-matching-properties.php:45
 #: includes/class-ph-search-form-field-catalog.php:121
@@ -130,14 +130,14 @@ msgstr ""
 msgid "Start typing to add property types"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:794
+#: includes/admin/settings/class-ph-settings-frontend.php:817
 #: includes/admin/class-ph-admin-applicant-list.php:142
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:867
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-address.php:281
 #: includes/admin/settings/class-ph-settings-custom-fields.php:361
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1351
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2588
-#: includes/admin/settings/class-ph-settings-frontend.php:820
-#: includes/admin/settings/class-ph-settings-frontend.php:843
 #: includes/admin/views/html-admin-matching-applicants.php:188
 #: includes/admin/views/html-admin-matching-properties.php:245
 #: includes/class-ph-search-form-field-catalog.php:24
@@ -297,8 +297,8 @@ msgstr ""
 msgid "Department"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1110
 #: includes/admin/class-ph-admin-applicant-list.php:943
-#: includes/admin/settings/class-ph-settings-frontend.php:1136
 #: includes/class-ph-search-form-field-catalog.php:316
 msgid "Currency"
 msgstr ""
@@ -430,7 +430,6 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:259
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:180
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:257
-#: includes/admin/settings/class-ph-settings-frontend.php:1818
 #: includes/admin/views/html-admin-matching-applicants.php:299
 #: includes/admin/views/html-admin-matching-properties.php:414
 #: includes/admin/views/admin-settings.php:185
@@ -547,6 +546,7 @@ msgstr ""
 msgid "Before asking for help, we recommend checking the documentation. Otherwise, please get in touch and a member of our team will be happy to assist."
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1972
 #: includes/admin/class-ph-admin-help.php:49
 msgid "View documentation"
 msgstr ""
@@ -1024,10 +1024,19 @@ msgstr ""
 
 #: includes/admin/class-ph-admin-onboarding.php:1290
 #: includes/admin/settings/class-ph-settings-offices.php:25
-#: includes/admin/settings/class-ph-settings-offices.php:43
 #: includes/admin/settings/class-ph-settings-offices.php:381
 #: includes/class-ph-post-types.php:615
 msgid "Offices"
+msgstr ""
+
+#: includes/admin/settings/class-ph-settings-offices.php:43
+msgid "Your Offices"
+msgstr ""
+
+#. translators: %s: Settings tab label.
+#: includes/admin/settings/class-ph-settings-page.php:63
+#, php-format
+msgid "%s sections"
 msgstr ""
 
 #: includes/admin/class-ph-admin-onboarding.php:1294
@@ -1687,6 +1696,7 @@ msgstr ""
 msgid "Show all contact types"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1076
 #: includes/admin/class-ph-admin-post-types.php:857
 #: includes/admin/class-ph-admin-profile.php:64
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:253
@@ -1694,7 +1704,6 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:73
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:109
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-record-details.php:81
-#: includes/admin/settings/class-ph-settings-frontend.php:1102
 #: includes/admin/views/html-bulk-edit-property.php:108
 #: includes/admin/views/html-contact-enquiries-meta-box.php:51
 #: includes/admin/views/html-property-enquiries-meta-box.php:41
@@ -1957,6 +1966,8 @@ msgid_plural "%1$s %2$s removed from archive."
 msgstr[0] ""
 msgstr[1] ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:486
+#: includes/admin/settings/class-ph-settings-frontend.php:526
 #: includes/admin/class-ph-admin.php:168
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1012
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1122
@@ -1971,8 +1982,6 @@ msgstr[1] ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1976
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2184
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2266
-#: includes/admin/settings/class-ph-settings-frontend.php:512
-#: includes/admin/settings/class-ph-settings-frontend.php:552
 msgid "ID"
 msgstr ""
 
@@ -2032,6 +2041,7 @@ msgstr ""
 msgid "Attending Negotiator(s)"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:835
 #: includes/admin/class-ph-admin.php:177
 #: includes/admin/class-ph-admin.php:186
 #: includes/admin/class-ph-admin.php:195
@@ -2046,7 +2056,6 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:34
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:36
 #: includes/admin/settings/class-ph-settings-emails.php:581
-#: includes/admin/settings/class-ph-settings-frontend.php:861
 #: includes/admin/views/html-contact-enquiries-meta-box.php:49
 #: includes/admin/views/html-contact-offers-meta-box.php:38
 #: includes/admin/views/html-contact-sales-meta-box.php:38
@@ -2399,12 +2408,12 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:942
+#: includes/admin/settings/class-ph-settings-frontend.php:950
 #: includes/admin/post-types/class-ph-admin-cpt-property.php:360
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:226
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:97
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-sales-details.php:53
-#: includes/admin/settings/class-ph-settings-frontend.php:968
-#: includes/admin/settings/class-ph-settings-frontend.php:976
 #: includes/admin/views/html-admin-matching-properties.php:324
 #: includes/bricks-builder-widgets/property-price.php:19
 #: includes/class-ph-search-form-field-catalog.php:175
@@ -2481,12 +2490,12 @@ msgstr ""
 msgid "End Date"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:970
+#: includes/admin/settings/class-ph-settings-frontend.php:978
 #: includes/admin/post-types/class-ph-admin-cpt-tenancy.php:106
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:224
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:55
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:153
-#: includes/admin/settings/class-ph-settings-frontend.php:996
-#: includes/admin/settings/class-ph-settings-frontend.php:1004
 #: includes/admin/views/html-admin-matching-properties.php:324
 #: includes/admin/views/html-contact-tenancies-meta-box.php:89
 #: includes/admin/views/html-property-tenancies-meta-box.php:89
@@ -2664,10 +2673,10 @@ msgstr ""
 msgid "Marketing"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1092
 #: includes/admin/post-types/class-ph-admin-meta-boxes.php:873
 #: includes/admin/settings/class-ph-settings-custom-fields.php:232
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2260
-#: includes/admin/settings/class-ph-settings-frontend.php:1118
 #: includes/class-ph-post-types.php:493
 #: includes/class-ph-search-form-field-catalog.php:305
 #: includes/divi-widgets/property-features.php:13
@@ -3115,11 +3124,11 @@ msgstr ""
 msgid "Residential Lettings"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:997
+#: includes/admin/settings/class-ph-settings-frontend.php:1061
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:198
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:231
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-details.php:42
-#: includes/admin/settings/class-ph-settings-frontend.php:1023
-#: includes/admin/settings/class-ph-settings-frontend.php:1087
 #: includes/bricks-builder-widgets/property-bedrooms.php:19
 #: includes/bricks-builder-widgets/property-bedrooms.php:51
 #: includes/bricks-builder-widgets/property-deposit.php:52
@@ -3187,13 +3196,13 @@ msgstr ""
 msgid "Select property type(s)"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:823
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:328
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-details.php:135
 #: includes/admin/settings/class-ph-settings-custom-fields.php:187
 #: includes/admin/settings/class-ph-settings-custom-fields.php:363
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1485
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2641
-#: includes/admin/settings/class-ph-settings-frontend.php:849
 #: includes/class-ph-post-types.php:357
 #: includes/class-ph-search-form-field-catalog.php:57
 #: includes/ph-template-functions.php:809
@@ -3208,12 +3217,12 @@ msgstr ""
 msgid "Select parking"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:829
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:363
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-details.php:170
 #: includes/admin/settings/class-ph-settings-custom-fields.php:365
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1567
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2684
-#: includes/admin/settings/class-ph-settings-frontend.php:855
 #: includes/class-ph-search-form-field-catalog.php:63
 #: includes/ph-template-functions.php:817
 msgid "Outside Space"
@@ -3463,8 +3472,8 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:911
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:568
-#: includes/admin/settings/class-ph-settings-frontend.php:937
 #: includes/admin/views/html-admin-matching-applicants.php:159
 #: includes/admin/views/html-admin-matching-properties.php:107
 #: includes/class-ph-search-form-field-catalog.php:145
@@ -3749,18 +3758,19 @@ msgstr ""
 msgid "Price On Application"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:919
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:169
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-sales-details.php:143
 #: includes/admin/settings/class-ph-settings-custom-fields.php:199
 #: includes/admin/settings/class-ph-settings-custom-fields.php:370
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1731
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3024
-#: includes/admin/settings/class-ph-settings-frontend.php:945
 #: includes/class-ph-post-types.php:442
 #: includes/class-ph-search-form-field-catalog.php:153
 msgid "Sale By"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:847
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:205
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-sales-details.php:181
 #: includes/admin/settings/class-ph-settings-custom-fields.php:372
@@ -3769,7 +3779,6 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1895
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3067
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3110
-#: includes/admin/settings/class-ph-settings-frontend.php:873
 #: includes/bricks-builder-widgets/property-tenure.php:19
 #: includes/class-ph-search-form-field-catalog.php:81
 #: includes/elementor-widgets/property-tenure.php:14
@@ -4317,11 +4326,11 @@ msgstr ""
 msgid "Tenures"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:925
 #: includes/admin/settings/class-ph-settings-custom-fields.php:216
 #: includes/admin/settings/class-ph-settings-custom-fields.php:377
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1977
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3153
-#: includes/admin/settings/class-ph-settings-frontend.php:951
 #: includes/class-ph-post-types.php:459
 #: includes/class-ph-search-form-field-catalog.php:159
 #: includes/elementor-widgets/property-furnished.php:14
@@ -4345,10 +4354,10 @@ msgstr ""
 msgid "Manage the values used in dropdowns, filters and fields across properties, contacts and other records."
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:841
 #: includes/admin/settings/class-ph-settings-custom-fields.php:382
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2185
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3300
-#: includes/admin/settings/class-ph-settings-frontend.php:867
 #: includes/class-ph-search-form-field-catalog.php:75
 #: includes/elementor-widgets/property-marketing-flag.php:14
 #: includes/elementor-widgets/property-marketing-flag.php:34
@@ -4491,6 +4500,7 @@ msgstr ""
 msgid "Edit Field"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:575
 #: includes/admin/settings/class-ph-settings-custom-fields.php:905
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1066
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1158
@@ -4512,7 +4522,6 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2292
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2714
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2767
-#: includes/admin/settings/class-ph-settings-frontend.php:601
 #: includes/admin/settings/class-ph-settings-offices.php:200
 #: includes/admin/settings/class-ph-settings-offices.php:457
 #: includes/admin/views/html-display-notes.php:352
@@ -5082,165 +5091,165 @@ msgstr ""
 msgid "Frontend"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:54
+#: includes/admin/settings/class-ph-settings-frontend.php:52
 msgid "You do not have permission to reset search forms."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:78
+#: includes/admin/settings/class-ph-settings-frontend.php:76
 msgid "You do not have permission to delete search forms."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:102
+#: includes/admin/settings/class-ph-settings-frontend.php:100
 #: includes/template-set/class-ph-template-set-request-context.php:222
 msgid "Property Templates"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:103
+#: includes/admin/settings/class-ph-settings-frontend.php:101
 msgid "Search Results"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:104
-#: includes/admin/settings/class-ph-settings-frontend.php:450
-#: includes/admin/settings/class-ph-settings-frontend.php:547
+#: includes/admin/settings/class-ph-settings-frontend.php:102
+#: includes/admin/settings/class-ph-settings-frontend.php:424
+#: includes/admin/settings/class-ph-settings-frontend.php:521
 msgid "Search Forms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:105
-#: includes/admin/settings/class-ph-settings-frontend.php:1396
+#: includes/admin/settings/class-ph-settings-frontend.php:103
+#: includes/admin/settings/class-ph-settings-frontend.php:1370
 msgid "Flags"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:156
+#: includes/admin/settings/class-ph-settings-frontend.php:130
 msgid "Search Results Page Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:161
+#: includes/admin/settings/class-ph-settings-frontend.php:135
 msgid "Default Sort Order"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:166
-#: includes/admin/settings/class-ph-settings-frontend.php:178
+#: includes/admin/settings/class-ph-settings-frontend.php:140
+#: includes/admin/settings/class-ph-settings-frontend.php:152
 msgid "default"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:173
+#: includes/admin/settings/class-ph-settings-frontend.php:147
 msgid "Properties Per Row"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:186
+#: includes/admin/settings/class-ph-settings-frontend.php:160
 msgid "Result Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:316
+#: includes/admin/settings/class-ph-settings-frontend.php:290
 msgid "Fields Shown"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:331
+#: includes/admin/settings/class-ph-settings-frontend.php:305
 msgid "Image Size Used"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:347
+#: includes/admin/settings/class-ph-settings-frontend.php:321
 msgid "Customise CSS"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:365
+#: includes/admin/settings/class-ph-settings-frontend.php:339
 msgid "Apply CSS To All Pages"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:543
-#: includes/admin/settings/class-ph-settings-frontend.php:625
+#: includes/admin/settings/class-ph-settings-frontend.php:517
+#: includes/admin/settings/class-ph-settings-frontend.php:599
 msgid "Add New Search Form"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:553
-#: includes/admin/settings/class-ph-settings-frontend.php:1686
+#: includes/admin/settings/class-ph-settings-frontend.php:527
+#: includes/admin/settings/class-ph-settings-frontend.php:1660
 msgid "Shortcode"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:590
+#: includes/admin/settings/class-ph-settings-frontend.php:564
 msgid "Edit Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:591
+#: includes/admin/settings/class-ph-settings-frontend.php:565
 msgid "Reset To Default Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:612
+#: includes/admin/settings/class-ph-settings-frontend.php:586
 msgid "No search forms exist"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:683
-#: includes/admin/settings/class-ph-settings-frontend.php:690
-#: includes/admin/settings/class-ph-settings-frontend.php:889
+#: includes/admin/settings/class-ph-settings-frontend.php:657
+#: includes/admin/settings/class-ph-settings-frontend.php:664
+#: includes/admin/settings/class-ph-settings-frontend.php:863
 #: includes/class-ph-search-form-field-catalog.php:97
 msgid "No Preference"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:828
+#: includes/admin/settings/class-ph-settings-frontend.php:802
 #: includes/class-ph-search-form-field-catalog.php:35
 msgid "Radius"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:832
+#: includes/admin/settings/class-ph-settings-frontend.php:806
 #: includes/class-ph-search-form-field-catalog.php:39
 msgid "This Area Only"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:833
+#: includes/admin/settings/class-ph-settings-frontend.php:807
 #: includes/class-ph-search-form-field-catalog.php:40
 msgid "Within 1 Mile"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:834
+#: includes/admin/settings/class-ph-settings-frontend.php:808
 #: includes/class-ph-search-form-field-catalog.php:41
 msgid "Within 2 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:835
+#: includes/admin/settings/class-ph-settings-frontend.php:809
 #: includes/class-ph-search-form-field-catalog.php:42
 msgid "Within 3 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:836
+#: includes/admin/settings/class-ph-settings-frontend.php:810
 #: includes/class-ph-search-form-field-catalog.php:43
 msgid "Within 5 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:837
+#: includes/admin/settings/class-ph-settings-frontend.php:811
 #: includes/class-ph-search-form-field-catalog.php:44
 msgid "Within 10 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:879
+#: includes/admin/settings/class-ph-settings-frontend.php:853
 #: includes/class-ph-search-form-field-catalog.php:87
 msgid "Commercial Tenure"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:885
+#: includes/admin/settings/class-ph-settings-frontend.php:859
 #: includes/class-ph-search-form-field-catalog.php:93
 msgid "For Sale / To Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:890
+#: includes/admin/settings/class-ph-settings-frontend.php:864
 #: includes/class-ph-search-form-field-catalog.php:98
 #: includes/ph-form-functions.php:647
 msgid "For Sale"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:891
+#: includes/admin/settings/class-ph-settings-frontend.php:865
 #: includes/class-ph-search-form-field-catalog.php:99
 #: includes/ph-form-functions.php:658
 msgid "To Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:896
-#: includes/admin/settings/class-ph-settings-frontend.php:920
-#: includes/admin/settings/class-ph-settings-frontend.php:957
-#: includes/admin/settings/class-ph-settings-frontend.php:985
-#: includes/admin/settings/class-ph-settings-frontend.php:1013
-#: includes/admin/settings/class-ph-settings-frontend.php:1038
-#: includes/admin/settings/class-ph-settings-frontend.php:1062
-#: includes/admin/settings/class-ph-settings-frontend.php:1143
+#: includes/admin/settings/class-ph-settings-frontend.php:870
+#: includes/admin/settings/class-ph-settings-frontend.php:894
+#: includes/admin/settings/class-ph-settings-frontend.php:931
+#: includes/admin/settings/class-ph-settings-frontend.php:959
+#: includes/admin/settings/class-ph-settings-frontend.php:987
+#: includes/admin/settings/class-ph-settings-frontend.php:1012
+#: includes/admin/settings/class-ph-settings-frontend.php:1036
+#: includes/admin/settings/class-ph-settings-frontend.php:1117
 #: includes/class-ph-search-form-field-catalog.php:104
 #: includes/class-ph-search-form-field-catalog.php:128
 #: includes/class-ph-search-form-field-catalog.php:165
@@ -5258,78 +5267,78 @@ msgstr ""
 msgid "No preference"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:906
+#: includes/admin/settings/class-ph-settings-frontend.php:880
 #: includes/class-ph-search-form-field-catalog.php:114
 msgid "Minimum Price"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:930
+#: includes/admin/settings/class-ph-settings-frontend.php:904
 #: includes/class-ph-search-form-field-catalog.php:138
 msgid "Minimum Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1031
+#: includes/admin/settings/class-ph-settings-frontend.php:1005
 #: includes/class-ph-search-form-field-catalog.php:233
 msgid "Max Beds"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1048
+#: includes/admin/settings/class-ph-settings-frontend.php:1022
 #: includes/class-ph-search-form-field-catalog.php:249
 msgid "Min Bathrooms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1055
+#: includes/admin/settings/class-ph-settings-frontend.php:1029
 #: includes/class-ph-search-form-field-catalog.php:256
 msgid "Max Bathrooms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1072
+#: includes/admin/settings/class-ph-settings-frontend.php:1046
 #: includes/class-ph-search-form-field-catalog.php:263
 msgid "Min Receptions"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1079
+#: includes/admin/settings/class-ph-settings-frontend.php:1053
 #: includes/class-ph-search-form-field-catalog.php:270
 msgid "Max Receptions"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1095
+#: includes/admin/settings/class-ph-settings-frontend.php:1069
 #: includes/class-ph-search-form-field-catalog.php:285
 #: includes/elementor-widgets/property-let-available-date.php:56
 msgid "Available From"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1109
+#: includes/admin/settings/class-ph-settings-frontend.php:1083
 #: includes/class-ph-search-form-field-catalog.php:297
 msgid "Keyword"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1153
+#: includes/admin/settings/class-ph-settings-frontend.php:1127
 #: includes/class-ph-search-form-field-catalog.php:329
 msgid "Date Added"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1214
+#: includes/admin/settings/class-ph-settings-frontend.php:1188
 msgid "Active Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1229
+#: includes/admin/settings/class-ph-settings-frontend.php:1203
 msgid "Inactive Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1401
+#: includes/admin/settings/class-ph-settings-frontend.php:1375
 msgid "Show Flags On Search Results"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1409
+#: includes/admin/settings/class-ph-settings-frontend.php:1383
 msgid "Show Flags On Property Details"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1417
+#: includes/admin/settings/class-ph-settings-frontend.php:1391
 msgid "Position Over Thumbnail"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1432
+#: includes/admin/settings/class-ph-settings-frontend.php:1406
 #: includes/elementor-widgets/property-actions.php:116
 #: includes/elementor-widgets/property-actions.php:151
 #: includes/elementor-widgets/property-brochures-link.php:104
@@ -5344,116 +5353,116 @@ msgstr ""
 msgid "Background Colour"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1439
+#: includes/admin/settings/class-ph-settings-frontend.php:1413
 #: includes/elementor-widgets/property-actions.php:127
 #: includes/elementor-widgets/property-actions.php:162
 msgid "Text Colour"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1462
+#: includes/admin/settings/class-ph-settings-frontend.php:1436
 msgid "Map Atlas remains selectable and will use its normal listing fallback until Map Search is installed and active."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1463
+#: includes/admin/settings/class-ph-settings-frontend.php:1437
 msgid "Map Search is installed but is not currently licensed for use. Map Atlas will use its normal listing fallback."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1464
+#: includes/admin/settings/class-ph-settings-frontend.php:1438
 msgid "Map Search is available but its view switcher or split format is not configured. Map Atlas will use its normal listing fallback."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1465
+#: includes/admin/settings/class-ph-settings-frontend.php:1439
 msgid "Map Search is ready. Map Atlas can use the configured list/map view."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1468
+#: includes/admin/settings/class-ph-settings-frontend.php:1442
 msgid "Map Search is ready in split-map format."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1470
+#: includes/admin/settings/class-ph-settings-frontend.php:1444
 msgid "Map Search is ready with its list/map view switcher."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1476
+#: includes/admin/settings/class-ph-settings-frontend.php:1450
 msgid "Map Search settings"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1480
+#: includes/admin/settings/class-ph-settings-frontend.php:1454
 msgid "Infinite Scroll is replaced by pagination in split and map-only layouts."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1482
+#: includes/admin/settings/class-ph-settings-frontend.php:1456
 msgid "Keep Portal-Style Search Results for the existing presentation, choose Portal Grid for an image-led listing, or use Map Atlas for a location-led experience. All three keep Property Hive search controls and theme templates in charge."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1485
+#: includes/admin/settings/class-ph-settings-frontend.php:1459
 msgid "Preview"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1508
+#: includes/admin/settings/class-ph-settings-frontend.php:1482
 msgid "Fine-tune the templates used for property detail pages and search results."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1513
+#: includes/admin/settings/class-ph-settings-frontend.php:1487
 msgid "Property Detail Template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1521
+#: includes/admin/settings/class-ph-settings-frontend.php:1495
 msgid "Search Results Template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1529
+#: includes/admin/settings/class-ph-settings-frontend.php:1503
 msgid "Search Listing Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1537
+#: includes/admin/settings/class-ph-settings-frontend.php:1511
 msgid "Search Card Size"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1545
+#: includes/admin/settings/class-ph-settings-frontend.php:1519
 msgid "Grid Properties Per Row"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1553
+#: includes/admin/settings/class-ph-settings-frontend.php:1527
 msgid "Gallery Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1561
+#: includes/admin/settings/class-ph-settings-frontend.php:1535
 msgid "Template Catalogue"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1567
+#: includes/admin/settings/class-ph-settings-frontend.php:1541
 msgid "Brand Colour"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1574
+#: includes/admin/settings/class-ph-settings-frontend.php:1548
 msgid "Accent Colour"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1581
+#: includes/admin/settings/class-ph-settings-frontend.php:1555
 msgid "Button Style"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1586
+#: includes/admin/settings/class-ph-settings-frontend.php:1560
 #: includes/template-set/class-ph-template-set-options.php:48
 msgid "Filled"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1587
+#: includes/admin/settings/class-ph-settings-frontend.php:1561
 #: includes/template-set/class-ph-template-set-options.php:49
 msgid "Outline"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1588
+#: includes/admin/settings/class-ph-settings-frontend.php:1562
 #: includes/template-set/class-ph-template-set-options.php:50
 msgid "Soft"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1593
+#: includes/admin/settings/class-ph-settings-frontend.php:1567
 msgid "Image Style"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1598
+#: includes/admin/settings/class-ph-settings-frontend.php:1572
 #: includes/avada-widgets/property-image.php:38
 #: includes/bricks-builder-widgets/property-image.php:67
 #: includes/divi-widgets/property-image.php:45
@@ -5465,448 +5474,422 @@ msgstr ""
 msgid "Square"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1599
+#: includes/admin/settings/class-ph-settings-frontend.php:1573
 #: includes/template-set/class-ph-template-set-options.php:109
 msgid "Soft corners"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1600
+#: includes/admin/settings/class-ph-settings-frontend.php:1574
 #: includes/template-set/class-ph-template-set-options.php:110
 msgid "Rounded corners"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1605
+#: includes/admin/settings/class-ph-settings-frontend.php:1579
 msgid "Contact Card Style"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1613
+#: includes/admin/settings/class-ph-settings-frontend.php:1587
 msgid "Display Options"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1618
+#: includes/admin/settings/class-ph-settings-frontend.php:1592
 msgid "Show branch contact details on property cards."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1626
+#: includes/admin/settings/class-ph-settings-frontend.php:1600
 msgid "Show badges on property cards."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1634
+#: includes/admin/settings/class-ph-settings-frontend.php:1608
 msgid "Show the mobile enquiry bar on property detail pages."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1642
+#: includes/admin/settings/class-ph-settings-frontend.php:1616
 msgid "Show floorplans on property detail pages when available."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1650
+#: includes/admin/settings/class-ph-settings-frontend.php:1624
 msgid "Show virtual tours on property detail pages when available."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1658
+#: includes/admin/settings/class-ph-settings-frontend.php:1632
 msgid "Show recommended homes on property detail pages."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1662
+#: includes/admin/settings/class-ph-settings-frontend.php:1636
 msgid "Recommended Homes Count"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1670
+#: includes/admin/settings/class-ph-settings-frontend.php:1644
 msgid "Recommended Homes Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1678
+#: includes/admin/settings/class-ph-settings-frontend.php:1652
 msgid "Recommended Homes Images"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1711
 msgid "Advanced template settings"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1751
-#: includes/admin/settings/class-ph-settings-frontend.php:2005
+#: includes/admin/settings/class-ph-settings-frontend.php:1720
+#: includes/admin/settings/class-ph-settings-frontend.php:1940
 msgid "Visual Editor"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1752
+#: includes/admin/settings/class-ph-settings-frontend.php:1721
 msgid "Recommended"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1753
+#: includes/admin/settings/class-ph-settings-frontend.php:1722
 msgid "Choose from professionally designed templates and customise them with live previews."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1756
 msgid "Live preview as you customise"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1757
-#: includes/admin/settings/class-ph-settings-frontend.php:2196
+#: includes/admin/settings/class-ph-settings-frontend.php:1970
+#: includes/admin/settings/class-ph-settings-frontend.php:2153
 msgid "No coding required"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1758
 msgid "Pre-built templates"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1759
 msgid "Responsive on all devices"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1763
+#: includes/admin/settings/class-ph-settings-frontend.php:1726
 msgid "Page Builder"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1765
+#: includes/admin/settings/class-ph-settings-frontend.php:1728
 msgid "Use Elementor, Divi or other supported page builders to design your templates."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1768
 msgid "Works with Elementor, Divi & more"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1769
-#: includes/admin/settings/class-ph-settings-frontend.php:2197
+#: includes/admin/settings/class-ph-settings-frontend.php:2154
 msgid "Full design flexibility"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1770
 msgid "Access to builder ecosystem"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1771
 msgid "Advanced styling options"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1775
+#: includes/admin/settings/class-ph-settings-frontend.php:1732
 msgid "Developer Mode"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1777
+#: includes/admin/settings/class-ph-settings-frontend.php:1734
 msgid "Edit templates using code, CSS, and PHP. Perfect for developers who want full control."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1780
 msgid "Full code control"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1781
 msgid "CSS & PHP customisation"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1782
 msgid "Override templates in your theme"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1783
 msgid "Version control friendly"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1794
 msgid "Editing method"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1799
-#: includes/admin/settings/class-ph-settings-frontend.php:1811
 msgid "Change editing method"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1810
 msgid "How would you like to edit your property templates?"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1814
 msgid "Choose the approach that best matches how you work."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1815
 msgid "Your existing template settings are kept when you switch methods."
 msgstr ""
 
 #. translators: %s: editing method name
-#: includes/admin/settings/class-ph-settings-frontend.php:1844
 #, php-format
 msgid "Choose %s"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1846
 msgid "Selected"
 msgstr ""
 
 #. translators: %s: "Learn more" link
-#: includes/admin/settings/class-ph-settings-frontend.php:1857
 #, php-format
 msgid "Not sure which option to choose? %s about each editing method."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1858
+#: includes/admin/settings/class-ph-settings-frontend.php:1808
 msgid "Learn more"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1976
-#: includes/admin/settings/class-ph-settings-frontend.php:1980
+#: includes/admin/settings/class-ph-settings-frontend.php:1891
+#: includes/admin/settings/class-ph-settings-frontend.php:1895
 msgid "Could not save. Please try again."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2005
+#: includes/admin/settings/class-ph-settings-frontend.php:1940
 msgid "NEW"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2009
+#: includes/admin/settings/class-ph-settings-frontend.php:1941
 msgid "The Visual Editor is our new and improved way to customise your property templates. It provides a live preview of your changes and makes it easy to create beautiful, responsive layouts without any coding knowledge."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2011
+#: includes/admin/settings/class-ph-settings-frontend.php:1947
 msgid "Edit Search Template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2012
 msgid "Edit Details Template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2018
 msgid "Need help getting started?"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2019
 msgid "Browse the Property Hive documentation or visit our official video channel for help and tutorials."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2021
 msgid "View Documentation"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2022
 msgid "Visit Video Channel"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2066
+#: includes/admin/settings/class-ph-settings-frontend.php:2023
 #, php-format
 msgid "%s is active"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2069
+#: includes/admin/settings/class-ph-settings-frontend.php:2026
 #: includes/template-set/class-ph-template-set-editor-controller.php:77
 #: includes/template-set/class-ph-template-set-editor-controller.php:278
 msgid "Ready"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2069
+#: includes/admin/settings/class-ph-settings-frontend.php:2026
 msgid "Setup required"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2075
+#: includes/admin/settings/class-ph-settings-frontend.php:2032
 #, php-format
 msgid "You can use %s Theme Builder to design Property Detail templates with full visual control."
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2080
+#: includes/admin/settings/class-ph-settings-frontend.php:2037
 #, php-format
 msgid "%s is active, but its Theme Builder is not available. Elementor Pro is required before you can create Property Hive templates."
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2091
+#: includes/admin/settings/class-ph-settings-frontend.php:2048
 #, php-format
 msgid "%s active"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2097
+#: includes/admin/settings/class-ph-settings-frontend.php:2054
 msgid "Theme Builder active"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2099
+#: includes/admin/settings/class-ph-settings-frontend.php:2056
 msgid "Elementor Pro Theme Builder required"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2104
-#: includes/admin/settings/class-ph-settings-frontend.php:2113
-#: includes/admin/settings/class-ph-settings-frontend.php:2124
+#: includes/admin/settings/class-ph-settings-frontend.php:2061
+#: includes/admin/settings/class-ph-settings-frontend.php:2070
+#: includes/admin/settings/class-ph-settings-frontend.php:2081
 msgid "Open Theme Builder"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2110
+#: includes/admin/settings/class-ph-settings-frontend.php:2067
 msgid "Getting started"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2116
+#: includes/admin/settings/class-ph-settings-frontend.php:2073
 #, php-format
 msgid "Open the Theme Builder provided by %s."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2120
+#: includes/admin/settings/class-ph-settings-frontend.php:2077
 msgid "Create a Property Detail template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2120
+#: includes/admin/settings/class-ph-settings-frontend.php:2077
 msgid "Choose the single-property display conditions described in the integration guide."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2121
+#: includes/admin/settings/class-ph-settings-frontend.php:2078
 msgid "Publish your changes"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2121
+#: includes/admin/settings/class-ph-settings-frontend.php:2078
 msgid "Your detail-template changes will be applied to matching properties."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2123
+#: includes/admin/settings/class-ph-settings-frontend.php:2080
 msgid "Activate Elementor Pro"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2123
+#: includes/admin/settings/class-ph-settings-frontend.php:2080
 msgid "Property Hive template integration requires Elementor Pro Theme Builder."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2124
+#: includes/admin/settings/class-ph-settings-frontend.php:2081
 msgid "Create a new Single template for Property Hive properties."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2125
+#: includes/admin/settings/class-ph-settings-frontend.php:2082
 msgid "Follow the integration guide"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2125
+#: includes/admin/settings/class-ph-settings-frontend.php:2082
 msgid "Apply the correct display conditions before publishing."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2130
+#: includes/admin/settings/class-ph-settings-frontend.php:2087
 msgid "Helpful resources"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2137
+#: includes/admin/settings/class-ph-settings-frontend.php:2094
 #, php-format
 msgid "How to use %s with Property Hive"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2141
+#: includes/admin/settings/class-ph-settings-frontend.php:2098
 msgid "Step-by-step guide to getting started."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2147
+#: includes/admin/settings/class-ph-settings-frontend.php:2104
 msgid "Which templates can I edit?"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2151
+#: includes/admin/settings/class-ph-settings-frontend.php:2108
 #, php-format
 msgid "See how %s integrates with Property Detail templates."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2161
+#: includes/admin/settings/class-ph-settings-frontend.php:2118
 msgid "Watch video tutorial"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2165
+#: includes/admin/settings/class-ph-settings-frontend.php:2122
 #, php-format
 msgid "Learn how to customise templates with %s."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2180
+#: includes/admin/settings/class-ph-settings-frontend.php:2137
 msgid "No page builder detected"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2181
+#: includes/admin/settings/class-ph-settings-frontend.php:2138
 msgid "We didn't detect any supported page builders on your site. Page builders let you visually design your property templates with drag and drop tools."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2183
+#: includes/admin/settings/class-ph-settings-frontend.php:2140
 msgid "Supported page builders:"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2192
+#: includes/admin/settings/class-ph-settings-frontend.php:2149
 msgid "What is a page builder?"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2193
+#: includes/admin/settings/class-ph-settings-frontend.php:2150
 msgid "Page builders are plugins that provide a visual interface for creating and designing page layouts."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2195
+#: includes/admin/settings/class-ph-settings-frontend.php:2152
 msgid "Drag and drop interface"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2201
+#: includes/admin/settings/class-ph-settings-frontend.php:2158
 msgid "Get started"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2202
+#: includes/admin/settings/class-ph-settings-frontend.php:2159
 msgid "Install and activate a supported page builder to unlock visual template building."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2204
+#: includes/admin/settings/class-ph-settings-frontend.php:2161
 msgid "View our documentation"
 msgstr ""
 
 #. translators: %s: page builder name
-#: includes/admin/settings/class-ph-settings-frontend.php:2209
+#: includes/admin/settings/class-ph-settings-frontend.php:2166
 #, php-format
 msgid "Explore %s"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2230
+#: includes/admin/settings/class-ph-settings-frontend.php:2187
 msgid "Template Overrides"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2231
+#: includes/admin/settings/class-ph-settings-frontend.php:2188
 msgid "Learn how to override any template file."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2236
+#: includes/admin/settings/class-ph-settings-frontend.php:2193
 msgid "Hooks & Filters"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2237
+#: includes/admin/settings/class-ph-settings-frontend.php:2194
 msgid "Learn how to extend Property Hive with hooks and filters."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2242
+#: includes/admin/settings/class-ph-settings-frontend.php:2199
 msgid "Developer Guide"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2243
+#: includes/admin/settings/class-ph-settings-frontend.php:2200
 msgid "Full guide to extending Property Hive."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2248
+#: includes/admin/settings/class-ph-settings-frontend.php:2205
 msgid "Sample Add-on"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2249
+#: includes/admin/settings/class-ph-settings-frontend.php:2206
 msgid "Example of a custom add-on plugin."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2259
+#: includes/admin/settings/class-ph-settings-frontend.php:2216
 msgid "Build without limits"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2260
+#: includes/admin/settings/class-ph-settings-frontend.php:2217
 msgid "Developer Mode allows you to override any Property Hive template and hook into the plugin using actions and filters. Perfect for developers who need full control."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2262
+#: includes/admin/settings/class-ph-settings-frontend.php:2219
 msgid "Override any template"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2263
+#: includes/admin/settings/class-ph-settings-frontend.php:2220
 msgid "Extend with hooks & filters"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2264
+#: includes/admin/settings/class-ph-settings-frontend.php:2221
 msgid "Safe, upgrade-friendly approach"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2268
+#: includes/admin/settings/class-ph-settings-frontend.php:2225
 msgid "Quick links"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:2278
+#: includes/admin/settings/class-ph-settings-frontend.php:2235
 msgid "All overrides are upgrade safe. Your changes will not be lost when the plugin updates."
 msgstr ""
 
@@ -5944,9 +5927,6 @@ msgid "Miscellaneous"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-general.php:70
-msgid "General Options"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-general.php:85
 #: includes/admin/settings/class-ph-settings-general.php:99
 #: includes/admin/settings/class-ph-settings-general.php:127
@@ -10270,6 +10250,7 @@ msgstr ""
 msgid "Show property labels"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1799
 #: includes/template-set/class-ph-template-set-editor-controller.php:104
 msgid "Search results"
 msgstr ""
@@ -10324,6 +10305,7 @@ msgstr ""
 msgid "Details shown"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-frontend.php:1801
 #: includes/template-set/class-ph-template-set-editor-controller.php:360
 msgid "Related properties"
 msgstr ""
@@ -11158,6 +11140,7 @@ msgid "Key features"
 msgstr ""
 
 #: includes/template-set/traits/trait-ph-template-set-preview.php:677
+#: includes/admin/settings/class-ph-settings-general.php:42
 #: templates/template-set/detail/conversion-first-sales-detail/modules.php:32
 #: templates/template-set/detail/immersive-cinema-detail/modules.php:32
 msgid "Overview"

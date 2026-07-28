@@ -43,12 +43,13 @@ class PH_Admin_Assets {
             // Admin styles for PH pages only
             wp_enqueue_style( 'propertyhive_admin_styles', PH()->plugin_url() . '/assets/css/admin.css', array(), PH_VERSION );
 
-            // Admin settings interface (navigation and template experience chooser).
+            // Admin settings interface (navigation and Frontend workspace).
             wp_enqueue_style( 'propertyhive_admin_settings_styles', PH()->plugin_url() . '/assets/css/admin-settings.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
 
             if ( false !== strpos( $screen->id, 'page_ph-settings' ) )
             {
                 $this->add_settings_navigation_colour_styles( $screen );
+                $this->add_frontend_settings_colour_styles( $screen );
 
                 wp_enqueue_style( 'propertyhive_admin_development_tools', PH()->plugin_url() . '/assets/css/admin-development-tools.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
             }
@@ -169,6 +170,92 @@ class PH_Admin_Assets {
             'focus'             => '--ph-settings-nav-focus',
             'count_background'  => '--ph-settings-nav-count-background',
             'count_text'        => '--ph-settings-nav-count-text',
+        );
+
+        $declarations = array();
+
+        foreach ( $variables as $key => $variable )
+        {
+            $colour = isset( $colours[ $key ] ) && is_string( $colours[ $key ] )
+                ? sanitize_hex_color( $colours[ $key ] )
+                : '';
+
+            if ( empty( $colour ) )
+            {
+                $colour = $defaults[ $key ];
+            }
+
+            $declarations[] = $variable . ':' . $colour;
+        }
+
+        wp_add_inline_style(
+            'propertyhive_admin_settings_styles',
+            '.propertyhive.ph-settings-page{' . implode( ';', $declarations ) . '}'
+        );
+    }
+
+    /**
+     * Add filterable colours for the Frontend settings workspace.
+     *
+     * @param WP_Screen $screen Current admin screen.
+     */
+    private function add_frontend_settings_colour_styles( $screen ) {
+        $defaults = array(
+            'accent'          => '#f5c518',
+            'accent_hover'    => '#eebc0f',
+            'accent_soft'     => '#fbf1d0',
+            'accent_tint'     => '#fffae9',
+            'accent_text'     => '#7a6115',
+            'text'            => '#1d1d24',
+            'muted_text'      => '#6b6b76',
+            'border'          => '#e5e5ea',
+            'border_strong'   => '#d3d3da',
+            'focus'           => '#3d5fe7',
+            'success'         => '#1f7a3d',
+            'success_soft'    => '#e4f7ea',
+            'success_tint'    => '#f4f8f5',
+            'warning'         => '#9a5a00',
+            'warning_soft'    => '#fff1dc',
+            'info'            => '#2c4a7c',
+            'info_soft'       => '#eef4ff',
+            'error'           => '#b32d2e',
+            'surface'         => '#ffffff',
+            'subtle_surface'  => '#f7f7f9',
+        );
+
+        /**
+         * Filters the colours used by the Frontend settings workspace.
+         *
+         * Values must be three- or six-digit hexadecimal colours. Missing or
+         * invalid values fall back independently, and unknown keys are ignored.
+         *
+         * @param string[] $colours Frontend workspace colours keyed by semantic role.
+         * @param WP_Screen $screen Current admin screen.
+         */
+        $colours = apply_filters( 'propertyhive_frontend_settings_colours', $defaults, $screen );
+        $colours = is_array( $colours ) ? wp_parse_args( $colours, $defaults ) : $defaults;
+
+        $variables = array(
+            'accent'         => '--ph-tx-yellow',
+            'accent_hover'   => '--ph-tx-yellow-hover',
+            'accent_soft'    => '--ph-tx-yellow-soft',
+            'accent_tint'    => '--ph-tx-yellow-tint',
+            'accent_text'    => '--ph-tx-yellow-text',
+            'text'           => '--ph-tx-ink',
+            'muted_text'     => '--ph-tx-muted',
+            'border'         => '--ph-tx-border',
+            'border_strong'  => '--ph-tx-border-strong',
+            'focus'          => '--ph-tx-blue',
+            'success'        => '--ph-tx-green',
+            'success_soft'   => '--ph-tx-green-soft',
+            'success_tint'   => '--ph-tx-green-tint',
+            'warning'        => '--ph-tx-warning',
+            'warning_soft'   => '--ph-tx-warning-soft',
+            'info'           => '--ph-tx-info',
+            'info_soft'      => '--ph-tx-info-soft',
+            'error'          => '--ph-tx-error',
+            'surface'        => '--ph-tx-surface',
+            'subtle_surface' => '--ph-tx-subtle-surface',
         );
 
         $declarations = array();
