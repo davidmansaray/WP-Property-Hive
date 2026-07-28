@@ -58,13 +58,34 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: stretch;
+    gap: 2px;
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+
+.propertyhive .ph-settings-nav-group {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
     min-width: 0;
     border: 1px solid var(--ph-tx-border);
     border-radius: var(--ph-tx-radius);
     background: #fff;
-    padding: 0;
-    margin: 0;
     box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+}
+
+.propertyhive .ph-settings-nav-group--settings {
+    flex: 1 1 auto;
+}
+
+.propertyhive .ph-settings-nav-group--pro {
+    flex: 0 1 auto;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-tab {
@@ -89,17 +110,22 @@
     order: 0;
 }
 
-.propertyhive .ph-settings-nav .ph-nav-tab:first-child {
+.propertyhive .ph-settings-nav-group > .ph-nav-tab:first-child {
     border-radius: calc(var(--ph-tx-radius) - 1px) 0 0 calc(var(--ph-tx-radius) - 1px);
 }
 
+.propertyhive .ph-settings-nav-group > .ph-nav-tab:last-child,
+.propertyhive .ph-settings-nav-group > .ph-nav-addons:last-child > .ph-nav-addons-toggle {
+    border-radius: 0 calc(var(--ph-tx-radius) - 1px) calc(var(--ph-tx-radius) - 1px) 0;
+}
+
 /* Divider lines between items (per design). */
-.propertyhive .ph-settings-nav > :not(:first-child) {
+.propertyhive .ph-settings-nav-group > :not(:first-child) {
     box-shadow: inset 1px 0 0 var(--ph-tx-border);
 }
 
-.propertyhive .ph-settings-nav > .nav-tab-active,
-.propertyhive .ph-settings-nav > .nav-tab-active + * {
+.propertyhive .ph-settings-nav-group > .nav-tab-active,
+.propertyhive .ph-settings-nav-group > .nav-tab-active + * {
     box-shadow: none;
 }
 

@@ -40,20 +40,44 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div>
 		<?php
-			// Split tabs into core (known meta) and add-on (registered dynamically).
-			$ph_core_tabs  = array();
-			$ph_addon_tabs = array();
+			// Keep day-to-day settings separate from the commercial tools. Add-on
+			// settings remain in the Pro group because they are license-managed
+			// extensions rather than core configuration.
+			$ph_settings_tabs = array();
+			$ph_pro_tabs      = array();
+			$ph_addon_tabs    = array();
+			$ph_pro_tab_ids   = apply_filters(
+				'propertyhive_settings_pro_tab_ids',
+				array( 'licensekey', 'features' )
+			);
+
 			foreach ( $tabs as $name => $label )
 			{
-				if ( isset( $ph_tab_meta[ $name ] ) )
+				if ( in_array( $name, $ph_pro_tab_ids, true ) )
 				{
-					$ph_core_tabs[ $name ] = $label;
+					$ph_pro_tabs[ $name ] = $label;
+				}
+				elseif ( isset( $ph_tab_meta[ $name ] ) )
+				{
+					$ph_settings_tabs[ $name ] = $label;
 				}
 				else
 				{
 					$ph_addon_tabs[ $name ] = $label;
 				}
 			}
+
+			// The Pro group has a deliberate hierarchy regardless of the order in
+			// which settings pages register themselves.
+			$ph_ordered_pro_tabs = array();
+			foreach ( $ph_pro_tab_ids as $name )
+			{
+				if ( isset( $ph_pro_tabs[ $name ] ) )
+				{
+					$ph_ordered_pro_tabs[ $name ] = $ph_pro_tabs[ $name ];
+				}
+			}
+			$ph_pro_tabs = $ph_ordered_pro_tabs;
 
 			$ph_active_is_addon = isset( $ph_addon_tabs[ $current_tab ] );
 
@@ -82,9 +106,19 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 			};
 		?>
 		<div class="ph-settings-nav-wrap">
-			<nav class="nav-tab-wrapper ph-settings-nav">
-				<?php
-					foreach ( $ph_core_tabs as $name => $label )
+			<nav class="nav-tab-wrapper ph-settings-nav" aria-label="<?php echo esc_attr__( 'Property Hive settings', 'propertyhive' ); ?>">
+				<div class="ph-settings-nav-group ph-settings-nav-group--settings" role="group" aria-label="<?php echo esc_attr__( 'Core settings', 'propertyhive' ); ?>">
+					<?php
+					foreach ( $ph_settings_tabs as $name => $label )
+					{
+						$ph_render_tab( $name, $label, 'row' );
+					}
+					?>
+				</div>
+
+				<div class="ph-settings-nav-group ph-settings-nav-group--pro" role="group" aria-label="<?php echo esc_attr__( 'Property Hive Pro', 'propertyhive' ); ?>">
+					<?php
+					foreach ( $ph_pro_tabs as $name => $label )
 					{
 						$ph_render_tab( $name, $label, 'row' );
 					}
@@ -119,7 +153,8 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 					}
 
 					do_action( 'propertyhive_settings_tabs' );
-				?>
+					?>
+				</div>
 			</nav>
 		</div>
 
