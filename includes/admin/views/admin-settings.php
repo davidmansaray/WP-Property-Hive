@@ -18,14 +18,16 @@ $ph_settings_content = ob_get_clean();
 
 $ph_tab_meta     = PH_Admin_Settings::get_tab_meta();
 $ph_current_meta = isset( $ph_tab_meta[ $current_tab ] ) ? $ph_tab_meta[ $current_tab ] : array();
-$ph_page_title   = isset( $tabs[ $current_tab ] ) ? $tabs[ $current_tab ] : '';
-$ph_page_desc    = isset( $ph_current_meta['description'] ) ? $ph_current_meta['description'] : ( isset( $ph_current_meta['subtitle'] ) ? $ph_current_meta['subtitle'] : '' );
-$ph_page_title   = apply_filters( 'propertyhive_settings_page_title', $ph_page_title, $current_tab, $current_section );
-$ph_page_desc    = apply_filters( 'propertyhive_settings_page_description', $ph_page_desc, $current_tab, $current_section );
-$ph_show_save    = ! isset( $GLOBALS['hide_save_button'] );
-$ph_show_cancel  = isset( $GLOBALS['show_cancel_button'] ) && true === $GLOBALS['show_cancel_button'];
-$ph_show_header  = '' !== $ph_page_title || '' !== $ph_page_desc || $ph_show_cancel;
-$ph_button_text  = __( 'Save changes', 'propertyhive' );
+$ph_page_title          = isset( $tabs[ $current_tab ] ) ? $tabs[ $current_tab ] : '';
+$ph_page_desc           = isset( $ph_current_meta['description'] ) ? $ph_current_meta['description'] : ( isset( $ph_current_meta['subtitle'] ) ? $ph_current_meta['subtitle'] : '' );
+$ph_page_title          = apply_filters( 'propertyhive_settings_page_title', $ph_page_title, $current_tab, $current_section );
+$ph_page_desc           = apply_filters( 'propertyhive_settings_page_description', $ph_page_desc, $current_tab, $current_section );
+$ph_help_url            = PH_Admin_Settings::get_help_url( $current_tab, $current_section );
+$ph_has_contextual_help = PH_Admin_Settings::DOCUMENTATION_URL !== $ph_help_url;
+$ph_show_save           = ! isset( $GLOBALS['hide_save_button'] );
+$ph_show_cancel         = isset( $GLOBALS['show_cancel_button'] ) && true === $GLOBALS['show_cancel_button'];
+$ph_show_header         = '' !== $ph_page_title || '' !== $ph_page_desc || $ph_show_cancel || $ph_has_contextual_help;
+$ph_button_text         = __( 'Save changes', 'propertyhive' );
 $ph_default_button_text = $ph_button_text;
 
 if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_text'] ) )
@@ -211,7 +213,7 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 						<?php
 					}
 					?>
-					<a class="ph-help-button" href="https://wp-property-hive.com/documentation/" target="_blank" rel="noopener" title="<?php echo esc_attr( __( 'Help & documentation', 'propertyhive' ) ); ?>">?</a>
+					<a class="ph-help-button" href="<?php echo esc_url( $ph_help_url ); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr( __( 'Help & documentation', 'propertyhive' ) ); ?>">?</a>
 				</div>
 			</div>
 		<?php endif; ?>
