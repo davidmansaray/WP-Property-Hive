@@ -1,6 +1,7 @@
 .vscode
 .DS_Store
 /AGENTS.md
+/.design/
 /docs/
 prototypes/
 .playwright-cli/
