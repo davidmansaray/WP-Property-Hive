@@ -22,6 +22,13 @@ class PH_Admin_Settings {
 	private static $messages = array();
 
 	/**
+	 * Property Hive documentation home URL.
+	 *
+	 * @var string
+	 */
+	const DOCUMENTATION_URL = 'https://docs.wp-property-hive.com/';
+
+	/**
 	 * Include the settings page classes
 	 */
 	public static function get_settings_pages() {
@@ -189,6 +196,80 @@ class PH_Admin_Settings {
 		);
 
 		return apply_filters( 'propertyhive_settings_tab_meta', $meta );
+	}
+
+	/**
+	 * Get the most relevant documentation URL for a settings screen.
+	 *
+	 * Sections without a dedicated article fall back to the documentation home
+	 * page. Add-ons can provide their own contextual link using the filter.
+	 *
+	 * @param string $tab     Current settings tab.
+	 * @param string $section Current settings section.
+	 * @return string
+	 */
+	public static function get_help_url( $tab, $section = '' ) {
+		$documentation_path = '';
+		$help_paths         = array(
+			'general' => array(
+				''                  => 'article/6-general-departments',
+				'modules'           => 'article/38-general-active-modules',
+				'map'               => 'article/40-general-map-and-geocoding-services-and-api-keys',
+				'media'             => 'article/254-general-media',
+				'international'     => 'article/39-general-international-countries-and-currency-settings',
+				'gdpr'              => 'article/41-general-gdpr',
+				'captcha'           => 'article/255-general-captcha',
+				'text-substitution' => 'article/648-general-text-substitution',
+				'misc'              => 'article/42-general-miscellaneous',
+			),
+			'offices' => array(
+				'default' => 'article/43-offices',
+			),
+			'customfields' => array(
+				''                      => 'article/44-custom-fields',
+				'default'               => 'article/44-custom-fields',
+				'additional'            => 'article/647-field-manager-additional-fields',
+				'addadditionalfield'    => 'article/647-field-manager-additional-fields',
+				'editadditionalfield'   => 'article/647-field-manager-additional-fields',
+				'deleteadditionalfield' => 'article/647-field-manager-additional-fields',
+			),
+			'frontend' => array(
+				'search-forms'   => 'article/650-frontend-search-forms',
+				'addsearchform'  => 'article/650-frontend-search-forms',
+				'editsearchform' => 'article/650-frontend-search-forms',
+				'flags'          => 'article/649-frontend-flags',
+			),
+			'email' => array(
+				''                       => 'article/45-emails-general-settings',
+				'enquiry-auto-responder' => 'article/46-emails-enquiry-auto-responders',
+				'match'                  => 'article/47-emails-property-matching',
+				'booking-confirmation'   => 'article/48-emails-booking-confirmations',
+				'log'                    => 'article/256-emails-queue',
+			),
+			'features' => array(
+				'default' => 'article/49-features',
+			),
+			'licensekey' => array(
+				'default' => 'article/50-license',
+			),
+		);
+
+		if ( isset( $help_paths[ $tab ][ $section ] ) ) {
+			$documentation_path = $help_paths[ $tab ][ $section ];
+		} elseif ( isset( $help_paths[ $tab ]['default'] ) ) {
+			$documentation_path = $help_paths[ $tab ]['default'];
+		}
+
+		$documentation_url = self::DOCUMENTATION_URL . $documentation_path;
+
+		/**
+		 * Filters the contextual documentation URL for a settings screen.
+		 *
+		 * @param string $documentation_url Documentation URL.
+		 * @param string $tab               Current settings tab.
+		 * @param string $section           Current settings section.
+		 */
+		return apply_filters( 'propertyhive_settings_help_url', $documentation_url, $tab, $section );
 	}
 
 	/**
