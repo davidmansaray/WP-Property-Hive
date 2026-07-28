@@ -200,6 +200,19 @@ Search integrations can inspect `propertyhive_template_set_map_search_state`, ad
 
 Detail integrations can customise the purchase-cost calculators with `propertyhive_template_set_purchase_costs_shortcodes`. The filter receives the default shortcode array and property object; each returned shortcode is rendered only when it is registered. Calculator output is wrapped for template-set styling, but the add-ons' duplicate `id="results"` markup is intentionally retained because their scripts scope result lookups by calculator wrapper class; this is an accepted upstream validator warning.
 
+== Settings navigation colour customisation ==
+
+Developers can brand the Property Hive settings navigation with the `propertyhive_settings_navigation_colours` filter. It accepts three- or six-digit hexadecimal colours for `background`, `border`, `text`, `muted_text`, `hover_background`, `active_background`, `active_accent`, `active_icon`, `focus`, `count_background`, and `count_text`. The `active_accent` controls the selected-tab underline, `active_icon` controls selected icons, and `focus` controls keyboard focus outlines. The current `WP_Screen` is available as the filter's second argument.
+
+    add_filter( 'propertyhive_settings_navigation_colours', function( $colours ) {
+        $colours['active_accent']     = '#0057b8';
+        $colours['active_icon']       = '#0057b8';
+        $colours['active_background'] = '#eef6ff';
+        return $colours;
+    } );
+
+Invalid values fall back to the Property Hive defaults without affecting the remaining colours. Customisers are responsible for maintaining accessible colour contrast and a visible focus indicator.
+
 == Changelog ==
 
 = 2.2.7 - 2026-07-27 =
