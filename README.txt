@@ -213,6 +213,16 @@ Developers can brand the Property Hive settings navigation with the `propertyhiv
 
 Invalid values fall back to the Property Hive defaults without affecting the remaining colours. Customisers are responsible for maintaining accessible colour contrast and a visible focus indicator.
 
+The Frontend settings workspace has a separate `propertyhive_frontend_settings_colours` filter. It accepts hexadecimal colours for `accent`, `accent_hover`, `accent_soft`, `accent_tint`, `accent_text`, `text`, `muted_text`, `border`, `border_strong`, `focus`, `success`, `success_soft`, `success_tint`, `warning`, `warning_soft`, `info`, `info_soft`, `error`, `surface`, and `subtle_surface`. The current `WP_Screen` is supplied as the second argument.
+
+    add_filter( 'propertyhive_frontend_settings_colours', function( $colours ) {
+        $colours['accent']       = '#0057b8';
+        $colours['accent_tint']  = '#eef6ff';
+        $colours['accent_text']  = '#003f86';
+        $colours['success_tint'] = '#f2f8f4';
+        return $colours;
+    } );
+
 == Changelog ==
 
 = 2.2.7 - 2026-07-27 =
