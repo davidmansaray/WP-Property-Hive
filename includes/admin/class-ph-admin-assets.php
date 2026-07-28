@@ -48,6 +48,8 @@ class PH_Admin_Assets {
 
             if ( false !== strpos( $screen->id, 'page_ph-settings' ) )
             {
+                $this->add_settings_navigation_colour_styles( $screen );
+
                 wp_enqueue_style( 'propertyhive_admin_development_tools', PH()->plugin_url() . '/assets/css/admin-development-tools.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
             }
 
@@ -121,6 +123,74 @@ class PH_Admin_Assets {
         }
 
         do_action( 'propertyhive_admin_css' );
+    }
+
+    /**
+     * Add filterable settings navigation colours as scoped CSS variables.
+     *
+     * @param WP_Screen $screen Current admin screen.
+     */
+    private function add_settings_navigation_colour_styles( $screen ) {
+        $defaults = array(
+            'background'        => '#ffffff',
+            'border'            => '#e5e5ea',
+            'text'              => '#1d1d24',
+            'muted_text'        => '#6b6b76',
+            'hover_background'  => '#f7f7f9',
+            'active_background' => '#fffae9',
+            'active_accent'     => '#f5c518',
+            'active_icon'       => '#f0a437',
+            'focus'             => '#3d5fe7',
+            'count_background'  => '#fbf1d0',
+            'count_text'        => '#8a6d1a',
+        );
+
+        /**
+         * Filters the colours used by the Property Hive settings navigation.
+         *
+         * Values must be three- or six-digit hexadecimal colours. Missing or
+         * invalid values fall back independently, and unknown keys are ignored.
+         *
+         * @param string[] $colours Navigation colours keyed by semantic role.
+         * @param WP_Screen $screen Current admin screen.
+         */
+        $colours = apply_filters( 'propertyhive_settings_navigation_colours', $defaults, $screen );
+        $colours = is_array( $colours ) ? wp_parse_args( $colours, $defaults ) : $defaults;
+
+        $variables = array(
+            'background'        => '--ph-settings-nav-background',
+            'border'            => '--ph-settings-nav-border',
+            'text'              => '--ph-settings-nav-text',
+            'muted_text'        => '--ph-settings-nav-muted-text',
+            'hover_background'  => '--ph-settings-nav-hover-background',
+            'active_background' => '--ph-settings-nav-active-background',
+            'active_accent'     => '--ph-settings-nav-active-accent',
+            'active_icon'       => '--ph-settings-nav-active-icon',
+            'focus'             => '--ph-settings-nav-focus',
+            'count_background'  => '--ph-settings-nav-count-background',
+            'count_text'        => '--ph-settings-nav-count-text',
+        );
+
+        $declarations = array();
+
+        foreach ( $variables as $key => $variable )
+        {
+            $colour = isset( $colours[ $key ] ) && is_string( $colours[ $key ] )
+                ? sanitize_hex_color( $colours[ $key ] )
+                : '';
+
+            if ( empty( $colour ) )
+            {
+                $colour = $defaults[ $key ];
+            }
+
+            $declarations[] = $variable . ':' . $colour;
+        }
+
+        wp_add_inline_style(
+            'propertyhive_frontend_redesign',
+            '.propertyhive.ph-settings-redesign{' . implode( ';', $declarations ) . '}'
+        );
     }
 
 
