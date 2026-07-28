@@ -1,0 +1,92 @@
+name: Release checklist
+description: Track the exact staging candidate, QA evidence, and upstream promotion.
+title: "Release <version>"
+labels:
+  - release
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create this issue in the matching version milestone. Keep the approved
+        staging SHA current whenever the release candidate changes.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 2.2.8
+    validations:
+      required: true
+
+  - type: input
+    id: staging_sha
+    attributes:
+      label: Approved staging SHA
+      description: Full 40-character commit SHA deployed and approved on staging.
+      placeholder: 0123456789abcdef0123456789abcdef01234567
+    validations:
+      required: true
+
+  - type: input
+    id: deployment
+    attributes:
+      label: Successful deployment run
+      description: Link to the GitHub Actions run for the approved SHA.
+      placeholder: https://github.com/davidmansaray/WP-Property-Hive/actions/runs/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Release scope
+      description: Link the milestone and summarize included pull requests.
+      placeholder: Milestone and included PRs
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: qa
+    attributes:
+      label: Staging and QA
+      options:
+        - label: Every included pull request is in this release milestone.
+          required: true
+        - label: Every included pull request has passed staging QA.
+          required: true
+        - label: The recorded SHA matches the successful staging deployment.
+          required: true
+        - label: The HTTPS site root and a published property return successfully.
+          required: true
+        - label: Migration and rollback requirements are documented.
+          required: true
+
+  - type: checkboxes
+    id: release_candidate
+    attributes:
+      label: Frozen release candidate
+      options:
+        - label: A single `release/<version>` branch was cut from the approved SHA.
+          required: true
+        - label: Plugin version, stable tag, changelog, and package contents agree.
+          required: true
+        - label: The latest release-branch SHA was redeployed and reapproved.
+          required: true
+        - label: The upstream pull request targets `propertyhive/WP-Property-Hive:master`.
+          required: true
+
+  - type: checkboxes
+    id: after_release
+    attributes:
+      label: After upstream merge
+      options:
+        - label: Fork `master` was synchronized from upstream `master`.
+        - label: The released upstream result was reconciled into `staging`.
+        - label: The tag and release notes were verified.
+        - label: The milestone was closed and release branch deleted.
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Evidence and notes
+      description: Add QA evidence, known limitations, migration details, and rollback notes.
