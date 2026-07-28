@@ -139,7 +139,6 @@ class PH_AJAX {
             // Dismissing notices
             'dismiss_notice_leave_review' => false,
             'dismiss_notice_retired_template_assistant' => false,
-            'dismiss_notice_demo_data' => false,
             'dismiss_notice_epl' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
@@ -293,14 +292,6 @@ class PH_AJAX {
             if ( ! current_user_can( 'activate_plugins' ) ) return;
             delete_option( 'propertyhive_template_assistant_retired_notice' );
         }
-        
-        // Quit out
-        die();
-    }
-
-    public function dismiss_notice_demo_data()
-    {
-        update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
         
         // Quit out
         die();

@@ -136,10 +136,15 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
 	            <a href="' . esc_url(admin_url('post-new.php?post_type=property&tutorial=yes')) . '" class="button button-primary button-hero" style="font-size:1.2em; padding:0 24px;">
 	                ' . esc_html( __( 'Add Your First Property', 'propertyhive' ) ) . '
-	            </a>&nbsp;
-	            <a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
-	                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
-	            </a>&nbsp; ';
+	            </a>&nbsp;';
+
+	            if ( class_exists( 'PH_Demo_Data' ) )
+	            {
+	                echo '
+		            <a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+		                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
+		            </a>&nbsp;';
+	            }
 
 	            if ( apply_filters( 'propertyhive_no_properties_property_import_button', true ) === true )
 	            {

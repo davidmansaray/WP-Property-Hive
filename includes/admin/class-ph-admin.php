@@ -34,7 +34,6 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
         add_action( 'admin_init', array( $this, 'export_sub_grid' ) );
-        add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
         add_action( 'admin_init', array( $this, 'check_install_add_on' ) );
         add_filter( 'propertyhive_screen_ids', array( $this, 'crm_only_mode_screen_id' ) );
     }
@@ -141,16 +140,6 @@ class PH_Admin {
             update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
 
             wp_redirect( admin_url('admin.php?page=ph-settings&tab=features') );
-            die();
-        }
-    }
-
-    public function check_hide_demo_data_tab()
-    {
-        if ( isset($_GET['tab']) && $_GET['tab'] == 'demo_data' && isset($_GET['hidetab']) )
-        {
-            update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
-            wp_redirect( admin_url('admin.php?page=ph-settings') );
             die();
         }
     }
@@ -689,31 +678,6 @@ class PH_Admin {
                         <p>
                             <a href=\"". esc_url(admin_url('plugins.php?s=easy%20property%20listings&plugin_status=all')) . "\" class=\"button-primary\">Deactivate Easy Property Listings</a>
                             <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_epl\">Dismiss</a>
-                        </p>
-                        
-                    </div>";
-            }
-
-            if ( 
-                !class_exists('PH_Demo_Data') && 
-                get_option( 'propertyhive_install_timestamp', '' ) >= 1618268400 &&
-                get_option( 'propertyhive_hide_demo_data_tab', '' ) != 'yes' && 
-                (
-                    !isset($_GET['page'])
-                    ||
-                    (
-                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
-                    )
-                )
-            )
-            {
-                echo "<div class=\"notice notice-info\" id=\"ph_notice_demo_data\">
-                        <p>
-                            " . __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) . "
-                        </p>
-                        <p>
-                            <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . "\" class=\"button-primary\">Import Demo Data</a>
-                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_demo_data\">Dismiss</a>
                         </p>
                         
                     </div>";
