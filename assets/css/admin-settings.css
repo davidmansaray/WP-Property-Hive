@@ -1,5 +1,5 @@
 /**
- * Property Hive — Frontend settings redesign
+ * Property Hive — Admin settings
  *
  * Styles the settings page chrome (icon nav bar, breadcrumb sub-nav, page
  * header band) and the "How will you be building your property pages?"
@@ -27,7 +27,18 @@
  * content width, including when no admin notice is rendered above it. Padding
  * preserves the same gap above the navigation as its margin provides below.
  */
-.propertyhive.ph-settings-redesign {
+.propertyhive.ph-settings-page {
+    --ph-settings-nav-background: #fff;
+    --ph-settings-nav-border: #e5e5ea;
+    --ph-settings-nav-text: #1d1d24;
+    --ph-settings-nav-muted-text: #6b6b76;
+    --ph-settings-nav-hover-background: #f7f7f9;
+    --ph-settings-nav-active-background: #fffae9;
+    --ph-settings-nav-active-accent: #f5c518;
+    --ph-settings-nav-active-icon: #f0a437;
+    --ph-settings-nav-focus: #3d5fe7;
+    --ph-settings-nav-count-background: #fbf1d0;
+    --ph-settings-nav-count-text: #8a6d1a;
     clear: both;
     margin-top: 0;
     padding-top: 14px;
@@ -36,10 +47,6 @@
 /* -------------------------------------------------------------------------
  * Top settings icon nav bar
  * ---------------------------------------------------------------------- */
-
-.propertyhive {
-    --ph-tx-amber: #f0a437;
-}
 
 .propertyhive .ph-settings-nav-wrap {
     position: relative;
@@ -74,9 +81,9 @@
     flex-wrap: nowrap;
     align-items: stretch;
     min-width: 0;
-    border: 1px solid var(--ph-tx-border);
+    border: 1px solid var(--ph-settings-nav-border);
     border-radius: var(--ph-tx-radius);
-    background: #fff;
+    background: var(--ph-settings-nav-background);
     box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
 }
 
@@ -101,7 +108,7 @@
     border: 0;
     border-radius: 0;
     background: transparent;
-    color: var(--ph-tx-ink);
+    color: var(--ph-settings-nav-text);
     line-height: 1.3;
     box-shadow: none;
     cursor: pointer;
@@ -121,7 +128,7 @@
 
 /* Divider lines between items (per design). */
 .propertyhive .ph-settings-nav-group > :not(:first-child) {
-    box-shadow: inset 1px 0 0 var(--ph-tx-border);
+    box-shadow: inset 1px 0 0 var(--ph-settings-nav-border);
 }
 
 .propertyhive .ph-settings-nav-group > .nav-tab-active,
@@ -132,19 +139,19 @@
 
 .propertyhive .ph-settings-nav .ph-nav-tab:hover,
 .propertyhive .ph-settings-nav .ph-nav-tab:focus {
-    background: #f7f7f9;
-    color: var(--ph-tx-ink);
+    background: var(--ph-settings-nav-hover-background);
+    color: var(--ph-settings-nav-text);
     outline: none;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-tab:focus-visible {
     z-index: 2;
-    outline: 3px solid var(--ph-tx-blue);
+    outline: 3px solid var(--ph-settings-nav-focus);
     outline-offset: -3px;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-tab.nav-tab-active {
-    background: var(--ph-tx-yellow-tint);
+    background: var(--ph-settings-nav-active-background);
 }
 
 .propertyhive .ph-settings-nav .ph-nav-tab.nav-tab-active::after {
@@ -154,7 +161,7 @@
     right: 0;
     bottom: 0;
     height: 3px;
-    background: var(--ph-tx-yellow);
+    background: var(--ph-settings-nav-active-accent);
 }
 
 /* Bare icon glyphs; amber on the active tab (per design). */
@@ -162,12 +169,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--ph-tx-ink);
+    color: var(--ph-settings-nav-text);
     flex: 0 0 auto;
 }
 
 .propertyhive .ph-settings-nav .ph-nav-tab.nav-tab-active .ph-nav-icon {
-    color: var(--ph-tx-amber);
+    color: var(--ph-settings-nav-active-icon);
 }
 
 .propertyhive .ph-settings-nav .ph-nav-icon svg {
@@ -197,7 +204,7 @@
     max-width: 100%;
     overflow: hidden;
     font-size: 11.5px;
-    color: var(--ph-tx-muted);
+    color: var(--ph-settings-nav-muted-text);
     font-weight: 400;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -211,8 +218,8 @@
     height: 17px;
     padding: 0 4px;
     border-radius: 999px;
-    background: var(--ph-tx-yellow-soft);
-    color: #8a6d1a;
+    background: var(--ph-settings-nav-count-background);
+    color: var(--ph-settings-nav-count-text);
     font-size: 10.5px;
     font-weight: 700;
     vertical-align: 1px;
@@ -221,8 +228,8 @@
 .propertyhive .ph-nav-chevron {
     width: 7px;
     height: 7px;
-    border-right: 1.8px solid var(--ph-tx-muted);
-    border-bottom: 1.8px solid var(--ph-tx-muted);
+    border-right: 1.8px solid var(--ph-settings-nav-muted-text);
+    border-bottom: 1.8px solid var(--ph-settings-nav-muted-text);
     transform: rotate(45deg);
     margin-left: 2px;
     transition: transform .15s ease;
@@ -252,8 +259,8 @@
     top: calc(100% + 8px);
     right: 0;
     min-width: 250px;
-    background: #fff;
-    border: 1px solid var(--ph-tx-border);
+    background: var(--ph-settings-nav-background);
+    border: 1px solid var(--ph-settings-nav-border);
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(20, 20, 30, 0.12);
     padding: 6px;
@@ -271,18 +278,30 @@
     padding: 9px 10px;
     border-radius: 7px;
     text-decoration: none;
-    color: var(--ph-tx-ink);
+    color: var(--ph-settings-nav-text);
     font-size: 13px;
     font-weight: 600;
 }
 
-.propertyhive .ph-nav-menu-item:hover {
-    background: #f7f7f9;
-    color: var(--ph-tx-ink);
+.propertyhive .ph-nav-menu-item:hover,
+.propertyhive .ph-nav-menu-item:focus {
+    background: var(--ph-settings-nav-hover-background);
+    color: var(--ph-settings-nav-text);
+    outline: none;
+    box-shadow: none;
+}
+
+.propertyhive .ph-nav-menu-item:focus-visible {
+    outline: 3px solid var(--ph-settings-nav-focus);
+    outline-offset: -3px;
 }
 
 .propertyhive .ph-nav-menu-item.is-active {
-    background: var(--ph-tx-yellow-tint);
+    background: var(--ph-settings-nav-active-background);
+}
+
+.propertyhive .ph-nav-menu-item.is-active .ph-nav-icon {
+    color: var(--ph-settings-nav-active-icon);
 }
 
 .propertyhive .ph-nav-menu-item .ph-nav-icon svg {
@@ -298,23 +317,23 @@
  * Section sub-nav (breadcrumb style)
  * ---------------------------------------------------------------------- */
 
-.propertyhive.ph-settings-redesign ul.subsubsub {
+.propertyhive.ph-settings-page ul.subsubsub {
     margin: 4px 0 10px;
     font-size: 13px;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a {
+.propertyhive.ph-settings-page ul.subsubsub li a {
     color: var(--ph-tx-muted);
     text-decoration: none;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a:hover,
-.propertyhive.ph-settings-redesign ul.subsubsub li a:focus {
+.propertyhive.ph-settings-page ul.subsubsub li a:hover,
+.propertyhive.ph-settings-page ul.subsubsub li a:focus {
     color: var(--ph-tx-ink);
     box-shadow: none;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a.current {
+.propertyhive.ph-settings-page ul.subsubsub li a.current {
     color: var(--ph-tx-ink);
     font-weight: 700;
 }
