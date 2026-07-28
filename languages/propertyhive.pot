@@ -392,7 +392,7 @@ msgid "The default country hasn't been selected as a country you operate in"
 msgstr ""
 
 #: includes/admin/class-ph-admin-assets.php:416
-#: includes/admin/views/html-admin-settings.php:207
+#: includes/admin/views/admin-settings.php:207
 #: includes/template-set/class-ph-template-set-editor-controller.php:279
 msgid "Unsaved changes"
 msgstr ""
@@ -433,7 +433,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-frontend.php:1818
 #: includes/admin/views/html-admin-matching-applicants.php:299
 #: includes/admin/views/html-admin-matching-properties.php:414
-#: includes/admin/views/html-admin-settings.php:185
+#: includes/admin/views/admin-settings.php:185
 #: includes/admin/views/html-viewing-actions.php:434
 #: includes/admin/views/html-viewing-actions.php:472
 #: includes/admin/views/html-viewing-actions.php:510
@@ -6603,32 +6603,32 @@ msgstr ""
 msgid "If you've opted to email any of the properties you'll have the ability to edit the contents of the email in the next step."
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:28
+#: includes/admin/views/admin-settings.php:28
 msgid "Save changes"
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:104
-#: includes/admin/views/html-admin-settings.php:107
+#: includes/admin/views/admin-settings.php:104
+#: includes/admin/views/admin-settings.php:107
 msgid "Add-ons"
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:108
+#: includes/admin/views/admin-settings.php:108
 msgid "Extension settings"
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:189
+#: includes/admin/views/admin-settings.php:189
 msgid "Help & documentation"
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:208
+#: includes/admin/views/admin-settings.php:208
 msgid "Review your changes before leaving this page."
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:212
+#: includes/admin/views/admin-settings.php:212
 msgid "Discard"
 msgstr ""
 
-#: includes/admin/views/html-admin-settings.php:221
+#: includes/admin/views/admin-settings.php:221
 msgid "Settings saved"
 msgstr ""
 

@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Buffer the tab content first: tabs may set $hide_save_button / button text
+// Buffer the settings tab content first: tabs may set $hide_save_button / button text
 // globals while rendering, and the header band (rendered above the content)
 // needs to know about them. Sections are buffered separately so the sub-nav
 // can sit between the tab bar and the page header, as per the design.
