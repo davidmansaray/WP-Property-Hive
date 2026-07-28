@@ -493,14 +493,7 @@ class PH_Admin_Assets {
                 'saving_text'                               => __( 'Saving…', 'propertyhive' ),
                 'saved_message'                             => __( 'Your settings have been saved.', 'propertyhive' ),
             );
-            if ( isset($_GET['tab']) && ph_clean($_GET['tab']) == 'licensekey' )
-            {
-                $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key(true);
-            }
-            else
-            {
-                $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key();
-            }
+            $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key();
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
         
