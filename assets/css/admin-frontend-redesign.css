@@ -21,6 +21,18 @@
     --ph-tx-radius: 12px;
 }
 
+/*
+ * WordPress floats the screen-meta links (Help, Recently Viewed) to the right.
+ * Keep the settings page below them so the top navigation always has the full
+ * content width, including when no admin notice is rendered above it. Padding
+ * preserves the same gap above the navigation as its margin provides below.
+ */
+.propertyhive.ph-settings-redesign {
+    clear: both;
+    margin-top: 0;
+    padding-top: 14px;
+}
+
 /* -------------------------------------------------------------------------
  * Top settings icon nav bar
  * ---------------------------------------------------------------------- */
@@ -31,7 +43,7 @@
 
 .propertyhive .ph-settings-nav-wrap {
     position: relative;
-    margin: 10px 0 14px;
+    margin: 0 0 14px;
 }
 
 .propertyhive .ph-settings-nav-wrap.is-open {
