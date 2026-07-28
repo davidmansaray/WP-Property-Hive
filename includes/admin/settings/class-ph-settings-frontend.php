@@ -1490,14 +1490,14 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
         $catalog_html .= '</ul></div>';
 
-        // Editing method summary and chooser (renders above the settings table).
+        // Editing method selector and workspace (renders above the settings table).
         $settings[] = array(
             'type' => 'template_experience',
         );
 
         // Remaining template styling controls live in a collapsed "advanced"
         // card, only shown when Developer Mode is selected. The
-        // enable flag and editor mode are owned by the chooser above.
+        // enable flag and editor mode are owned by the workspace above.
         $settings[] = array(
             'type' => 'template_advanced_start',
         );
@@ -1698,31 +1698,28 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     }
 
     /**
-     * Open the collapsed advanced-settings card wrapping the template set table.
+     * Keep retired template controls in the form so existing values survive
+     * ordinary settings submissions without exposing the old settings section.
      *
      * @access public
      * @return void
      */
     public function template_advanced_start() {
-        // Keep these controls exclusive to Developer Mode. Visual Editor and
-        // Page Builder each provide their own editing method.
-        $show_advanced = PH_Template_Set::EDITOR_MODE_DEVELOPER === PH_Template_Set::get_editor_mode();
-
-        echo '<details class="ph-tx-advanced"' . ( $show_advanced ? '' : ' style="display:none"' ) . '><summary>' . esc_html__( 'Advanced template settings', 'propertyhive' ) . '<span class="ph-tx-advanced-chevron" aria-hidden="true"></span></summary><div class="ph-tx-advanced-body">';
+        echo '<div class="ph-tx-retained-template-settings" hidden>';
     }
 
     /**
-     * Close the advanced-settings card.
+     * Close the retained template controls wrapper.
      *
      * @access public
      * @return void
      */
     public function template_advanced_end() {
-        echo '</div></details>';
+        echo '</div>';
     }
 
     /**
-     * Render the editing method summary, chooser, and method-specific workspace.
+     * Render the editing method selector and method-specific workspace.
      *
      * @access public
      * @return void
@@ -1732,7 +1729,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $settings = PH_Template_Set::get_settings();
         $mode     = isset( $settings['template_set_editor_mode'] ) ? $settings['template_set_editor_mode'] : PH_Template_Set::EDITOR_MODE_VISUAL;
 
-        // The chooser only knows three editing methods. Legacy/unknown sites preview
+        // The workspace only knows three editing methods. Legacy/unknown sites preview
         // the Visual Editor without claiming it has already been selected.
         $card_modes = array(
             PH_Template_Set::EDITOR_MODE_VISUAL,
@@ -1744,132 +1741,104 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ( PH_Template_Set::EDITOR_MODE_VISUAL !== $mode || $visual_editor_enabled );
         $selected                = $has_selected_experience ? $mode : PH_Template_Set::EDITOR_MODE_VISUAL;
 
-        $nonce = wp_create_nonce( PH_Template_Set::EXPERIENCE_NONCE_ACTION );
-
         $cards = array(
             PH_Template_Set::EDITOR_MODE_VISUAL => array(
                 'label'       => __( 'Visual Editor', 'propertyhive' ),
                 'badge'       => __( 'Recommended', 'propertyhive' ),
                 'description' => __( 'Choose from professionally designed templates and customise them with live previews.', 'propertyhive' ),
                 'icon'        => $this->template_experience_icon( 'visual' ),
-                'checks'      => array(
-                    __( 'Live preview as you customise', 'propertyhive' ),
-                    __( 'No coding required', 'propertyhive' ),
-                    __( 'Pre-built templates', 'propertyhive' ),
-                    __( 'Responsive on all devices', 'propertyhive' ),
-                ),
             ),
             PH_Template_Set::EDITOR_MODE_PAGE_BUILDER => array(
                 'label'       => __( 'Page Builder', 'propertyhive' ),
                 'badge'       => '',
                 'description' => __( 'Use Elementor, Divi or other supported page builders to design your templates.', 'propertyhive' ),
                 'icon'        => $this->template_experience_icon( 'builder' ),
-                'checks'      => array(
-                    __( 'Works with Elementor, Divi & more', 'propertyhive' ),
-                    __( 'Full design flexibility', 'propertyhive' ),
-                    __( 'Access to builder ecosystem', 'propertyhive' ),
-                    __( 'Advanced styling options', 'propertyhive' ),
-                ),
             ),
             PH_Template_Set::EDITOR_MODE_DEVELOPER => array(
                 'label'       => __( 'Developer Mode', 'propertyhive' ),
                 'badge'       => '',
                 'description' => __( 'Edit templates using code, CSS, and PHP. Perfect for developers who want full control.', 'propertyhive' ),
                 'icon'        => $this->template_experience_icon( 'developer' ),
-                'checks'      => array(
-                    __( 'Full code control', 'propertyhive' ),
-                    __( 'CSS & PHP customisation', 'propertyhive' ),
-                    __( 'Override templates in your theme', 'propertyhive' ),
-                    __( 'Version control friendly', 'propertyhive' ),
-                ),
             ),
         );
-        $current_card = $cards[ $selected ];
+        $template_set_enabled = $visual_editor_enabled ? 'yes' : '';
+        $nonce                = wp_create_nonce( PH_Template_Set::EXPERIENCE_NONCE_ACTION );
+        $template_docs_url    = PH_Admin_Settings::get_help_url( $this->id, 'template-set' );
         ?>
-        <div class="ph-template-experience<?php echo $has_selected_experience ? ' has-persisted-experience' : ''; ?>" data-selected="<?php echo esc_attr( $selected ); ?>" data-persisted-mode="<?php echo esc_attr( $has_selected_experience ? $mode : '' ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+        <div class="ph-template-experience" data-preview-mode="<?php echo esc_attr( $selected ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+            <input type="hidden" class="ph-tx-mode-value" name="template_set_editor_mode" value="<?php echo esc_attr( $mode ); ?>" data-ph-save-tray-ignore>
+            <input type="hidden" class="ph-tx-template-enabled" name="<?php echo esc_attr( PH_Template_Set::OPTION_ENABLED ); ?>" value="<?php echo esc_attr( $template_set_enabled ); ?>" data-ph-save-tray-ignore>
 
-            <div class="ph-tx-current-method" tabindex="-1"<?php echo $has_selected_experience ? '' : ' hidden'; ?>>
-                <span class="ph-tx-current-icon" aria-hidden="true"><?php echo $current_card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                <span class="ph-tx-current-copy">
-                    <span class="ph-tx-current-kicker"><?php esc_html_e( 'Editing method', 'propertyhive' ); ?></span>
-                    <strong class="ph-tx-current-label"><?php echo esc_html( $current_card['label'] ); ?></strong>
-                    <span class="ph-tx-current-description"><?php echo esc_html( $current_card['description'] ); ?></span>
-                </span>
-                <button type="button" class="button ph-tx-change-method" aria-expanded="false" aria-controls="ph-template-editing-method-chooser">
-                    <?php esc_html_e( 'Change editing method', 'propertyhive' ); ?>
-                </button>
-            </div>
+            <header class="ph-tx-page-heading">
+                <h1><?php esc_html_e( 'Frontend', 'propertyhive' ); ?></h1>
+                <p><?php esc_html_e( 'Choose how you want to build and customise your property pages.', 'propertyhive' ); ?></p>
+            </header>
 
-            <div id="ph-template-editing-method-chooser" class="ph-tx-chooser<?php echo $has_selected_experience ? '' : ' is-open'; ?>" aria-hidden="<?php echo $has_selected_experience ? 'true' : 'false'; ?>"<?php echo $has_selected_experience ? ' inert' : ''; ?>>
-                <div class="ph-tx-chooser-clip">
-                    <div class="ph-tx-shell">
-
+            <div class="ph-tx-workspace">
+                <section class="ph-tx-methods" aria-labelledby="ph-template-editing-method-title">
                     <div class="ph-tx-intro">
-                        <div>
-                            <h2 id="ph-template-editing-method-title" tabindex="-1">
-                                <span class="ph-tx-first-choice"><?php esc_html_e( 'How would you like to edit your property templates?', 'propertyhive' ); ?></span>
-                                <span class="ph-tx-change-choice"><?php esc_html_e( 'Change editing method', 'propertyhive' ); ?></span>
-                            </h2>
-                            <p>
-                                <span class="ph-tx-first-choice"><?php esc_html_e( 'Choose the approach that best matches how you work.', 'propertyhive' ); ?></span>
-                                <span class="ph-tx-change-choice"><?php esc_html_e( 'Your existing template settings are kept when you switch methods.', 'propertyhive' ); ?></span>
-                            </p>
-                        </div>
-                        <button type="button" class="button-link ph-tx-chooser-cancel"<?php echo $has_selected_experience ? '' : ' hidden'; ?>><?php esc_html_e( 'Cancel', 'propertyhive' ); ?></button>
+                        <h2 id="ph-template-editing-method-title"><?php esc_html_e( 'How would you like to build your site?', 'propertyhive' ); ?></h2>
+                        <p><?php esc_html_e( 'You can switch between editing methods at any time.', 'propertyhive' ); ?></p>
                     </div>
 
-                    <div class="ph-tx-cards">
+                    <div class="ph-tx-cards" role="radiogroup" aria-label="<?php echo esc_attr__( 'Template editing method', 'propertyhive' ); ?>">
                         <?php foreach ( $cards as $card_mode => $card ) :
-                            $is_selected = $has_selected_experience && ( $card_mode === $selected );
+                            $is_selected = $has_selected_experience && $card_mode === $selected;
                             ?>
-                            <div class="ph-tx-card<?php echo $is_selected ? ' is-selected' : ''; ?>" data-mode="<?php echo esc_attr( $card_mode ); ?>" data-label="<?php echo esc_attr( $card['label'] ); ?>" data-description="<?php echo esc_attr( $card['description'] ); ?>">
-                                <div class="ph-tx-card-head">
-                                    <span class="ph-tx-card-icon"><?php echo $card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                                    <h3>
+                            <label class="ph-tx-card<?php echo $is_selected ? ' is-selected' : ''; ?>" data-mode="<?php echo esc_attr( $card_mode ); ?>">
+                                <input
+                                    type="radio"
+                                    class="ph-tx-mode-input"
+                                    name="template_set_editor_mode_choice"
+                                    value="<?php echo esc_attr( $card_mode ); ?>"
+                                    aria-controls="ph-template-panel-<?php echo esc_attr( $card_mode ); ?>"
+                                    data-ph-save-tray-ignore
+                                    data-ph-auto-save-control
+                                    <?php checked( $is_selected ); ?>
+                                >
+                                <span class="ph-tx-radio" aria-hidden="true"></span>
+                                <span class="ph-tx-card-icon" aria-hidden="true"><?php echo $card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                                <span class="ph-tx-card-copy">
+                                    <strong>
                                         <?php echo esc_html( $card['label'] ); ?>
                                         <?php if ( ! empty( $card['badge'] ) ) : ?>
                                             <span class="ph-tx-badge"><?php echo esc_html( $card['badge'] ); ?></span>
                                         <?php endif; ?>
-                                    </h3>
-                                    <p><?php echo esc_html( $card['description'] ); ?></p>
-                                </div>
-                                <ul class="ph-tx-checks">
-                                    <?php foreach ( $card['checks'] as $check ) : ?>
-                                        <li><?php echo esc_html( $check ); ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                                <button type="button" class="button ph-tx-select" data-mode="<?php echo esc_attr( $card_mode ); ?>">
-                                    <span class="ph-tx-select-choose"><?php
-                                        /* translators: %s: editing method name */
-                                        echo esc_html( sprintf( __( 'Choose %s', 'propertyhive' ), $card['label'] ) );
-                                    ?></span>
-                                    <span class="ph-tx-select-selected"><?php esc_html_e( 'Selected', 'propertyhive' ); ?></span>
-                                </button>
-                            </div>
+                                    </strong>
+                                    <span><?php echo esc_html( $card['description'] ); ?></span>
+                                </span>
+                            </label>
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="ph-tx-hint">
-                        <span class="ph-tx-hint-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'bulb' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                        <?php
-                        printf(
-                            /* translators: %s: "Learn more" link */
-                            esc_html__( 'Not sure which option to choose? %s about each editing method.', 'propertyhive' ),
-                            '<a href="' . esc_url( 'https://docs.wp-property-hive.com/article/282-an-introduction-to-integrating-property-hive-to-your-website' ) . '" target="_blank" rel="noopener">' . esc_html__( 'Learn more', 'propertyhive' ) . '</a>'
-                        );
-                        ?>
-                    </div>
+                </section>
 
-                    </div><!-- .ph-tx-shell -->
-                </div><!-- .ph-tx-chooser-clip -->
-            </div><!-- .ph-tx-chooser -->
-
-            <div class="ph-tx-panels">
+                <div class="ph-tx-panels">
                 <?php
-                $this->template_experience_visual_panel( $settings );
+                $this->template_experience_visual_panel( $settings, $template_docs_url );
                 $this->template_experience_page_builder_panel();
                 $this->template_experience_developer_panel();
                 ?>
+                </div>
+            </div>
+
+            <div class="ph-tx-build-once">
+                <span class="ph-tx-build-once-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'visual' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                <div class="ph-tx-build-once-copy">
+                    <h3><?php esc_html_e( 'Build once. Use anywhere.', 'propertyhive' ); ?></h3>
+                    <p><?php esc_html_e( 'Your templates are shared across Property Hive pages, including search results, property details and related-property sections.', 'propertyhive' ); ?></p>
+                    <span class="ph-tx-chip"><?php esc_html_e( 'Search results', 'propertyhive' ); ?></span>
+                    <span class="ph-tx-chip"><?php esc_html_e( 'Property details', 'propertyhive' ); ?></span>
+                    <span class="ph-tx-chip"><?php esc_html_e( 'Related properties', 'propertyhive' ); ?></span>
+                </div>
+                <div class="ph-tx-safe-note">
+                    <span class="ph-tx-safe-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'shield' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                    <div>
+                        <strong><?php esc_html_e( 'Safe and flexible', 'propertyhive' ); ?></strong>
+                        <span><?php esc_html_e( 'Switch editing methods without losing your existing template settings.', 'propertyhive' ); ?></span>
+                        <a href="<?php echo esc_url( $template_docs_url ); ?>" target="_blank" rel="noopener" aria-label="<?php esc_attr_e( 'Learn more about switching editing methods safely', 'propertyhive' ); ?>"><?php esc_html_e( 'Learn more', 'propertyhive' ); ?> <span class="ph-tx-external-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></a>
+                    </div>
+                </div>
             </div>
 
             <p class="ph-tx-status" role="status" aria-live="polite"></p>
@@ -1879,107 +1848,103 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         jQuery( function( $ ) {
             var $wrap = $( '.ph-template-experience' );
             if ( ! $wrap.length ) { return; }
-            var $chooser = $wrap.find( '.ph-tx-chooser' );
-            var $current = $wrap.find( '.ph-tx-current-method' );
-            var $change  = $wrap.find( '.ph-tx-change-method' );
-            var $cancel  = $wrap.find( '.ph-tx-chooser-cancel' );
-            var $title   = $wrap.find( '#ph-template-editing-method-title' );
+            var $form = $wrap.closest( 'form' );
+            var persistedMode = $wrap.find( '.ph-tx-mode-value' ).val();
+            var persistedEnabled = $wrap.find( '.ph-tx-template-enabled' ).val();
+            var previewMode = $wrap.data( 'preview-mode' );
 
             function showPanel( mode, markSelected ) {
                 $wrap.find( '.ph-tx-card' ).removeClass( 'is-selected' );
                 if ( markSelected ) {
                     $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' ).addClass( 'is-selected' );
                 }
-                $wrap.find( '.ph-tx-panel' ).removeClass( 'is-active' );
-                if ( markSelected ) {
-                    $wrap.find( '.ph-tx-panel[data-panel="' + mode + '"]' ).addClass( 'is-active' );
-                }
-                $wrap.attr( 'data-selected', mode );
+                $wrap.find( '.ph-tx-panel' ).removeClass( 'is-active' ).attr( 'aria-hidden', 'true' );
+                $wrap.find( '.ph-tx-panel[data-panel="' + mode + '"]' ).addClass( 'is-active' ).attr( 'aria-hidden', 'false' );
 
-                // Advanced settings are available only when Developer Mode is selected.
-                $( '.ph-tx-advanced' ).toggle( markSelected && mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>' );
             }
 
-            function updateCurrentMethod( mode ) {
-                var $card = $wrap.find( '.ph-tx-card[data-mode="' + mode + '"]' );
-                $current.find( '.ph-tx-current-icon' ).html( $card.find( '.ph-tx-card-icon' ).html() );
-                $current.find( '.ph-tx-current-label' ).text( $card.data( 'label' ) );
-                $current.find( '.ph-tx-current-description' ).text( $card.data( 'description' ) );
-            }
+            function restorePersistedMode() {
+                var $persistedInput = $wrap.find( '.ph-tx-mode-input[value="' + persistedMode + '"]' );
+                var hasPersistedCard = 0 < $persistedInput.length;
 
-            function setChooserOpen( open, restoreFocus ) {
-                $chooser.toggleClass( 'is-open', open ).attr( 'aria-hidden', open ? 'false' : 'true' );
-                $change.attr( 'aria-expanded', open ? 'true' : 'false' );
-
-                if ( open ) {
-                    $chooser.removeAttr( 'inert' );
-                    window.setTimeout( function() { $title.trigger( 'focus' ); }, 180 );
-                } else {
-                    $chooser.attr( 'inert', '' );
-                    if ( restoreFocus ) {
-                        $change.trigger( 'focus' );
-                    }
+                $wrap.find( '.ph-tx-mode-input' ).prop( 'checked', false );
+                if ( hasPersistedCard ) {
+                    $persistedInput.prop( 'checked', true );
                 }
+                $wrap.find( '.ph-tx-mode-value' ).val( persistedMode );
+                $wrap.find( '.ph-tx-template-enabled' ).val( persistedEnabled );
+                showPanel( hasPersistedCard ? persistedMode : previewMode, hasPersistedCard );
             }
 
             showPanel(
-                $wrap.attr( 'data-selected' ),
-                $wrap.attr( 'data-persisted-mode' ) === $wrap.attr( 'data-selected' )
+                previewMode,
+                0 < $wrap.find( '.ph-tx-mode-input:checked' ).length
             );
 
-            $wrap.on( 'click', '.ph-tx-change-method', function( e ) {
-                e.preventDefault();
-                setChooserOpen( true, false );
-            } );
+            $wrap.on( 'change', '.ph-tx-mode-input', function() {
+                var mode = $( this ).val();
+                var $inputs = $wrap.find( '.ph-tx-mode-input' );
+                var autoSaveSucceeded = false;
 
-            $wrap.on( 'click', '.ph-tx-chooser-cancel', function( e ) {
-                e.preventDefault();
-                setChooserOpen( false, true );
-            } );
-
-            $( document ).on( 'keydown.phTemplateEditingMethod', function( e ) {
-                if ( 'Escape' === e.key && $chooser.hasClass( 'is-open' ) && $wrap.attr( 'data-persisted-mode' ) ) {
-                    e.preventDefault();
-                    setChooserOpen( false, true );
-                }
-            } );
-
-            $wrap.on( 'click', '.ph-tx-select', function( e ) {
-                e.preventDefault();
-
-                var mode  = $( this ).data( 'mode' );
-                var $btns = $wrap.find( '.ph-tx-select' );
-
-                if ( mode === $wrap.attr( 'data-persisted-mode' ) ) {
-                    setChooserOpen( false, true );
+                if ( $form.data( 'ph-save-tray-submitting' ) ) {
+                    restorePersistedMode();
                     return;
                 }
 
-                $btns.prop( 'disabled', true );
+                showPanel( mode, true );
+                $wrap.find( '.ph-tx-mode-value' ).val( mode );
+                if ( mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_VISUAL ); ?>' ) {
+                    $wrap.find( '.ph-tx-template-enabled' ).val( 'yes' );
+                }
+                $inputs.prop( 'disabled', true );
+                $form.data( 'ph-auto-save-pending', true );
+                $wrap.attr( 'aria-busy', 'true' );
                 $wrap.find( '.ph-tx-status' ).text( '' );
 
                 $.post( ajaxurl, {
                     action: 'propertyhive_set_template_experience',
-                    mode:   mode,
-                    nonce:  $wrap.data( 'nonce' )
+                    mode: mode,
+                    nonce: $wrap.data( 'nonce' )
                 } ).done( function( response ) {
                     if ( response && response.success ) {
-                        $wrap.attr( 'data-persisted-mode', mode );
-                        $wrap.addClass( 'has-persisted-experience' );
-                        $current.removeAttr( 'hidden' );
-                        $cancel.removeAttr( 'hidden' );
-                        updateCurrentMethod( mode );
-                        showPanel( mode, true );
-                        setChooserOpen( false, false );
-                        $current.trigger( 'focus' );
-                    } else {
-                        var msg = ( response && response.data && response.data.message ) ? response.data.message : '<?php echo esc_js( __( 'Could not save. Please try again.', 'propertyhive' ) ); ?>';
-                        $wrap.find( '.ph-tx-status' ).text( msg );
+                        autoSaveSucceeded = true;
+                        persistedMode = mode;
+                        if ( mode === '<?php echo esc_js( PH_Template_Set::EDITOR_MODE_VISUAL ); ?>' ) {
+                            persistedEnabled = 'yes';
+                        }
+                        return;
                     }
+
+                    restorePersistedMode();
+                    $wrap.find( '.ph-tx-status' ).text(
+                        response && response.data && response.data.message
+                            ? response.data.message
+                            : '<?php echo esc_js( __( 'Could not save. Please try again.', 'propertyhive' ) ); ?>'
+                    );
                 } ).fail( function() {
+                    restorePersistedMode();
                     $wrap.find( '.ph-tx-status' ).text( '<?php echo esc_js( __( 'Could not save. Please try again.', 'propertyhive' ) ); ?>' );
                 } ).always( function() {
-                    $btns.prop( 'disabled', false );
+                    var activeElement = document.activeElement;
+                    var focusWasLost = ! activeElement || activeElement === document.body || activeElement === document.documentElement;
+
+                    $inputs.prop( 'disabled', false );
+                    if ( focusWasLost ) {
+                        var $focusTarget = $wrap.find( '.ph-tx-mode-input:checked' );
+                        if ( ! $focusTarget.length ) {
+                            $focusTarget = $wrap.find( '.ph-tx-mode-input[value="' + previewMode + '"]' );
+                        }
+                        $focusTarget.trigger( 'focus' );
+                    }
+                    $wrap.removeAttr( 'aria-busy' );
+                    $form.removeData( 'ph-auto-save-pending' );
+
+                    if ( $form.data( 'ph-submit-after-auto-save' ) ) {
+                        $form.removeData( 'ph-submit-after-auto-save' );
+                        if ( autoSaveSucceeded ) {
+                            $form.trigger( 'submit' );
+                        }
+                    }
                 } );
             } );
         } );
@@ -1990,37 +1955,60 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     /**
      * Contextual panel for the Visual Editor experience.
      *
-     * @param array $settings Template set settings.
+     * @param array  $settings          Template set settings.
+     * @param string $template_docs_url Contextual Template Assistant documentation URL.
      * @return void
      */
-    private function template_experience_visual_panel( $settings ) {
+    private function template_experience_visual_panel( $settings, $template_docs_url ) {
         $search_slug = isset( $settings['template_set_search_template'] ) ? $settings['template_set_search_template'] : '';
         $detail_slug = isset( $settings['template_set_detail_template'] ) ? $settings['template_set_detail_template'] : '';
 
         $edit_search_url = add_query_arg( PH_Template_Set::EDIT_QUERY_ARG, '1', PH_Template_Set::get_template_preview_url( $search_slug ) );
         $edit_detail_url = add_query_arg( PH_Template_Set::EDIT_QUERY_ARG, '1', PH_Template_Set::get_template_preview_url( $detail_slug ) );
         ?>
-        <div class="ph-tx-panel ph-tx-panel-row ph-tx-panel-row--visual" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_VISUAL ); ?>">
-            <div class="ph-tx-panel-card">
+        <div id="ph-template-panel-<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_VISUAL ); ?>" class="ph-tx-panel ph-tx-panel-row ph-tx-panel-row--visual" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_VISUAL ); ?>" aria-hidden="true">
+            <div class="ph-tx-panel-card ph-tx-visual-primary">
                 <h3><?php esc_html_e( 'Visual Editor', 'propertyhive' ); ?> <span class="ph-tx-badge ph-tx-badge--new"><?php esc_html_e( 'NEW', 'propertyhive' ); ?></span></h3>
-                <div class="ph-tx-media">
-                    <span class="ph-tx-panel-icon ph-tx-panel-icon--brand"><?php echo $this->template_experience_icon( 'brush' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-                    <div>
-                        <p><?php esc_html_e( 'The Visual Editor is our new and improved way to customise your property templates. It provides a live preview of your changes and makes it easy to create beautiful, responsive layouts without any coding knowledge.', 'propertyhive' ); ?></p>
-                        <p class="ph-tx-actions">
-                            <a class="button button-primary" href="<?php echo esc_url( $edit_search_url ); ?>"><?php esc_html_e( 'Edit Search Template', 'propertyhive' ); ?> <span class="ph-tx-btn-glyph" aria-hidden="true">&rsaquo;</span></a>
-                            <a class="button button-primary" href="<?php echo esc_url( $edit_detail_url ); ?>"><?php esc_html_e( 'Edit Details Template', 'propertyhive' ); ?> <span class="ph-tx-btn-glyph" aria-hidden="true">&rsaquo;</span></a>
-                        </p>
-                    </div>
+                <p><?php esc_html_e( 'The Visual Editor is our new and improved way to customise your property templates. It provides a live preview of your changes and makes it easy to create beautiful, responsive layouts without any coding knowledge.', 'propertyhive' ); ?></p>
+
+                <div class="ph-tx-template-actions">
+                    <a class="ph-tx-template-action" href="<?php echo esc_url( $edit_search_url ); ?>">
+                        <span class="ph-tx-template-action-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                        <span class="ph-tx-template-action-copy">
+                            <strong><?php esc_html_e( 'Edit Search Template', 'propertyhive' ); ?></strong>
+                            <span><?php esc_html_e( 'Customise how your search results are displayed.', 'propertyhive' ); ?></span>
+                        </span>
+                        <span class="ph-tx-template-action-arrow" aria-hidden="true">&rarr;</span>
+                    </a>
+                    <a class="ph-tx-template-action" href="<?php echo esc_url( $edit_detail_url ); ?>">
+                        <span class="ph-tx-template-action-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'home' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                        <span class="ph-tx-template-action-copy">
+                            <strong><?php esc_html_e( 'Edit Property Template', 'propertyhive' ); ?></strong>
+                            <span><?php esc_html_e( 'Customise how your property details page is displayed.', 'propertyhive' ); ?></span>
+                        </span>
+                        <span class="ph-tx-template-action-arrow" aria-hidden="true">&rarr;</span>
+                    </a>
                 </div>
+
             </div>
-            <div class="ph-tx-panel-card">
-                <h3><?php esc_html_e( 'Need help getting started?', 'propertyhive' ); ?></h3>
-                <p><?php esc_html_e( 'Browse the Property Hive documentation or visit our official video channel for help and tutorials.', 'propertyhive' ); ?></p>
-                <p class="ph-tx-actions">
-                    <a class="button" href="<?php echo esc_url( 'https://docs.wp-property-hive.com/category/325-template-assistant' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View Documentation', 'propertyhive' ); ?> <span class="ph-tx-btn-glyph" aria-hidden="true">&#8599;</span></a>
-                    <a class="button" href="<?php echo esc_url( 'https://www.youtube.com/channel/UCbxvikUbwOUzntjY5WYI-dQ' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Visit Video Channel', 'propertyhive' ); ?> <span class="ph-tx-btn-glyph" aria-hidden="true">&#9654;</span></a>
-                </p>
+            <div class="ph-tx-panel-card ph-tx-visual-help">
+                <div class="ph-tx-visual-guide">
+                    <h3><?php esc_html_e( 'Learn more about the Visual Editor', 'propertyhive' ); ?></h3>
+                    <ul class="ph-tx-checks ph-tx-checks--stacked">
+                        <li><?php esc_html_e( 'Live preview as you build', 'propertyhive' ); ?></li>
+                        <li><?php esc_html_e( 'Drag-and-drop sections and elements', 'propertyhive' ); ?></li>
+                        <li><?php esc_html_e( 'Responsive controls for all devices', 'propertyhive' ); ?></li>
+                        <li><?php esc_html_e( 'No coding required', 'propertyhive' ); ?></li>
+                    </ul>
+                    <a class="ph-tx-text-link" href="<?php echo esc_url( $template_docs_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View documentation', 'propertyhive' ); ?> <span class="ph-tx-external-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></a>
+                </div>
+                <a class="ph-tx-video-prompt" href="<?php echo esc_url( 'https://www.youtube.com/channel/UCbxvikUbwOUzntjY5WYI-dQ' ); ?>" target="_blank" rel="noopener">
+                    <span class="ph-tx-video-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'play' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                    <span>
+                        <strong><?php esc_html_e( 'Need a quick introduction?', 'propertyhive' ); ?></strong>
+                        <span class="ph-tx-video-meta"><?php esc_html_e( 'Visit our video channel', 'propertyhive' ); ?> <span class="ph-tx-video-external ph-tx-external-icon" aria-hidden="true"><?php echo $this->template_experience_icon( 'external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></span>
+                    </span>
+                </a>
             </div>
         </div>
         <?php
@@ -2044,7 +2032,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $builder_video_url  = isset( $builder_resources['video_url'] ) ? $builder_resources['video_url'] : '';
         $builder_ready      = ! empty( $builder['ready'] );
         ?>
-        <div class="ph-tx-panel" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_PAGE_BUILDER ); ?>">
+        <div id="ph-template-panel-<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_PAGE_BUILDER ); ?>" class="ph-tx-panel" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_PAGE_BUILDER ); ?>" aria-hidden="true">
             <?php if ( ! empty( $builder['active'] ) ) :
                 $theme_builder_url = '';
                 if ( 'elementor' === $builder['builder'] && ! empty( $builder['theme_builder'] ) ) {
@@ -2252,7 +2240,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ),
         );
         ?>
-        <div class="ph-tx-panel" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>">
+        <div id="ph-template-panel-<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>" class="ph-tx-panel" data-panel="<?php echo esc_attr( PH_Template_Set::EDITOR_MODE_DEVELOPER ); ?>" aria-hidden="true">
             <div class="ph-tx-panel-card ph-tx-panel-card--columns ph-tx-panel-card--two">
             <div class="ph-tx-panel-col">
                 <span class="ph-tx-panel-icon"><?php echo $this->template_experience_icon( 'developer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
@@ -2283,7 +2271,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     }
 
     /**
-     * Inline SVG icons for the experience chooser. Kept as simple line icons to
+     * Inline SVG icons for the editing-method workspace. Kept as simple line icons to
      * match the design mockups.
      *
      * @param string $name Icon key.
@@ -2310,8 +2298,11 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'github'    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-5-2-5-2m10 5v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 18 4.77 5.07 5.07 0 0 0 17.91 1S16.73.65 14 2.48a13.38 13.38 0 0 0-7 0C4.27.65 3.09 1 3.09 1A5.07 5.07 0 0 0 3 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 7 18.13V22"/></svg>',
             // Elementor brand roundel (used when Elementor is the detected builder).
             'elementor' => '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.5" fill="#92003B"/><rect x="7.4" y="7.3" width="2.1" height="9.4" fill="#fff"/><rect x="11.1" y="7.3" width="5.5" height="2.1" fill="#fff"/><rect x="11.1" y="10.95" width="5.5" height="2.1" fill="#fff"/><rect x="11.1" y="14.6" width="5.5" height="2.1" fill="#fff"/></svg>',
-            // Yellow lightbulb (hint bar).
-            'bulb'      => '<svg viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0-4 10.47c.63.55 1 1.34 1 2.18V16a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-.35c0-.84.37-1.63 1-2.18A6 6 0 0 0 12 3z"/><path d="M10 20h4"/></svg>',
+            'search'    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="5.8"/><path d="m15 15 5 5"/></svg>',
+            'home'      => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.2 12 3l9 8.2-1.6 1.8-1.2-1.1V21h-4.5v-5.7h-3.4V21H5.8v-9.1L4.6 13 3 11.2Z"/></svg>',
+            'play'      => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m9 7 9 5-9 5V7Z"/></svg>',
+            'external'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"/><path d="m19 5-8 8"/><path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>',
+            'shield'    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.8 19 5.6v5.8c0 4.5-2.8 8.2-7 9.8-4.2-1.6-7-5.3-7-9.8V5.6l7-2.8Z"/></svg>',
         );
 
         return isset( $icons[ $name ] ) ? $icons[ $name ] : '';
