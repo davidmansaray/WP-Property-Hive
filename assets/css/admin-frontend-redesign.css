@@ -125,7 +125,8 @@
 }
 
 .propertyhive .ph-settings-nav-group > .nav-tab-active,
-.propertyhive .ph-settings-nav-group > .nav-tab-active + * {
+.propertyhive .ph-settings-nav-group > .nav-tab-active + *,
+.propertyhive .ph-settings-nav-group > .ph-nav-addons.is-active {
     box-shadow: none;
 }
 
@@ -244,25 +245,6 @@
     height: 100%;
 }
 
-.propertyhive .ph-nav-addons-toggle.is-compact .ph-nav-text .ph-nav-subtitle,
-.propertyhive .ph-nav-addons-toggle.is-compact .ph-nav-text .ph-nav-label > :not(.ph-nav-count) {
-    display: none;
-}
-
-.propertyhive .ph-nav-addons-toggle.is-compact {
-    padding: 14px 12px;
-    gap: 6px;
-}
-
-/* Hide the label word but keep the count pill in compact mode. */
-.propertyhive .ph-nav-addons-toggle.is-compact .ph-nav-label {
-    font-size: 0;
-}
-
-.propertyhive .ph-nav-addons-toggle.is-compact .ph-nav-count {
-    font-size: 10.5px;
-}
-
 /* Dropdown menu panel. */
 .propertyhive .ph-nav-addons-menu {
     display: none;
@@ -310,13 +292,6 @@
 
 .propertyhive .ph-nav-menu-item .ph-nav-subtitle {
     display: none;
-}
-
-/* The active add-on tab (rendered inline beside the toggle) sizes to content. */
-.propertyhive .ph-settings-nav .ph-nav-addon {
-    flex: 0 1 auto;
-    min-width: 0;
-    max-width: 260px;
 }
 
 /* -------------------------------------------------------------------------
@@ -1445,13 +1420,6 @@
         display: none;
     }
 
-    .propertyhive .ph-settings-nav .ph-nav-addon {
-        max-width: 220px;
-    }
-
-    .propertyhive .ph-nav-addons-toggle.is-compact {
-        padding: 12px 9px;
-    }
 }
 
 @media screen and (max-width: 1200px) {
@@ -1553,25 +1521,7 @@
         padding: 10px 6px;
     }
 
-    .propertyhive .ph-settings-nav .ph-nav-addon {
-        flex: 0 0 auto;
-        max-width: none;
-    }
-
-    .propertyhive .ph-settings-nav .ph-nav-addon .ph-nav-text {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
-
-    .propertyhive .ph-nav-addons-toggle,
-    .propertyhive .ph-nav-addons-toggle.is-compact {
+    .propertyhive .ph-nav-addons-toggle {
         gap: 4px;
         padding: 10px 7px;
     }

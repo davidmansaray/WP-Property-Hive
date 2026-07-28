@@ -87,11 +87,10 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 				$ph_meta     = isset( $ph_tab_meta[ $name ] ) ? $ph_tab_meta[ $name ] : array();
 				$ph_icon     = PH_Admin_Settings::get_tab_icon_svg( isset( $ph_meta['icon'] ) ? $ph_meta['icon'] : 'default' );
 				$ph_subtitle = isset( $ph_meta['subtitle'] ) ? $ph_meta['subtitle'] : '';
-				$ph_is_core  = isset( $ph_tab_meta[ $name ] );
 
 				$classes = 'menu' === $context
 					? 'ph-nav-menu-item' . ( $current_tab == $name ? ' is-active' : '' )
-					: 'nav-tab ph-nav-tab ' . ( $ph_is_core ? 'ph-nav-core' : 'ph-nav-addon' ) . ' nav-tab-' . sanitize_title( $name ) . ( $current_tab == $name ? ' nav-tab-active' : '' );
+					: 'nav-tab ph-nav-tab ph-nav-core nav-tab-' . sanitize_title( $name ) . ( $current_tab == $name ? ' nav-tab-active' : '' );
 
 				echo '<a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=' . $name ) ) . '" class="' . esc_attr( $classes ) . '"' . ( 'row' === $context ? ' title="' . esc_attr( $label ) . '"' : '' ) . '>';
 					echo '<span class="ph-nav-icon">' . $ph_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -125,17 +124,8 @@ $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 
 					if ( ! empty( $ph_addon_tabs ) )
 					{
-						// The active add-on tab renders inline so the current
-						// location is always visible; the rest live in the menu.
-						if ( $ph_active_is_addon )
-						{
-							$ph_render_tab( $current_tab, $ph_addon_tabs[ $current_tab ], 'row' );
-						}
-
-						echo '<span class="ph-nav-addons">';
-							// Compact toggle (icon + count) when an add-on tab is
-							// already visible inline, to keep the nav to one row.
-							echo '<button type="button" class="ph-nav-tab ph-nav-addons-toggle' . ( $ph_active_is_addon ? ' is-compact' : '' ) . '" aria-expanded="false" aria-haspopup="true" title="' . esc_attr__( 'Add-ons', 'propertyhive' ) . '">';
+						echo '<span class="ph-nav-addons' . ( $ph_active_is_addon ? ' is-active' : '' ) . '">';
+							echo '<button type="button" class="ph-nav-tab ph-nav-addons-toggle' . ( $ph_active_is_addon ? ' nav-tab-active' : '' ) . '" aria-expanded="false" aria-haspopup="true"' . ( $ph_active_is_addon ? ' aria-current="page"' : '' ) . ' title="' . esc_attr__( 'Add-ons', 'propertyhive' ) . '">';
 								echo '<span class="ph-nav-icon">' . PH_Admin_Settings::get_tab_icon_svg( 'default' ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								echo '<span class="ph-nav-text">';
 									echo '<span class="ph-nav-label">' . esc_html__( 'Add-ons', 'propertyhive' ) . ' <span class="ph-nav-count">' . count( $ph_addon_tabs ) . '</span></span>';
