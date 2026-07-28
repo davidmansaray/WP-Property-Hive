@@ -186,7 +186,6 @@ class PH_Admin_Settings {
 			'email'        => array( 'icon' => 'mail',      'subtitle' => __( 'Email templates', 'propertyhive' ), 'description' => __( 'Configure outgoing email settings and templates.', 'propertyhive' ) ),
 			'features'     => array( 'icon' => 'star',      'subtitle' => __( 'Extra features', 'propertyhive' ), 'description' => __( 'Enable and manage optional Property Hive features.', 'propertyhive' ) ),
 			'licensekey'   => array( 'icon' => 'key',       'subtitle' => __( 'Your license', 'propertyhive' ), 'description' => __( 'Manage your Property Hive license.', 'propertyhive' ) ),
-			'demo_data'    => array( 'icon' => 'database',  'subtitle' => __( 'Import sample data', 'propertyhive' ), 'description' => __( 'Fill Property Hive with sample data to explore how it works.', 'propertyhive' ) ),
 		);
 
 		return apply_filters( 'propertyhive_settings_tab_meta', $meta );
