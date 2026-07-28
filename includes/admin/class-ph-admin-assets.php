@@ -43,8 +43,8 @@ class PH_Admin_Assets {
             // Admin styles for PH pages only
             wp_enqueue_style( 'propertyhive_admin_styles', PH()->plugin_url() . '/assets/css/admin.css', array(), PH_VERSION );
 
-            // Frontend settings redesign (icon nav bar + template experience chooser).
-            wp_enqueue_style( 'propertyhive_frontend_redesign', PH()->plugin_url() . '/assets/css/admin-frontend-redesign.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
+            // Admin settings interface (navigation and template experience chooser).
+            wp_enqueue_style( 'propertyhive_admin_settings_styles', PH()->plugin_url() . '/assets/css/admin-settings.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
 
             if ( false !== strpos( $screen->id, 'page_ph-settings' ) )
             {
@@ -188,8 +188,8 @@ class PH_Admin_Assets {
         }
 
         wp_add_inline_style(
-            'propertyhive_frontend_redesign',
-            '.propertyhive.ph-settings-redesign{' . implode( ';', $declarations ) . '}'
+            'propertyhive_admin_settings_styles',
+            '.propertyhive.ph-settings-page{' . implode( ';', $declarations ) . '}'
         );
     }
 

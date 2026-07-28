@@ -3,7 +3,7 @@ var initial_save_changes_value = '';
 jQuery( function($){
 
     var $settings_form = $('#mainform');
-    var $settings_wrap = $settings_form.closest('.ph-settings-redesign');
+    var $settings_wrap = $settings_form.closest('.ph-settings-page');
     var $development_tools = $('[data-ph-development-tools]');
     var $save_tray = $settings_form.find('[data-ph-save-tray]');
     var $save_button = $settings_form.find('[data-ph-save-button]');

@@ -1,5 +1,5 @@
 /**
- * Property Hive — Frontend settings redesign
+ * Property Hive — Admin settings
  *
  * Styles the settings page chrome (icon nav bar, breadcrumb sub-nav, page
  * header band) and the "How will you be building your property pages?"
@@ -27,7 +27,7 @@
  * content width, including when no admin notice is rendered above it. Padding
  * preserves the same gap above the navigation as its margin provides below.
  */
-.propertyhive.ph-settings-redesign {
+.propertyhive.ph-settings-page {
     --ph-settings-nav-background: #fff;
     --ph-settings-nav-border: #e5e5ea;
     --ph-settings-nav-text: #1d1d24;
@@ -317,23 +317,23 @@
  * Section sub-nav (breadcrumb style)
  * ---------------------------------------------------------------------- */
 
-.propertyhive.ph-settings-redesign ul.subsubsub {
+.propertyhive.ph-settings-page ul.subsubsub {
     margin: 4px 0 10px;
     font-size: 13px;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a {
+.propertyhive.ph-settings-page ul.subsubsub li a {
     color: var(--ph-tx-muted);
     text-decoration: none;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a:hover,
-.propertyhive.ph-settings-redesign ul.subsubsub li a:focus {
+.propertyhive.ph-settings-page ul.subsubsub li a:hover,
+.propertyhive.ph-settings-page ul.subsubsub li a:focus {
     color: var(--ph-tx-ink);
     box-shadow: none;
 }
 
-.propertyhive.ph-settings-redesign ul.subsubsub li a.current {
+.propertyhive.ph-settings-page ul.subsubsub li a.current {
     color: var(--ph-tx-ink);
     font-weight: 700;
 }

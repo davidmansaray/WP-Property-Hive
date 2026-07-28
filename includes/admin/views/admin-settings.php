@@ -36,7 +36,7 @@ if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_tex
 $ph_always_show_save = $ph_button_text !== $ph_default_button_text;
 ?>
 
-<div class="wrap propertyhive ph-settings-redesign">
+<div class="wrap propertyhive ph-settings-page">
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div>
 		<?php
