@@ -107,7 +107,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 				get_option('propertyhive_pro_license_key', '')[$length-1]; 
 			}
 
-			if ( PH()->license->is_valid_pro_license_key(true) )
+			if ( PH()->license->is_valid_pro_license_key() )
 			{
 				$valid_pro_license = true;				
 				// to be used for displaying subscription level in future
