@@ -24,6 +24,7 @@ jobs:
         env:
           BASE_BRANCH: ${{ github.base_ref }}
           HEAD_BRANCH: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -Eeuo pipefail
 
@@ -45,7 +46,12 @@ jobs:
                   echo "$HEAD_BRANCH may be proposed to master."
                   ;;
                 agent/staging-release-workflow)
-                  echo "Allowing the one-time staging workflow bootstrap pull request."
+                  if [[ "$PR_NUMBER" == "1" ]]; then
+                    echo "Allowing staging workflow bootstrap pull request #1."
+                  else
+                    echo "::error::The staging workflow bootstrap exception applied only to pull request #1."
+                    exit 1
+                  fi
                   ;;
                 *)
                   echo "::error::Only release/*, hotfix/*, or staging may target master. Propose normal work to staging instead."
