@@ -234,6 +234,7 @@ class PH_Admin_Settings {
 				'deleteadditionalfield' => 'article/647-field-manager-additional-fields',
 			),
 			'frontend' => array(
+				'template-set'   => 'category/325-template-assistant',
 				'search-forms'   => 'article/650-frontend-search-forms',
 				'addsearchform'  => 'article/650-frontend-search-forms',
 				'editsearchform' => 'article/650-frontend-search-forms',
