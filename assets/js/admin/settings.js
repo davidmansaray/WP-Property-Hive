@@ -79,7 +79,7 @@ jQuery( function($){
     {
         var state = [];
 
-        $settings_form.find(':input').not(':button, :submit, :reset').each(function()
+        $settings_form.find(':input').not(':button, :submit, :reset, [data-ph-save-tray-ignore]').each(function()
         {
             if ( !this.name )
             {
@@ -346,6 +346,13 @@ jQuery( function($){
             return true;
         }
 
+        if ( this.id == 'mainform' && $(this).data('ph-auto-save-pending') )
+        {
+            event.preventDefault();
+            $(this).data('ph-submit-after-auto-save', true);
+            return false;
+        }
+
         // Check for confirm removal checkbox
         // and make sure it's ticked
         if ( $('input[type=\'checkbox\'][name=\'confirm_removal\']').length > 0 )
@@ -431,6 +438,8 @@ jQuery( function($){
             event.preventDefault();
 
             save_tray_submitting = true;
+            $settings_form.data('ph-save-tray-submitting', true);
+            $settings_form.find('[data-ph-auto-save-control]').prop('disabled', true);
             $settings_wrap
                 .addClass('ph-save-tray-saving')
                 .addClass('ph-save-tray-visible');
