@@ -323,28 +323,59 @@
 }
 
 /* -------------------------------------------------------------------------
- * Section sub-nav (breadcrumb style)
+ * Section sub-nav
  * ---------------------------------------------------------------------- */
 
-.propertyhive.ph-settings-page ul.subsubsub {
-    margin: 4px 0 10px;
+.propertyhive.ph-settings-page ul.ph-settings-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    float: none;
+    width: 100%;
+    margin: 14px 0 20px;
+    padding: 0;
+    border-bottom: 1px solid var(--ph-tx-border);
     font-size: 13px;
 }
 
-.propertyhive.ph-settings-page ul.subsubsub li a {
+.propertyhive.ph-settings-page ul.ph-settings-sections li {
+    float: none;
+    margin: 0;
+}
+
+.propertyhive.ph-settings-page ul.ph-settings-sections li a {
+    position: relative;
+    display: block;
+    padding: 0 0 10px;
     color: var(--ph-tx-muted);
     text-decoration: none;
 }
 
-.propertyhive.ph-settings-page ul.subsubsub li a:hover,
-.propertyhive.ph-settings-page ul.subsubsub li a:focus {
+.propertyhive.ph-settings-page ul.ph-settings-sections li a:hover,
+.propertyhive.ph-settings-page ul.ph-settings-sections li a:focus {
     color: var(--ph-tx-ink);
     box-shadow: none;
 }
 
-.propertyhive.ph-settings-page ul.subsubsub li a.current {
+.propertyhive.ph-settings-page ul.ph-settings-sections li a:focus-visible {
+    border-radius: 2px;
+    outline: 3px solid var(--ph-settings-nav-focus);
+    outline-offset: 3px;
+}
+
+.propertyhive.ph-settings-page ul.ph-settings-sections li a.current {
     color: var(--ph-tx-ink);
     font-weight: 700;
+}
+
+.propertyhive.ph-settings-page ul.ph-settings-sections li a.current::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: var(--ph-settings-nav-active-accent);
+    content: "";
 }
 
 /* -------------------------------------------------------------------------
@@ -357,6 +388,10 @@
     justify-content: space-between;
     gap: 20px;
     margin: 4px 0 20px;
+}
+
+.propertyhive .ph-settings-header--has-sections {
+    margin-bottom: 0;
 }
 
 .propertyhive .ph-settings-header-text h1 {
@@ -372,6 +407,15 @@
     margin: 0;
     color: var(--ph-tx-muted);
     font-size: 13px;
+}
+
+.propertyhive h2.ph-settings-section-title {
+    margin: 0 0 8px;
+    padding: 0;
+    color: var(--ph-tx-ink);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .propertyhive .ph-settings-header-actions {
@@ -1085,25 +1129,6 @@
 .propertyhive .ph-template-experience {
     margin: 0 0 20px;
     color: var(--ph-tx-ink);
-}
-
-.propertyhive .ph-tx-page-heading {
-    margin: 2px 0 18px;
-    animation: ph-tx-rise-in .28s ease both;
-}
-
-.propertyhive .ph-tx-page-heading h1 {
-    margin: 0 0 5px;
-    padding: 0;
-    color: var(--ph-tx-ink);
-    font-size: 21px;
-    line-height: 1.3;
-}
-
-.propertyhive .ph-tx-page-heading p {
-    margin: 0;
-    color: var(--ph-tx-muted);
-    font-size: 13px;
 }
 
 .propertyhive .ph-tx-workspace {
@@ -1824,7 +1849,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .propertyhive .ph-tx-page-heading,
     .propertyhive .ph-tx-workspace,
     .propertyhive .ph-tx-panel.is-active,
     .propertyhive .ph-tx-build-once {

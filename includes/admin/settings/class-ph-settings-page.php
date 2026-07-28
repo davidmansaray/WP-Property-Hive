@@ -55,17 +55,31 @@ class PH_Settings_Page {
 
 		$sections = $this->get_sections();
 
-		if ( empty( $sections ) )
+		if ( empty( $sections ) ) {
 			return;
+		}
 
-		echo '<ul class="subsubsub">';
+		/* translators: %s: Settings tab label. */
+		echo '<nav class="ph-settings-sections-nav" aria-label="' . esc_attr( sprintf( __( '%s sections', 'propertyhive' ), $this->label ) ) . '">';
+		echo '<ul class="subsubsub ph-settings-sections">';
 
-		$array_keys = array_keys( $sections );
+		foreach ( $sections as $id => $label ) {
+			$section_id = sanitize_title( (string) $id );
+			$url_args = array(
+				'page' => 'ph-settings',
+				'tab'  => $this->id,
+			);
 
-		foreach ( $sections as $id => $label )
-			echo '<li>&nbsp;<a href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=' . $this->id . '&section=' . sanitize_title( $id ) ) ) . '" class="' . ( $current_section == $id ? 'current' : '' ) . '">' . esc_html($label) . '</a> ' . ( end( $array_keys ) == $id ? '' : '| ' ) . ' </li>';
+			if ( '' !== $section_id ) {
+				$url_args['section'] = $section_id;
+			}
 
-		echo '</ul><br class="clear" />';
+			$is_current = $current_section === $section_id;
+
+			echo '<li><a href="' . esc_url( add_query_arg( $url_args, admin_url( 'admin.php' ) ) ) . '" class="' . ( $is_current ? 'current' : '' ) . '"' . ( $is_current ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a></li>';
+		}
+
+		echo '</ul></nav>';
 	}
 
 	/**

@@ -40,7 +40,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
         
         return apply_filters( 'propertyhive_office_settings', array(
 
-            array( 'title' => __( 'Offices', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'offices_options' ),
+            array( 'title' => __( 'Your Offices', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'offices_options' ),
             
             array(
                 'type'      => 'offices',

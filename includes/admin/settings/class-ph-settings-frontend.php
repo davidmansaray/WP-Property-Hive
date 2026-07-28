@@ -31,8 +31,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 16 );
 		add_filter( 'propertyhive_default_settings_section_' . $this->id, array( $this, 'get_default_section' ) );
-		add_filter( 'propertyhive_settings_page_title', array( $this, 'get_page_title' ), 10, 3 );
-		add_filter( 'propertyhive_settings_page_description', array( $this, 'get_page_description' ), 10, 3 );
 		add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
@@ -116,30 +114,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 	 */
 	public function get_default_section( $section = '' ) {
 		return '' === $section ? 'template-set' : $section;
-	}
-
-	/**
-	 * Remove the redundant page heading beneath the Frontend section menu.
-	 *
-	 * @param string $title Current page title.
-	 * @param string $tab Current settings tab.
-	 * @param string $section Current settings section.
-	 * @return string
-	 */
-	public function get_page_title( $title, $tab, $section ) {
-		return $this->id === $tab ? '' : $title;
-	}
-
-	/**
-	 * Remove the redundant page description beneath the Frontend section menu.
-	 *
-	 * @param string $description Current page description.
-	 * @param string $tab Current settings tab.
-	 * @param string $section Current settings section.
-	 * @return string
-	 */
-	public function get_page_description( $description, $tab, $section ) {
-		return $this->id === $tab ? '' : $description;
 	}
 
 	/**
@@ -1768,11 +1742,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         <div class="ph-template-experience" data-preview-mode="<?php echo esc_attr( $selected ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
             <input type="hidden" class="ph-tx-mode-value" name="template_set_editor_mode" value="<?php echo esc_attr( $mode ); ?>" data-ph-save-tray-ignore>
             <input type="hidden" class="ph-tx-template-enabled" name="<?php echo esc_attr( PH_Template_Set::OPTION_ENABLED ); ?>" value="<?php echo esc_attr( $template_set_enabled ); ?>" data-ph-save-tray-ignore>
-
-            <header class="ph-tx-page-heading">
-                <h1><?php esc_html_e( 'Frontend', 'propertyhive' ); ?></h1>
-                <p><?php esc_html_e( 'Choose how you want to build and customise your property pages.', 'propertyhive' ); ?></p>
-            </header>
 
             <div class="ph-tx-workspace">
                 <section class="ph-tx-methods" aria-labelledby="ph-template-editing-method-title">

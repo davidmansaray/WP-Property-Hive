@@ -404,7 +404,8 @@ class PH_Admin_Settings {
 	        	// Section Titles
 	            case 'title':
 	            	if ( ! empty( $value['title'] ) ) {
-	            		echo '<h3>' . esc_html( $value['title'] ) . '</h3>';
+						$heading_tag = isset( $GLOBALS['propertyhive_settings_heading_level'] ) && 2 === (int) $GLOBALS['propertyhive_settings_heading_level'] ? 'h2' : 'h3';
+						echo '<' . $heading_tag . ' class="ph-settings-section-title">' . esc_html( $value['title'] ) . '</' . $heading_tag . '>';
 	            	}
 	            	if ( ! empty( $value['desc'] ) ) {
 	            		echo wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) );
