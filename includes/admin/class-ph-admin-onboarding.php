@@ -557,23 +557,55 @@ class PH_Admin_Onboarding {
 			return;
 		}
 
+		$panel_id         = 'ph-development-setup-tools-panel';
+		$environment_type = self::get_environment_type();
+
 		?>
-		<div class="notice notice-info inline">
-			<p>
-				<strong><?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?></strong>
-			</p>
-			<p>
+		<div class="ph-development-tools" data-ph-development-tools>
+			<button
+				type="button"
+				class="ph-development-tools__toggle"
+				aria-expanded="false"
+				aria-controls="<?php echo esc_attr( $panel_id ); ?>"
+				title="<?php esc_attr_e( 'Development setup tools', 'propertyhive' ); ?>"
+				data-ph-development-tools-toggle
+			>
+				<span class="dashicons dashicons-admin-tools" aria-hidden="true"></span>
+				<span class="ph-development-tools__indicator" aria-hidden="true"></span>
+				<span class="screen-reader-text"><?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?></span>
+			</button>
+
+			<div
+				id="<?php echo esc_attr( $panel_id ); ?>"
+				class="ph-development-tools__panel"
+				role="region"
+				aria-labelledby="<?php echo esc_attr( $panel_id ); ?>-title"
+				data-ph-development-tools-panel
+				hidden
+			>
+				<button
+					type="button"
+					class="ph-development-tools__close"
+					data-ph-development-tools-close
+				>
+					<span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
+					<span class="screen-reader-text"><?php esc_html_e( 'Close', 'propertyhive' ); ?></span>
+				</button>
+
+				<strong id="<?php echo esc_attr( $panel_id ); ?>-title" class="ph-development-tools__title">
+					<?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?>
+				</strong>
+				<p class="ph-development-tools__description">
 				<?php
-				printf(
-					/* translators: %s: WordPress environment type. */
-					esc_html__( 'This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing.', 'propertyhive' ),
-					'<code>' . esc_html( self::get_environment_type() ) . '</code>'
-				);
+					printf(
+						/* translators: %s: WordPress environment type. */
+						esc_html__( 'This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing.', 'propertyhive' ),
+						'<code>' . esc_html( $environment_type ) . '</code>'
+					);
 				?>
-			</p>
-			<p>
-				<a class="button" href="<?php echo esc_url( $this->get_restart_onboarding_url() ); ?>"><?php esc_html_e( 'Restart setup wizard', 'propertyhive' ); ?></a>
-			</p>
+				</p>
+				<a class="button button-primary ph-development-tools__action" href="<?php echo esc_url( $this->get_restart_onboarding_url() ); ?>"><?php esc_html_e( 'Restart setup wizard', 'propertyhive' ); ?></a>
+			</div>
 		</div>
 		<?php
 	}

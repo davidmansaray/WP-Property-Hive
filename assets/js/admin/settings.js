@@ -4,6 +4,7 @@ jQuery( function($){
 
     var $settings_form = $('#mainform');
     var $settings_wrap = $settings_form.closest('.ph-settings-redesign');
+    var $development_tools = $('[data-ph-development-tools]');
     var $save_tray = $settings_form.find('[data-ph-save-tray]');
     var $save_button = $settings_form.find('[data-ph-save-button]');
     var $save_state = $settings_form.find('[data-ph-save-state]');
@@ -14,6 +15,65 @@ jQuery( function($){
     var save_tray_dirty = false;
     var save_tray_submitting = false;
     var save_tray_check_timer;
+
+    function ph_init_development_tools()
+    {
+        if ( !$development_tools.length )
+        {
+            return;
+        }
+
+        var $toggle = $development_tools.find('[data-ph-development-tools-toggle]');
+        var $panel = $development_tools.find('[data-ph-development-tools-panel]');
+        var $close = $development_tools.find('[data-ph-development-tools-close]');
+
+        function ph_set_development_tools_open(is_open, restore_focus)
+        {
+            $development_tools.toggleClass('is-open', is_open);
+            $toggle.attr('aria-expanded', is_open ? 'true' : 'false');
+            $panel.prop('hidden', !is_open);
+
+            if ( !is_open && restore_focus )
+            {
+                $toggle.trigger('focus');
+            }
+        }
+
+        $toggle.on('click.phDevelopmentTools', function()
+        {
+            ph_set_development_tools_open($toggle.attr('aria-expanded') !== 'true', false);
+        });
+
+        $close.on('click.phDevelopmentTools', function()
+        {
+            ph_set_development_tools_open(false, true);
+        });
+
+        $(document).on('click.phDevelopmentTools', function(event)
+        {
+            if (
+                $toggle.attr('aria-expanded') === 'true' &&
+                !$(event.target).closest('[data-ph-development-tools]').length
+            )
+            {
+                ph_set_development_tools_open(false, false);
+            }
+        });
+
+        $(document).on('keydown.phDevelopmentTools', function(event)
+        {
+            if ( event.key === 'Escape' && $toggle.attr('aria-expanded') === 'true' )
+            {
+                event.preventDefault();
+                ph_set_development_tools_open(false, true);
+            }
+        });
+    }
+
+    function ph_sync_development_tools_with_save_tray(is_visible)
+    {
+        $development_tools.toggleClass('ph-development-tools--save-tray-visible', is_visible);
+    }
 
     function ph_get_save_tray_form_state()
     {
@@ -78,6 +138,7 @@ jQuery( function($){
 
         save_tray_dirty = is_dirty;
         $settings_wrap.toggleClass('ph-save-tray-visible', should_show);
+        ph_sync_development_tools_with_save_tray(should_show);
         $save_tray.prop('inert', !should_show).attr('aria-hidden', should_show ? 'false' : 'true');
         $save_button.prop('disabled', !should_show);
         $save_discard.prop('disabled', !is_dirty);
@@ -373,6 +434,7 @@ jQuery( function($){
             $settings_wrap
                 .addClass('ph-save-tray-saving')
                 .addClass('ph-save-tray-visible');
+            ph_sync_development_tools_with_save_tray(true);
             $save_tray.prop('inert', false).attr('aria-hidden', 'false');
             $save_state.text(propertyhive_admin_settings.saving_text);
             $save_button.prop('disabled', true);
@@ -383,6 +445,7 @@ jQuery( function($){
                 $settings_wrap
                     .removeClass('ph-save-tray-visible')
                     .removeClass('ph-save-tray-saving');
+                ph_sync_development_tools_with_save_tray(false);
             }, 300);
 
             window.setTimeout(function()
@@ -625,6 +688,7 @@ jQuery( function($){
 
     ph_resize_pro_features_list();
     ph_show_saved_toast();
+    ph_init_development_tools();
 
     window.setTimeout(ph_init_save_tray, 120);
 });

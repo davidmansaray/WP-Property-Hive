@@ -46,6 +46,11 @@ class PH_Admin_Assets {
             // Frontend settings redesign (icon nav bar + template experience chooser).
             wp_enqueue_style( 'propertyhive_frontend_redesign', PH()->plugin_url() . '/assets/css/admin-frontend-redesign.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
 
+            if ( false !== strpos( $screen->id, 'page_ph-settings' ) )
+            {
+                wp_enqueue_style( 'propertyhive_admin_development_tools', PH()->plugin_url() . '/assets/css/admin-development-tools.css', array( 'propertyhive_admin_styles' ), PH_VERSION );
+            }
+
             wp_enqueue_style( 'font_awesome', PH()->plugin_url() . '/assets/css/font-awesome.min.css', array(), PH_VERSION );
             
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
