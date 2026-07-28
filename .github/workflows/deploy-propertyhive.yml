@@ -24,11 +24,11 @@ jobs:
     timeout-minutes: 20
     environment:
       name: staging
-      url: ${{ steps.deploy.outputs.site_url }}
+      url: ${{ vars.PROPERTYHIVE_STAGING_SITE_URL }}
     env:
-      DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
-      DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
-      DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+      DEPLOY_HOST: ${{ vars.PROPERTYHIVE_DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.PROPERTYHIVE_DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.PROPERTYHIVE_DEPLOY_PATH }}
       DEPLOY_KNOWN_HOSTS: ${{ secrets.PROPERTYHIVE_DEPLOY_KNOWN_HOSTS }}
       DEPLOY_SSH_KEY: ${{ secrets.PROPERTYHIVE_DEPLOY_SSH_KEY }}
 
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Validate deployment secrets
+      - name: Validate deployment configuration
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -53,7 +53,7 @@ jobs:
             DEPLOY_SSH_KEY
           do
             if [[ -z "${!name:-}" ]]; then
-              echo "::error::Required deployment secret ${name} is not configured."
+              echo "::error::Required deployment setting ${name} is not configured."
               missing=1
             fi
           done

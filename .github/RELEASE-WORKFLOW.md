@@ -96,6 +96,8 @@ After release, synchronize upstream `master` back into fork `master` and
 
 The workflow's job summary is the deployment record. It contains the deployed
 branch and SHA, rollback path, smoke-test URLs and statuses, and Actions run.
+The host, user, path, and site URL are environment variables; only the SSH key
+and known-hosts data are stored as environment secrets.
 
 Use `workflow_dispatch` only to redeploy an allowed `staging` or `release/*`
 commit. Selecting any other branch intentionally skips the deployment job.
