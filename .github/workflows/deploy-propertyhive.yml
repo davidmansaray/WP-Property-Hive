@@ -1,0 +1,104 @@
+name: Deploy Property Hive to Staging
+
+on:
+  push:
+    branches:
+      - staging
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: propertyhive-staging-deploy
+  queue: max
+
+jobs:
+  deploy:
+    name: Deploy exact commit
+    if: >-
+      github.ref == 'refs/heads/staging' ||
+      startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.site_url }}
+    env:
+      DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+      DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.PROPERTYHIVE_DEPLOY_KNOWN_HOSTS }}
+      DEPLOY_SSH_KEY: ${{ secrets.PROPERTYHIVE_DEPLOY_SSH_KEY }}
+
+    steps:
+      - name: Check out the deployed commit
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate deployment secrets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          missing=0
+          for name in \
+            DEPLOY_HOST \
+            DEPLOY_USER \
+            DEPLOY_PATH \
+            DEPLOY_KNOWN_HOSTS \
+            DEPLOY_SSH_KEY
+          do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::Required deployment secret ${name} is not configured."
+              missing=1
+            fi
+          done
+
+          exit "$missing"
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          install -d -m 700 "$HOME/.ssh"
+          key_file="$RUNNER_TEMP/propertyhive_staging_deploy_key"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$key_file"
+          chmod 600 "$key_file"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+          if ! ssh-keygen -F "$DEPLOY_HOST" -f "$HOME/.ssh/known_hosts" >/dev/null; then
+            echo "::error::The configured known-hosts secret has no entry for the deployment host."
+            exit 1
+          fi
+
+          echo "DEPLOY_SSH_KEY_FILE=$key_file" >> "$GITHUB_ENV"
+
+      - name: Package the exact commit
+        id: package
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          package_dir="$RUNNER_TEMP/propertyhive-package"
+          .github/scripts/package-propertyhive.sh "$GITHUB_SHA" "$package_dir"
+          echo "directory=$package_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy and verify
+        id: deploy
+        shell: bash
+        env:
+          PACKAGE_DIR: ${{ steps.package.outputs.directory }}
+        run: .github/scripts/deploy-propertyhive.sh
+
+      - name: Remove temporary credentials
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          rm -f -- "${DEPLOY_SSH_KEY_FILE:-}" "$HOME/.ssh/known_hosts"
