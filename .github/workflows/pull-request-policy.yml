@@ -1,0 +1,66 @@
+name: Release Branch Policy
+
+on:
+  pull_request:
+    branches:
+      - master
+      - staging
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+  validate-target:
+    name: Validate pull request target
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check branch relationship
+        shell: bash
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -Eeuo pipefail
+
+          case "$BASE_BRANCH" in
+            staging)
+              case "$HEAD_BRANCH" in
+                feature/* | fix/* | chore/* | hotfix/* | agent/*)
+                  echo "$HEAD_BRANCH may be proposed to staging."
+                  ;;
+                *)
+                  echo "::error::Normal work must use feature/*, fix/*, chore/*, hotfix/*, or agent/* before targeting staging."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            master)
+              case "$HEAD_BRANCH" in
+                release/* | hotfix/* | staging)
+                  echo "$HEAD_BRANCH may be proposed to master."
+                  ;;
+                feature/staging-release-workflow)
+                  if [[ "$PR_NUMBER" == "4" ]]; then
+                    echo "Allowing staging workflow bootstrap pull request #4."
+                  else
+                    echo "::error::The staging workflow bootstrap exception applies only to pull request #4."
+                    exit 1
+                  fi
+                  ;;
+                *)
+                  echo "::error::Only release/*, hotfix/*, or staging may target master. Propose normal work to staging instead."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "::error::Unexpected protected base branch: $BASE_BRANCH"
+              exit 1
+              ;;
+          esac
