@@ -44,6 +44,9 @@ jobs:
                 release/* | hotfix/* | staging)
                   echo "$HEAD_BRANCH may be proposed to master."
                   ;;
+                agent/staging-release-workflow)
+                  echo "Allowing the one-time staging workflow bootstrap pull request."
+                  ;;
                 *)
                   echo "::error::Only release/*, hotfix/*, or staging may target master. Propose normal work to staging instead."
                   exit 1
