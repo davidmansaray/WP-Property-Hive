@@ -87,27 +87,36 @@ class PH_Licenses {
 
         $license_type = $this->get_license_type();
 
-        if ( $license_type != 'pro' || get_option('propertyhive_pro_license_key', '') == '' )
+        // Legacy ('old') licence holders can keep using add-ons without pro licence checks
+        if ( $license_type == 'old' )
         {
             return $can;
         }
 
-		// Only retrieve the remote feature catalogue when a Pro licence is configured.
-		$feature = get_ph_pro_feature( $slug );
+        $pro_license_configured = ( $license_type == 'pro' && get_option( 'propertyhive_pro_license_key', '' ) != '' );
 
-		if ( false === $feature )
-		{
-			// A configured Pro licence must not bypass plan enforcement when
-			// the feature catalogue is unavailable, malformed, or incomplete.
-			return false;
-		}
+        // Only retrieve the remote feature catalogue when a Pro licence is configured.
+        $feature = get_ph_pro_feature( $slug );
 
-		$plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
+        if ( false === $feature )
+        {
+            // A configured Pro licence must not bypass plan enforcement when
+            // the feature catalogue is unavailable, malformed, or incomplete.
+            return $pro_license_configured ? false : $can;
+        }
 
-		if ( in_array( 'free', $plans, true ) )
-		{
-			return $can;
-		}
+        $plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
+
+        if ( in_array( 'free', $plans, true ) )
+        {
+            return $can;
+        }
+
+        // A paid add-on cannot be used without a valid Pro licence key
+        if ( ! $pro_license_configured )
+        {
+            return false;
+        }
 
         if ( !$this->is_valid_pro_license_key() )
         {
