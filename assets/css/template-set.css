@@ -80,13 +80,21 @@
 
 body.ph-template-editor-active {
 	--ph-template-editor-width: clamp(300px, 32vw, 380px);
-	padding-left: var(--ph-template-editor-width);
+	--ph-template-editor-space: var(--ph-template-editor-width);
+	--ph-template-editor-collapse-handle-width: 18px;
+	--ph-template-editor-collapse-handle-height: 50px;
+	padding-left: var(--ph-template-editor-space);
+	transition: padding-left 500ms ease-in-out;
+}
+
+body.ph-template-editor-active.ph-template-editor-sidebar-collapsed {
+	--ph-template-editor-space: 0px;
 }
 
 @media (min-width: 721px) {
 	body.ph-template-editor-active .ph-template-search,
 	body.ph-template-editor-active .ph-template-detail {
-		max-width: min(1180px, calc(100vw - var(--ph-template-editor-width) - 48px));
+		max-width: min(1180px, calc(100vw - var(--ph-template-editor-space) - 48px));
 	}
 }
 
@@ -111,8 +119,19 @@ body.ph-template-editor-active {
 	left: 0;
 	position: fixed;
 	top: 0;
+	transform: translateX(0);
+	transition: transform 500ms ease-in-out;
 	width: var(--ph-template-editor-width, 380px);
+	will-change: transform;
 	z-index: 100030;
+}
+
+body.ph-template-editor-active .ph-template-editor.is-collapsed {
+	transform: translateX(-100%);
+}
+
+body.ph-template-editor-active .ph-template-editor.is-collapsed .ph-template-editor-form {
+	pointer-events: none;
 }
 
 body.admin-bar .ph-template-editor {
@@ -184,26 +203,58 @@ body.admin-bar .ph-template-editor {
 	margin: 0;
 }
 
-.ph-template-editor-header a {
+.ph-template-editor-collapse-toggle,
+body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle {
 	align-items: center;
-	background: transparent;
+	appearance: none;
+	background: var(--ph-editor-carbon);
 	border: 1px solid rgba(255, 255, 255, 0.35);
-	border-radius: 6px;
+	border-left: 0;
+	border-radius: 0 6px 6px 0;
+	box-shadow: 8px 0 18px rgba(21, 21, 21, 0.18);
 	color: var(--ph-editor-white);
-	display: inline-flex;
-	font-size: 24px;
-	height: 36px;
+	cursor: pointer;
+	display: flex;
+	height: var(--ph-template-editor-collapse-handle-height);
 	justify-content: center;
-	line-height: 1;
-	text-decoration: none;
-	width: 36px;
+	left: 100%;
+	margin-left: 1px;
+	padding: 0;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+	width: var(--ph-template-editor-collapse-handle-width);
+	z-index: 2;
 }
 
-.ph-template-editor-header a:focus,
-.ph-template-editor-header a:hover {
+.ph-template-editor-collapse-toggle span {
+	border-bottom: 2px solid currentColor;
+	border-right: 2px solid currentColor;
+	display: block;
+	height: 7px;
+	transform: rotate(135deg);
+	transition: transform 180ms ease;
+	width: 7px;
+}
+
+.ph-template-editor.is-collapsed .ph-template-editor-collapse-toggle span {
+	transform: rotate(-45deg);
+}
+
+.ph-template-editor-collapse-toggle:focus,
+.ph-template-editor-collapse-toggle:hover,
+body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle:focus,
+body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle:hover {
+	background: var(--ph-editor-honey);
 	border-color: var(--ph-editor-honey);
-	color: var(--ph-editor-honey);
+	color: var(--ph-editor-carbon);
 	outline: none;
+}
+
+.ph-template-editor-collapse-toggle:focus-visible {
+	outline: 2px solid var(--ph-editor-honey);
+	outline-offset: 2px;
 }
 
 .ph-template-editor-section {
@@ -327,6 +378,15 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 }
 
 @media (prefers-reduced-motion: reduce) {
+	body.ph-template-editor-active,
+	.ph-template-editor,
+	.ph-template-editor-collapse-toggle,
+	.ph-template-editor-collapse-toggle span,
+	body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle,
+	body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle span {
+		transition: none;
+	}
+
 	.ph-template-editor-groups.is-ready .ph-template-editor-group-body {
 		transition: none;
 	}
@@ -4990,13 +5050,22 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 }
 
 @media (max-width: 720px) {
-	body.ph-template-editor-active {
-		padding-bottom: min(68vh, 560px);
+	body.ph-template-editor-active,
+	body.ph-template-set-active.ph-template-editor-active {
+		--ph-template-editor-space: min(68vh, 560px);
+		--ph-template-editor-collapse-handle-width: 50px;
+		--ph-template-editor-collapse-handle-height: 18px;
+		padding-bottom: var(--ph-template-editor-space);
 		padding-left: 0;
+		transition: padding-bottom 500ms ease-in-out;
+	}
+
+	body.ph-template-editor-active.ph-template-editor-sidebar-collapsed {
+		--ph-template-editor-space: var(--ph-template-editor-collapse-handle-height);
 	}
 
 	.ph-template-preview-loader {
-		bottom: min(68vh, 560px);
+		bottom: var(--ph-template-editor-space);
 		left: 0;
 	}
 
@@ -5006,7 +5075,32 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 		box-shadow: 0 -12px 32px rgba(22, 28, 36, 0.14);
 		height: min(68vh, 560px);
 		top: auto;
+		transform: translateY(0);
 		width: 100%;
+	}
+
+	body.ph-template-editor-active .ph-template-editor.is-collapsed {
+		transform: translateY(calc(100% - var(--ph-template-editor-collapse-handle-height)));
+	}
+
+	.ph-template-editor-collapse-toggle,
+	body.ph-template-editor-active .ph-template-editor button.ph-template-editor-collapse-toggle {
+		border-bottom: 0;
+		border-left: 1px solid rgba(255, 255, 255, 0.35);
+		border-radius: 6px 6px 0 0;
+		bottom: 100%;
+		left: 50%;
+		margin-left: 0;
+		top: auto;
+		transform: translateX(-50%);
+	}
+
+	.ph-template-editor-collapse-toggle span {
+		transform: rotate(-45deg);
+	}
+
+	.ph-template-editor.is-collapsed .ph-template-editor-collapse-toggle span {
+		transform: rotate(135deg);
 	}
 
 	body.admin-bar .ph-template-editor {
@@ -5726,9 +5820,9 @@ body.ph-detail-template-immersive-cinema-detail .wp-site-blocks > footer a {
 
 @media (min-width: 721px) {
 	body.ph-template-editor-active.ph-detail-template-immersive-cinema-detail .ph-template-gallery {
-		margin-inline: calc(50% - (100vw - var(--ph-template-editor-width)) / 2);
-		max-width: calc(100vw - var(--ph-template-editor-width));
-		width: calc(100vw - var(--ph-template-editor-width));
+		margin-inline: calc(50% - (100vw - var(--ph-template-editor-space)) / 2);
+		max-width: calc(100vw - var(--ph-template-editor-space));
+		width: calc(100vw - var(--ph-template-editor-space));
 	}
 }
 
@@ -6759,7 +6853,7 @@ body.ph-detail-template-immersive-cinema-detail .wp-site-blocks > footer a {
 	font-weight: 700;
 	gap: 12px;
 	justify-content: center;
-	left: var(--ph-template-editor-width, 380px);
+	left: var(--ph-template-editor-space, 380px);
 	position: fixed;
 	right: 0;
 	top: 0;
