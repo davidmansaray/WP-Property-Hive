@@ -33,11 +33,57 @@
 	}
 
 	function normalizeEditorSidebarLayout(layout) {
-		if (!layout || !layout.groups || !layout.groups.search || !layout.groups.detail) {
+		if (
+			!layout
+			|| !layout.groups
+			|| !Array.isArray(layout.groups.search)
+			|| !Array.isArray(layout.groups.detail)
+		) {
 			return fallbackEditorSidebarLayout;
 		}
 
 		return layout;
+	}
+
+	function getEditorGroupText(value) {
+		if (typeof value !== 'string' && typeof value !== 'number') {
+			return '';
+		}
+
+		return String(value).trim();
+	}
+
+	function getEditorGroupAdvancedUrl(value) {
+		var url;
+
+		if (typeof value !== 'string' || !value.trim() || !window.URL || !window.location) {
+			return '';
+		}
+
+		try {
+			url = new window.URL(value, window.location.href);
+			if ((url.protocol !== 'http:' && url.protocol !== 'https:') || url.hostname !== window.location.hostname) {
+				return '';
+			}
+
+			return url.href;
+		} catch (error) {
+			return '';
+		}
+	}
+
+	function getEditorGroupControls(group, items) {
+		var controls = Array.isArray(group.controls) ? group.controls : [];
+
+		return controls.map(function (control) {
+			if (typeof control === 'string') {
+				return control;
+			}
+
+			return control && typeof control.name === 'string' ? control.name : '';
+		}).filter(function (controlName) {
+			return !!controlName && !!items[controlName];
+		});
 	}
 
 	function getEditorGroupStorageKey(context) {
@@ -243,18 +289,38 @@
 	}
 
 	function getEditorLayoutGroups(layout, context, items) {
-		return (layout.groups[context] || []).map(function (group) {
-			var controls = group.controls.filter(function (controlName) {
-				return !!items[controlName];
-			});
+		var contextGroups = Array.isArray(layout.groups[context]) ? layout.groups[context] : [];
+
+		return contextGroups.map(function (group) {
+			var groupId;
+			var description;
+			var scope;
+			var advancedUrl;
+
+			if (!group || typeof group !== 'object') {
+				return null;
+			}
+
+			groupId = getEditorGroupText(group.id);
+			description = getEditorGroupText(group.description);
+			scope = getEditorGroupText(group.scopeLabel || group.scope_label || group.scope);
+			advancedUrl = getEditorGroupAdvancedUrl(group.advancedUrl);
+
+			if (!groupId) {
+				return null;
+			}
 
 			return {
-				id: group.id,
-				label: group.label,
-				controls: controls
+				id: groupId,
+				label: getEditorGroupText(group.label) || groupId,
+				description: description,
+				scope: scope,
+				advancedUrl: advancedUrl,
+				advancedLabel: getEditorGroupText(group.advancedLabel),
+				controls: getEditorGroupControls(group, items)
 			};
 		}).filter(function (group) {
-			return group.controls.length > 0;
+			return group && (group.controls.length > 0 || group.description || group.scope || group.advancedUrl);
 		});
 	}
 
@@ -273,9 +339,37 @@
 
 		content.className = 'ph-template-editor-group-content';
 
+		if (group.description) {
+			var description = document.createElement('p');
+
+			description.className = 'ph-template-editor-group-description';
+			description.setAttribute('data-ph-template-editor-group-description', '');
+			description.textContent = group.description;
+			content.appendChild(description);
+		}
+
+		if (group.scope) {
+			var scope = document.createElement('p');
+
+			scope.className = 'ph-template-editor-group-scope';
+			scope.setAttribute('data-ph-template-editor-group-scope', '');
+			scope.textContent = group.scope;
+			content.appendChild(scope);
+		}
+
 		group.controls.forEach(function (controlName) {
 			content.appendChild(items[controlName]);
 		});
+
+		if (group.advancedUrl) {
+			var advancedLink = document.createElement('a');
+
+			advancedLink.className = 'ph-template-editor-advanced-link';
+			advancedLink.setAttribute('data-ph-template-editor-advanced-link', '');
+			advancedLink.href = group.advancedUrl;
+			advancedLink.textContent = group.advancedLabel || 'Edit advanced settings';
+			content.appendChild(advancedLink);
+		}
 
 		body.appendChild(content);
 		panel.appendChild(button);
@@ -292,7 +386,7 @@
 		button.setAttribute('data-ph-template-editor-group-toggle', group.id);
 		button.setAttribute('aria-controls', 'ph-template-editor-' + layoutId + '-' + group.id);
 		button.setAttribute('aria-expanded', 'false');
-		button.textContent = group.label;
+		button.textContent = group.label || group.id;
 
 		return button;
 	}
@@ -318,6 +412,8 @@
 	}
 
 	function setEditorGroupBodyOpen(body, isActive) {
+		var focusableSelector = 'a[href], button, input, select, textarea, [tabindex]';
+
 		if (!body) {
 			return;
 		}
@@ -327,6 +423,21 @@
 			body.removeAttribute('aria-hidden');
 			if ('inert' in body) {
 				body.inert = false;
+			} else {
+				body.querySelectorAll(focusableSelector).forEach(function (item) {
+					var previousTabIndex = item.getAttribute('data-ph-template-editor-previous-tabindex');
+
+					if (previousTabIndex === null) {
+						return;
+					}
+
+					if (previousTabIndex === '') {
+						item.removeAttribute('tabindex');
+					} else {
+						item.setAttribute('tabindex', previousTabIndex);
+					}
+					item.removeAttribute('data-ph-template-editor-previous-tabindex');
+				});
 			}
 			return;
 		}
@@ -335,6 +446,13 @@
 		body.setAttribute('aria-hidden', 'true');
 		if ('inert' in body) {
 			body.inert = true;
+		} else {
+			body.querySelectorAll(focusableSelector).forEach(function (item) {
+				if (!item.hasAttribute('data-ph-template-editor-previous-tabindex')) {
+					item.setAttribute('data-ph-template-editor-previous-tabindex', item.getAttribute('tabindex') || '');
+				}
+				item.setAttribute('tabindex', '-1');
+			});
 		}
 	}
 
@@ -359,9 +477,15 @@
 	function setActiveEditorGroup(organizer, activeGroupId) {
 		organizer.querySelectorAll('[data-ph-template-editor-group]').forEach(function (group) {
 			var groupId = group.getAttribute('data-ph-template-editor-group');
-			var button = organizer.querySelector('[data-ph-template-editor-group-toggle="' + groupId + '"]');
+			var button = null;
 			var body = group.querySelector('[data-ph-template-editor-group-body]');
 			var isActive = groupId === activeGroupId;
+
+			organizer.querySelectorAll('[data-ph-template-editor-group-toggle]').forEach(function (candidate) {
+				if (candidate.getAttribute('data-ph-template-editor-group-toggle') === groupId) {
+					button = candidate;
+				}
+			});
 
 			group.classList.toggle('is-active', isActive);
 			setEditorGroupBodyOpen(body, isActive);

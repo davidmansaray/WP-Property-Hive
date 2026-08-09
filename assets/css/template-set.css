@@ -382,6 +382,52 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	padding: 14px;
 }
 
+.ph-template-editor-group-description,
+.ph-template-editor-group-scope {
+	margin: 0;
+}
+
+.ph-template-editor-group-description {
+	color: var(--ph-editor-carbon);
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.ph-template-editor-group-scope {
+	color: var(--ph-editor-muted);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	line-height: 1.35;
+	text-transform: uppercase;
+}
+
+.ph-template-editor-advanced-link {
+	border-top: 1px solid var(--ph-editor-smoke);
+	color: var(--ph-editor-carbon);
+	display: block;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.35;
+	margin-top: 2px;
+	padding-top: 11px;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+
+.ph-template-editor-advanced-link:focus,
+.ph-template-editor-advanced-link:hover {
+	color: var(--ph-editor-carbon);
+	text-decoration-thickness: 2px;
+}
+
+.ph-template-editor-advanced-link:focus-visible {
+	border-radius: 3px;
+	outline: 2px solid var(--ph-editor-wax);
+	outline-offset: 3px;
+}
+
 .ph-template-editor-group.is-active .ph-template-editor-group-body {
 	opacity: 1;
 }

@@ -169,6 +169,60 @@ class PH_Template_Set {
 		return PH_Template_Set_Settings::get_settings();
 	}
 
+	/**
+	 * Add stable metadata to an editor-only add-on surface.
+	 *
+	 * The visual editor owns the live preview DOM, so add-on controls must be
+	 * able to identify and toggle their existing markup without a refresh.
+	 *
+	 * @param string $addon              Add-on identifier.
+	 * @param string $surface            Surface identifier.
+	 * @param bool   $visible            Whether the surface is currently enabled.
+	 * @param bool   $hide_when_disabled Whether to add the hidden state.
+	 * @return string
+	 */
+	public static function get_editor_addon_surface_attributes( $addon, $surface, $visible = true, $hide_when_disabled = true ) {
+		if ( ! PH_Template_Set_Request_Context::is_template_editor_active() ) {
+			return '';
+		}
+
+		$attributes  = ' data-ph-template-addon="' . esc_attr( sanitize_key( $addon ) ) . '"';
+		$attributes .= ' data-ph-template-addon-surface="' . esc_attr( sanitize_key( $surface ) ) . '"';
+		$attributes .= ' data-ph-template-addon-visible="' . ( $visible ? 'true' : 'false' ) . '"';
+
+		if ( ! $visible && $hide_when_disabled ) {
+			$attributes .= ' hidden aria-hidden="true" inert';
+		}
+
+		return $attributes;
+	}
+
+	/**
+	 * Decorate the first HTML element in captured add-on markup.
+	 *
+	 * @param string $markup   Captured markup.
+	 * @param string $addon    Add-on identifier.
+	 * @param string $surface  Surface identifier.
+	 * @param bool   $visible  Whether the surface is currently enabled.
+	 * @return string
+	 */
+	public static function decorate_editor_addon_markup( $markup, $addon, $surface, $visible = true ) {
+		if ( ! PH_Template_Set_Request_Context::is_template_editor_active() || '' === trim( (string) $markup ) ) {
+			return $markup;
+		}
+
+		$attributes = self::get_editor_addon_surface_attributes( $addon, $surface, $visible );
+
+		return (string) preg_replace_callback(
+			'/<([a-z][a-z0-9:-]*)\b([^>]*)>/i',
+			static function ( $matches ) use ( $attributes ) {
+				return '<' . $matches[1] . $matches[2] . $attributes . '>';
+			},
+			(string) $markup,
+			1
+		);
+	}
+
 	private static function get_default_editor_mode( $settings ) {
 		return PH_Template_Set_Settings::get_default_editor_mode( $settings );
 	}
@@ -521,6 +575,7 @@ include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-catalog.
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-settings.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-request-context.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-search-form-editor.php';
+include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-addon-settings.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-editor-controller.php';
 include_once dirname( __FILE__ ) . '/template-set/class-ph-template-set-assets.php';
 

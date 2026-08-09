@@ -46,6 +46,7 @@ class PH_Template_Set_Settings {
 				'template_set_recommended_count'      => 3,
 				'template_set_recommended_layout'     => 'grid',
 				'template_set_recommended_image_size' => 'standard',
+				'template_set_search_overrides'        => array(),
 				'template_overrides'                  => array(),
 			)
 		);
@@ -145,6 +146,37 @@ class PH_Template_Set_Settings {
 
 		if ( array_key_exists( $key, $settings ) ) {
 			return $settings[ $key ];
+		}
+
+		return isset( $controls[ $key ] ) && array_key_exists( 'default', $controls[ $key ] ) ? $controls[ $key ]['default'] : null;
+	}
+
+	/**
+	 * Resolve a setting for a specific search template.
+	 *
+	 * Search add-on visibility settings live in their own per-template map so
+	 * existing detail overrides and legacy settings retain their shape.
+	 *
+	 * @param string $key           Setting key.
+	 * @param string $template_slug Search template slug.
+	 * @param array  $settings      Optional settings.
+	 * @return mixed
+	 */
+	public static function get_search_for_template( $key, $template_slug, $settings = null ) {
+		$template_slug = sanitize_title( $template_slug );
+		$manifest      = PH_Template_Set_Catalog::get_search_template_manifest( $template_slug );
+		$controls      = PH_Template_Set_Catalog::get_search_template_controls( $template_slug );
+		$settings      = is_array( $settings ) ? $settings : self::get_settings();
+		$overrides     = isset( $settings['template_set_search_overrides'][ $template_slug ] ) && is_array( $settings['template_set_search_overrides'][ $template_slug ] )
+			? $settings['template_set_search_overrides'][ $template_slug ]
+			: array();
+
+		if ( array_key_exists( $key, $overrides ) ) {
+			return $overrides[ $key ];
+		}
+
+		if ( isset( $manifest['defaults'][ $key ] ) ) {
+			return $manifest['defaults'][ $key ];
 		}
 
 		return isset( $controls[ $key ] ) && array_key_exists( 'default', $controls[ $key ] ) ? $controls[ $key ]['default'] : null;
@@ -342,6 +374,8 @@ class PH_Template_Set_Settings {
 		$is_detail_editor     = 'detail' === $editor_context;
 		$override_source      = isset( $raw_settings['template_overrides'] ) ? $raw_settings['template_overrides'] : ( isset( $current_settings['template_overrides'] ) ? $current_settings['template_overrides'] : array() );
 		$template_overrides   = self::sanitize_template_overrides( $override_source );
+		$search_override_source = isset( $current_settings['template_set_search_overrides'] ) && is_array( $current_settings['template_set_search_overrides'] ) ? $current_settings['template_set_search_overrides'] : array();
+		$search_overrides       = self::sanitize_search_template_overrides( $search_override_source );
 
 		if ( in_array( $editor_context, array( 'detail', 'search' ), true ) ) {
 			foreach ( $template_scoped_keys as $key ) {
@@ -362,6 +396,10 @@ class PH_Template_Set_Settings {
 					continue;
 				}
 
+				if ( ! array_key_exists( $key, $raw_settings ) ) {
+					continue;
+				}
+
 				if ( 'checkbox' === $controls[ $key ]['type'] ) {
 					$value = self::normalise_checkbox_value( $raw_settings, $key );
 				} elseif ( array_key_exists( $key, $raw_settings ) ) {
@@ -376,6 +414,26 @@ class PH_Template_Set_Settings {
 			}
 		}
 
+		if ( 'search' === $editor_context ) {
+			$search_manifest = PH_Template_Set_Catalog::get_search_template_manifest( $search_template );
+			$search_controls = PH_Template_Set_Catalog::get_search_template_controls( $search_template );
+
+			foreach ( $search_controls as $key => $control ) {
+				if ( ! is_array( $control ) || ! array_key_exists( $key, $raw_settings ) ) {
+					continue;
+				}
+
+				$value = 'checkbox' === $control['type']
+					? self::normalise_checkbox_value( $raw_settings, $key )
+					: self::sanitize_manifest_control_value( $raw_settings[ $key ], $control );
+
+				if ( null !== $value ) {
+					$search_overrides[ $search_template ][ $key ] = $value;
+				}
+			}
+		}
+
+		$template_set_settings['template_set_search_overrides'] = $search_overrides;
 		$template_set_settings['template_overrides'] = $template_overrides;
 
 		return array_merge( $current_settings, $template_set_settings );
@@ -410,6 +468,40 @@ class PH_Template_Set_Settings {
 
 				$value = self::sanitize_manifest_control_value( $values[ $key ], $controls[ $key ] );
 
+				if ( null !== $value ) {
+					$clean[ $slug ][ $key ] = $value;
+				}
+			}
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Validate saved per-template search overrides.
+	 *
+	 * @param array $overrides Raw overrides.
+	 * @return array
+	 */
+	public static function sanitize_search_template_overrides( $overrides ) {
+		$clean     = array();
+		$templates = PH_Template_Set_Catalog::get_search_templates();
+		$overrides = is_array( $overrides ) ? $overrides : array();
+
+		foreach ( $overrides as $slug => $values ) {
+			$slug = sanitize_title( $slug );
+
+			if ( ! isset( $templates[ $slug ] ) || ! is_array( $values ) ) {
+				continue;
+			}
+
+			$controls = PH_Template_Set_Catalog::get_search_template_controls( $slug );
+			foreach ( $controls as $key => $control ) {
+				if ( ! array_key_exists( $key, $values ) ) {
+					continue;
+				}
+
+				$value = self::sanitize_manifest_control_value( $values[ $key ], $control );
 				if ( null !== $value ) {
 					$clean[ $slug ][ $key ] = $value;
 				}

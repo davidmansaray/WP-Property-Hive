@@ -60,6 +60,8 @@ class PH_Template_Set_Editor_Controller {
 					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch contact details', 'propertyhive' ), $settings['template_set_show_branch'] );
 					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property labels', 'propertyhive' ), $settings['template_set_show_badges'] );
 					self::render_template_editor_section_end();
+					self::render_search_manifest_controls( PH_Template_Set_Request_Context::get_search_template() );
+					self::render_addon_settings_sections( $context );
 				} else {
 					self::render_template_editor_hidden( 'template_set_search_layout', $settings['template_set_search_layout'] );
 					self::render_template_editor_hidden( 'template_set_search_card_size', $settings['template_set_search_card_size'] );
@@ -69,6 +71,7 @@ class PH_Template_Set_Editor_Controller {
 					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
 
 					self::render_detail_manifest_controls( PH_Template_Set_Request_Context::get_detail_template() );
+					self::render_addon_settings_sections( $context );
 				}
 
 			echo '<footer class="ph-template-editor-footer">';
@@ -189,8 +192,127 @@ class PH_Template_Set_Editor_Controller {
 	 */
 	public static function render_template_editor_checkbox( $name, $label, $value ) {
 		echo '<label class="ph-template-editor-toggle">';
+			echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="">';
 			echo '<input type="checkbox" name="' . esc_attr( $name ) . '" value="yes"' . checked( 'yes', $value, false ) . ' data-ph-template-editor-control>';
 			echo '<span>' . esc_html( $label ) . '</span>';
+		echo '</label>';
+	}
+
+	/**
+	 * Render currently available template-scoped search controls.
+	 *
+	 * @param string $template Search template slug.
+	 */
+	private static function render_search_manifest_controls( $template ) {
+		$controls = PH_Template_Set_Catalog::get_available_search_template_controls( $template );
+		$groups   = self::get_search_control_groups( $template );
+
+		foreach ( $groups as $group ) {
+			self::render_template_editor_section_start( $group['label'] );
+
+			foreach ( $group['controls'] as $key ) {
+				if ( ! isset( $controls[ $key ] ) ) {
+					continue;
+				}
+
+				$control = $controls[ $key ];
+				$value   = PH_Template_Set_Settings::get_search_for_template( $key, $template );
+
+				if ( 'checkbox' === $control['type'] ) {
+					self::render_template_editor_checkbox( $key, $control['label'], $value );
+				} else {
+					self::render_template_editor_select( $key, $control['label'], $control['options'], $value );
+				}
+			}
+
+			self::render_template_editor_section_end();
+		}
+	}
+
+	/**
+	 * Render available add-on settings into the source sections that the
+	 * existing sidebar organizer turns into accordion groups.
+	 *
+	 * @param string $context Editor context.
+	 */
+	private static function render_addon_settings_sections( $context ) {
+		$definitions     = PH_Template_Set_Addon_Settings::get_available_definitions( $context );
+		$public_settings = PH_Template_Set_Addon_Settings::get_public_settings( $context );
+
+		foreach ( $definitions as $definition ) {
+			self::render_template_editor_section_start( $definition['label'] );
+
+			$first_control = true;
+			foreach ( (array) $definition['controls'] as $key => $control ) {
+				if ( ! is_array( $control ) || empty( $control['option_key'] ) ) {
+					continue;
+				}
+
+				$value = isset( $public_settings[ $definition['id'] ][ $key ] ) ? $public_settings[ $definition['id'] ][ $key ] : '';
+
+				self::render_addon_settings_control(
+					$definition,
+					$key,
+					$control,
+					$value,
+					$first_control
+				);
+				$first_control = false;
+			}
+
+			self::render_template_editor_section_end();
+		}
+	}
+
+	/**
+	 * Render one registered add-on editor control.
+	 *
+	 * @param array  $definition Add-on definition.
+	 * @param string $key        Control key.
+	 * @param array  $control    Control definition.
+	 * @param mixed  $value      Current value.
+	 * @param bool   $with_meta  Whether to include section metadata and copy.
+	 */
+	private static function render_addon_settings_control( $definition, $key, $control, $value, $with_meta ) {
+		$is_multiple = isset( $control['type'] ) && 'multiselect' === $control['type'];
+		$name        = PH_Template_Set_Addon_Settings::get_field_name( $definition['id'], $key, $is_multiple );
+		$field_class = sanitize_html_class( 'ph-template-editor-addon-' . $definition['id'] . '-' . $key );
+		$meta_attrs  = '';
+
+		if ( $with_meta ) {
+			$meta_attrs .= ' data-ph-template-editor-addon-id="' . esc_attr( $definition['id'] ) . '"';
+			$meta_attrs .= ' data-ph-template-editor-addon-scope="' . esc_attr( isset( $definition['scope'] ) ? $definition['scope'] : 'site_wide' ) . '"';
+			$meta_attrs .= ' data-ph-template-editor-addon-advanced-url="' . esc_url( isset( $definition['advanced_url'] ) ? $definition['advanced_url'] : '' ) . '"';
+			$meta_attrs .= ' data-ph-template-editor-addon-reload-after-save="' . ( ! empty( $definition['reload_after_save'] ) ? 'true' : 'false' ) . '"';
+		}
+
+		echo '<label class="ph-template-editor-field ' . esc_attr( $field_class ) . '"' . $meta_attrs . '>';
+			echo '<span>' . esc_html( isset( $control['label'] ) ? $control['label'] : '' ) . '</span>';
+
+			if ( 'multiselect' === $control['type'] ) {
+				$selected_values = array_map( 'strval', is_array( $value ) ? $value : array() );
+				echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="">';
+				echo '<select name="' . esc_attr( $name ) . '" multiple size="7" data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+					foreach ( (array) $control['options'] as $option_value => $option_label ) {
+						$is_selected = in_array( (string) $option_value, $selected_values, true );
+						echo '<option value="' . esc_attr( $option_value ) . '"' . selected( $is_selected, true, false ) . '>' . esc_html( $option_label ) . '</option>';
+					}
+				echo '</select>';
+			} elseif ( 'select' === $control['type'] ) {
+				echo '<select name="' . esc_attr( $name ) . '" data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+					foreach ( (array) $control['options'] as $option_value => $option_label ) {
+						echo '<option value="' . esc_attr( $option_value ) . '"' . selected( $option_value, $value, false ) . '>' . esc_html( $option_label ) . '</option>';
+					}
+				echo '</select>';
+			} elseif ( 'checkbox' === $control['type'] ) {
+				$checked_value   = isset( $control['checked_value'] ) ? (string) $control['checked_value'] : '1';
+				$unchecked_value = isset( $control['unchecked_value'] ) ? (string) $control['unchecked_value'] : '';
+				echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $unchecked_value ) . '">';
+				echo '<input type="checkbox" name="' . esc_attr( $name ) . '" value="' . esc_attr( $checked_value ) . '"' . checked( $checked_value, $value, false ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+			} else {
+				echo '<input type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '"' . ( isset( $control['maxlength'] ) ? ' maxlength="' . absint( $control['maxlength'] ) . '"' : '' ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+			}
+
 		echo '</label>';
 	}
 
@@ -247,15 +369,29 @@ class PH_Template_Set_Editor_Controller {
 
 		check_ajax_referer( PH_Template_Set::EDITOR_NONCE_ACTION, 'security' );
 
+		$editor_context = isset( $_POST['template_set_editor_context'] ) ? sanitize_key( wp_unslash( $_POST['template_set_editor_context'] ) ) : '';
+		$addon_save     = PH_Template_Set_Addon_Settings::prepare_save( $_POST, $editor_context );
+
+		if ( is_wp_error( $addon_save ) ) {
+			wp_send_json_error( array( 'message' => $addon_save->get_error_message() ), 400 );
+		}
+
 		$current_settings = get_option( 'propertyhive_template_assistant', array() );
 		$settings         = PH_Template_Set_Settings::sanitize_template_set_settings( $_POST, $current_settings, true );
 
-		update_option( 'propertyhive_template_assistant', $settings );
+		$addon_committed = PH_Template_Set_Addon_Settings::commit_save( $addon_save, $settings );
+
+		if ( is_wp_error( $addon_committed ) ) {
+			wp_send_json_error( array( 'message' => $addon_committed->get_error_message() ), 500 );
+		}
 
 		wp_send_json_success(
 			array(
-				'message'  => __( 'Template saved.', 'propertyhive' ),
-				'settings' => PH_Template_Set_Settings::get_public_settings( $settings ),
+				'message'           => __( 'Template saved.', 'propertyhive' ),
+				'settings'          => PH_Template_Set_Settings::get_public_settings( $settings ),
+				'addon_settings'     => PH_Template_Set_Addon_Settings::get_public_settings( $editor_context ),
+				'reloadRequired'     => ! empty( $addon_save['reload_after_save'] ),
+				'reload_after_save'  => ! empty( $addon_save['reload_after_save'] ),
 			)
 		);
 	}
@@ -277,6 +413,7 @@ class PH_Template_Set_Editor_Controller {
 			'editorActive'        => PH_Template_Set_Request_Context::is_template_editor_active(),
 			'editorMode'          => $settings['template_set_editor_mode'],
 			'settings'            => PH_Template_Set_Settings::get_public_settings( $settings ),
+			'addonSettings'       => PH_Template_Set_Addon_Settings::get_public_definitions( self::get_template_editor_context() ),
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'editorSidebarLayout' => self::get_editor_sidebar_layout(),
 			'mapSearchState'      => $map_state,
@@ -318,7 +455,37 @@ class PH_Template_Set_Editor_Controller {
 			),
 			self::get_detail_control_groups( PH_Template_Set_Request_Context::get_detail_template() )
 		);
+		$detail_groups = array_merge( $detail_groups, PH_Template_Set_Addon_Settings::get_sidebar_groups( 'detail' ) );
 		$detail_active = isset( $detail_groups[1]['id'] ) ? $detail_groups[1]['id'] : 'template';
+		$search_groups = array(
+			array(
+				'id'       => 'template',
+				'label'    => __( 'Template', 'propertyhive' ),
+				'controls' => array( 'template_set_search_template' ),
+			),
+			array(
+				'id'       => 'search-form',
+				'label'    => __( 'Search form', 'propertyhive' ),
+				'controls' => array( 'ph_search_form_builder' ),
+			),
+			array(
+				'id'       => 'layout',
+				'label'    => __( 'Layout', 'propertyhive' ),
+				'controls' => array( 'template_set_search_layout', 'template_set_search_grid_columns' ),
+			),
+			array(
+				'id'       => 'card-appearance',
+				'label'    => __( 'Card appearance', 'propertyhive' ),
+				'controls' => array( 'template_set_search_card_size', 'template_set_image_style' ),
+			),
+			array(
+				'id'       => 'details',
+				'label'    => __( 'Details shown', 'propertyhive' ),
+				'controls' => array( 'template_set_show_branch', 'template_set_show_badges' ),
+			),
+		);
+		$search_groups = array_merge( $search_groups, PH_Template_Set_Addon_Settings::get_sidebar_groups( 'search' ) );
+		$search_groups = array_merge( $search_groups, self::get_search_control_groups( PH_Template_Set_Request_Context::get_search_template() ) );
 
 		return array(
 			'active' => array(
@@ -326,33 +493,7 @@ class PH_Template_Set_Editor_Controller {
 				'detail' => $detail_active,
 			),
 			'groups' => array(
-				'search' => array(
-					array(
-						'id'       => 'template',
-						'label'    => __( 'Template', 'propertyhive' ),
-						'controls' => array( 'template_set_search_template' ),
-					),
-					array(
-						'id'       => 'search-form',
-						'label'    => __( 'Search form', 'propertyhive' ),
-						'controls' => array( 'ph_search_form_builder' ),
-					),
-					array(
-						'id'       => 'layout',
-						'label'    => __( 'Layout', 'propertyhive' ),
-						'controls' => array( 'template_set_search_layout', 'template_set_search_grid_columns' ),
-					),
-					array(
-						'id'       => 'card-appearance',
-						'label'    => __( 'Card appearance', 'propertyhive' ),
-						'controls' => array( 'template_set_search_card_size', 'template_set_image_style' ),
-					),
-					array(
-						'id'       => 'details',
-						'label'    => __( 'Details shown', 'propertyhive' ),
-						'controls' => array( 'template_set_show_branch', 'template_set_show_badges' ),
-					),
-				),
+				'search' => $search_groups,
 				'detail' => $detail_groups,
 			),
 		);
@@ -370,7 +511,43 @@ class PH_Template_Set_Editor_Controller {
 			'media'       => __( 'Media', 'propertyhive' ),
 			'enquiry'     => __( 'Enquiries', 'propertyhive' ),
 			'modules'     => __( 'Modules', 'propertyhive' ),
+			'purchase-calculators' => __( 'Purchase calculators', 'propertyhive' ),
+			'shortlist'   => __( 'Shortlist', 'propertyhive' ),
+			'send-to-friend' => __( 'Send To Friend', 'propertyhive' ),
+			'rooms'       => __( 'Rooms', 'propertyhive' ),
+			'what3words'  => __( 'what3words', 'propertyhive' ),
 			'recommended' => __( 'Related properties', 'propertyhive' ),
+		);
+		$groups = array();
+
+		foreach ( $controls as $key => $control ) {
+			$group = isset( $control['group'] ) ? sanitize_title( $control['group'] ) : 'details';
+
+			if ( ! isset( $groups[ $group ] ) ) {
+				$groups[ $group ] = array(
+					'id'       => $group,
+					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucwords( str_replace( '-', ' ', $group ) ),
+					'controls' => array(),
+				);
+			}
+
+			$groups[ $group ]['controls'][] = $key;
+		}
+
+		return array_values( $groups );
+	}
+
+	/**
+	 * Build grouped search controls directly from the current manifest.
+	 *
+	 * @param string $template Search template slug.
+	 * @return array
+	 */
+	private static function get_search_control_groups( $template ) {
+		$controls = PH_Template_Set_Catalog::get_available_search_template_controls( $template );
+		$labels   = array(
+			'save-search' => __( 'Save Search', 'propertyhive' ),
+			'shortlist'  => __( 'Shortlist', 'propertyhive' ),
 		);
 		$groups = array();
 

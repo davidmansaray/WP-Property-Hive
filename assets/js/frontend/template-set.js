@@ -40,6 +40,21 @@
 				return;
 			}
 
+			if (field.multiple) {
+				var selectedOptions = Array.prototype.filter.call(field.options, function (option) {
+					return option.selected;
+				});
+
+				if (selectedOptions.length) {
+					selectedOptions.forEach(function (option) {
+						data.append(field.name, option.value);
+					});
+				} else {
+					data.append(field.name, '');
+				}
+				return;
+			}
+
 			data.append(field.name, field.value);
 		});
 
@@ -196,6 +211,12 @@
 			return control.checked ? control.value : '';
 		}
 
+		if (control.multiple) {
+			return Array.prototype.map.call(control.selectedOptions, function (option) {
+				return option.value;
+			}).join('|');
+		}
+
 		return control.value;
 	}
 
@@ -207,6 +228,15 @@
 
 		if (control.type === 'radio') {
 			control.checked = value === control.value;
+			return;
+		}
+
+		if (control.multiple) {
+			var selectedValues = String(value || '').split('|');
+
+			Array.prototype.forEach.call(control.options, function (option) {
+				option.selected = selectedValues.indexOf(option.value) !== -1;
+			});
 			return;
 		}
 
@@ -447,7 +477,7 @@
 	}
 
 	function initEditorNavigationGuard(editor, searchFormBuilder, labels) {
-		var settingsLink;
+		var settingsLinks;
 		var allowNavigation = false;
 		var guard;
 
@@ -455,7 +485,7 @@
 			editorNavigationGuard.destroy();
 		}
 
-		settingsLink = editor.querySelector('[data-ph-template-editor-settings-link]');
+		settingsLinks = Array.prototype.slice.call(editor.querySelectorAll('[data-ph-template-editor-settings-link], [data-ph-template-editor-advanced-link]'));
 
 		function hasChanges() {
 			return hasUnsavedEditorChanges(editor, searchFormBuilder);
@@ -471,6 +501,9 @@
 		}
 
 		function handleSettingsLinkClick(event) {
+			var settingsLink = event.currentTarget;
+			var confirmation;
+
 			if (
 				event.defaultPrevented
 				|| event.button !== 0
@@ -484,21 +517,29 @@
 			}
 
 			event.preventDefault();
-			confirmTemplateNavigation(labels).then(function (shouldLeave) {
+			confirmation = confirmTemplateNavigation(labels);
+
+			function navigateAfterConfirmation(shouldLeave) {
 				if (!shouldLeave) {
 					return;
 				}
 
 				allowNavigation = true;
 				window.location.href = settingsLink.href;
-			});
+			}
+
+			if (confirmation && typeof confirmation.then === 'function') {
+				confirmation.then(navigateAfterConfirmation);
+			} else {
+				navigateAfterConfirmation(confirmation);
+			}
 		}
 
 		window.addEventListener('beforeunload', handleBeforeUnload);
 
-		if (settingsLink) {
+		settingsLinks.forEach(function (settingsLink) {
 			settingsLink.addEventListener('click', handleSettingsLinkClick);
-		}
+		});
 
 		guard = {
 			allowNavigation: function () {
@@ -507,9 +548,9 @@
 			destroy: function () {
 				window.removeEventListener('beforeunload', handleBeforeUnload);
 
-				if (settingsLink) {
+				settingsLinks.forEach(function (settingsLink) {
 					settingsLink.removeEventListener('click', handleSettingsLinkClick);
-				}
+				});
 			}
 		};
 		editorNavigationGuard = guard;
@@ -602,11 +643,22 @@
 					setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
 				});
 			}
+
+			if (control.type === 'text') {
+				control.addEventListener('input', function () {
+					if (modules.editorPreview && typeof modules.editorPreview.applyControl === 'function') {
+						modules.editorPreview.applyControl(control);
+					}
+					control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+					editor.classList.add('is-dirty');
+					setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+				});
+			}
 		});
 
 		form.addEventListener('submit', function (event) {
 			var saveButton = form.querySelector('[data-ph-template-editor-save]');
-			var forceLocationMapNavigation = shouldForceLocationMapNavigation(form);
+			var reloadRequired = shouldForceLocationMapNavigation(form);
 
 			event.preventDefault();
 
@@ -644,10 +696,11 @@
 				editor.classList.remove('is-dirty');
 				form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
 					control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+					control.setAttribute('data-ph-template-editor-saved-value', getControlValue(control));
 				});
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
 
-				if (forceLocationMapNavigation) {
+				if (reloadRequired) {
 					window.location.reload();
 				}
 			}).catch(function (error) {
