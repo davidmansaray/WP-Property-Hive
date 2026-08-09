@@ -314,6 +314,15 @@
 		},
 		'ph_template_set_addons[onedome][show_onedome_offer_action]': function (value, control) {
 			setBodyToggle('ph-template-show-onedome-make-offer', 'ph-template-hide-onedome-make-offer', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[propertyfile][hide_propertyhive_enquiry_action]': function (value, control) {
+			setBodyToggle('ph-template-show-propertyfile-propertyhive-enquiry', 'ph-template-hide-propertyfile-propertyhive-enquiry', !isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[propertyfile][show_propertyfile_viewing_action]': function (value, control) {
+			setBodyToggle('ph-template-show-propertyfile-book-viewing', 'ph-template-hide-propertyfile-book-viewing', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[propertyfile][show_propertyfile_valuation_action]': function (value, control) {
+			setBodyToggle('ph-template-show-propertyfile-book-valuation', 'ph-template-hide-propertyfile-book-valuation', isEnabledValue(value, control));
 		}
 	};
 

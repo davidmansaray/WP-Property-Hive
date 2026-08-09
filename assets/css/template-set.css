@@ -1173,6 +1173,13 @@ body.ph-template-editor-active.ph-template-hide-onedome-propertyhive-enquiry .ph
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-hide-propertyfile-book-viewing .action-propertyfile-book-viewing,
+body.ph-template-editor-active.ph-template-hide-propertyfile-book-valuation .action-propertyfile-book-valuation,
+body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .action-make-enquiry,
+body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .ph-template-contact-actions .ph-template-button-primary {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }

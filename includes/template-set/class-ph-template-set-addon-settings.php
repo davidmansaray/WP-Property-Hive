@@ -294,6 +294,25 @@ class PH_Template_Set_Addon_Settings {
 					'show_onedome_offer_action'        => self::get_checkbox_control( __( 'Show OneDome Make Offer button', 'propertyhive' ), 'show_onedome_offer_action', '', 'yes' ),
 				),
 			),
++			array(
+				'id'                => 'propertyfile',
+				'slug'              => 'propertyhive-propertyfile',
+				'context'           => 'detail',
+				'label'             => __( 'PropertyFile', 'propertyhive' ),
+				'description'       => __( 'Controls the PropertyFile property action buttons. Widget script URLs and credentials remain in the advanced settings.', 'propertyhive' ),
+				'scope'             => 'site_wide',
+				'scope_label'       => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'      => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'propertyfile' ), admin_url( 'admin.php' ) ),
+				'advanced_label'    => __( 'Edit advanced PropertyFile settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_propertyfile',
+				'symbols'           => array( __CLASS__, 'has_propertyfile_symbols' ),
+				'controls'          => array(
+					'hide_propertyhive_enquiry_action' => self::get_checkbox_control( __( 'Hide Property Hive enquiry button', 'propertyhive' ), 'hide_propertyhive_enquiry_action', '', 'yes' ),
+					'show_propertyfile_viewing_action' => self::get_checkbox_control( __( 'Show PropertyFile Book Viewing button', 'propertyhive' ), 'show_propertyfile_viewing_action', '', 'yes' ),
+					'show_propertyfile_valuation_action' => self::get_checkbox_control( __( 'Show PropertyFile Book Valuation button', 'propertyhive' ), 'show_propertyfile_valuation_action', '', 'yes' ),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );
