@@ -274,6 +274,26 @@ class PH_Template_Set_Addon_Settings {
 					'data_capture' => self::get_checkbox_control( __( 'Require visitor details before emailing a report', 'propertyhive' ), 'data_capture', '', '1' ),
 				),
 			),
++			array(
+				'id'                => 'onedome',
+				'slug'              => 'propertyhive-onedome',
+				'context'           => 'detail',
+				'label'             => __( 'OneDome', 'propertyhive' ),
+				'description'       => __( 'Controls the OneDome and Property Hive property action buttons. Widget credentials and appearance remain in the advanced settings.', 'propertyhive' ),
+				'scope'             => 'site_wide',
+				'scope_label'       => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'      => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'onedome' ), admin_url( 'admin.php' ) ),
+				'advanced_label'    => __( 'Edit advanced OneDome settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_onedome',
+				'symbols'           => array( __CLASS__, 'has_onedome_symbols' ),
+				'controls'          => array(
+					'hide_propertyhive_enquiry_action' => self::get_checkbox_control( __( 'Hide Property Hive enquiry button', 'propertyhive' ), 'hide_propertyhive_enquiry_action', '', 'yes' ),
+					'show_onedome_viewing_action'      => self::get_checkbox_control( __( 'Show OneDome Book Viewing button', 'propertyhive' ), 'show_onedome_viewing_action', '', 'yes' ),
+					'show_onedome_valuation_action'    => self::get_checkbox_control( __( 'Show OneDome Book Valuation button', 'propertyhive' ), 'show_onedome_valuation_action', '', 'yes' ),
+					'show_onedome_offer_action'        => self::get_checkbox_control( __( 'Show OneDome Make Offer button', 'propertyhive' ), 'show_onedome_offer_action', '', 'yes' ),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

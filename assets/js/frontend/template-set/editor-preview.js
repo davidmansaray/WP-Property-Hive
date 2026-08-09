@@ -302,6 +302,18 @@
 		},
 		'ph_template_set_addons[locrating][all_in_one_button]': function (value, control) {
 			setBodyToggle('ph-template-show-locrating-all-in-one', 'ph-template-hide-locrating-all-in-one', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[onedome][hide_propertyhive_enquiry_action]': function (value, control) {
+			setBodyToggle('ph-template-show-onedome-propertyhive-enquiry', 'ph-template-hide-onedome-propertyhive-enquiry', !isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[onedome][show_onedome_viewing_action]': function (value, control) {
+			setBodyToggle('ph-template-show-onedome-book-viewing', 'ph-template-hide-onedome-book-viewing', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[onedome][show_onedome_valuation_action]': function (value, control) {
+			setBodyToggle('ph-template-show-onedome-book-valuation', 'ph-template-hide-onedome-book-valuation', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[onedome][show_onedome_offer_action]': function (value, control) {
+			setBodyToggle('ph-template-show-onedome-make-offer', 'ph-template-hide-onedome-make-offer', isEnabledValue(value, control));
 		}
 	};
 
