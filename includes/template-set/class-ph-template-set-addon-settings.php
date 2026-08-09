@@ -197,6 +197,43 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
++			array(
+				'id'                => 'viewing_request',
+				'slug'              => 'propertyhive-viewing-request',
+				'context'           => 'detail',
+				'label'             => __( 'Viewing Request', 'propertyhive' ),
+				'description'       => __( 'Controls the days and times available for viewing requests. Other enquiry and notification settings remain in the advanced settings.', 'propertyhive' ),
+				'scope'             => 'site_wide',
+				'scope_label'       => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'      => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'viewing_request' ), admin_url( 'admin.php' ) ),
+				'advanced_label'    => __( 'Edit advanced viewing request settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_viewing_request',
+				'symbols'           => array( __CLASS__, 'has_viewing_request_symbols' ),
+				'controls'          => array(
+					'available_days' => array(
+						'type'       => 'multiselect',
+						'label'      => __( 'Available days', 'propertyhive' ),
+						'options'    => self::get_viewing_request_day_options(),
+						'option_key' => 'available_days',
+						'default'   => array(),
+					),
+					'viewing_time_from' => array(
+						'type'       => 'select',
+						'label'      => __( 'Time range from', 'propertyhive' ),
+						'options'    => $viewing_time_options,
+						'option_key' => 'viewing_time_from',
+						'default'   => $viewing_time_from,
+					),
+					'viewing_time_to' => array(
+						'type'       => 'select',
+						'label'      => __( 'Time range to', 'propertyhive' ),
+						'options'    => $viewing_time_options,
+						'option_key' => 'viewing_time_to',
+						'default'   => $viewing_time_to,
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );
