@@ -263,6 +263,9 @@
 		template_set_editorial_show_brief: function (value) {
 			setBodyToggle('ph-template-show-editorial-brief', 'ph-template-hide-editorial-brief', value === 'yes');
 		},
+		template_set_show_save_search: function (value, control) {
+			setBodyToggle('ph-template-show-save-search', 'ph-template-hide-save-search', isEnabledValue(value, control));
+		},
 		'ph_template_set_addons[map_search][format]': function (value) {
 			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
 

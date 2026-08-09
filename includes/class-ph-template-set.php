@@ -117,6 +117,7 @@ class PH_Template_Set {
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_map_dependency_notice' ), 35 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_map_fallback_panel' ), 36 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_demo_search_results' ), 45 );
+		add_action( 'propertyhive_after_search_results_loop', array( __CLASS__, 'restore_scoped_search_addon_actions' ), 999 );
 		add_filter( 'propertyhive_show_results', array( __CLASS__, 'maybe_hide_results_for_module_preview' ), 20 );
 		add_filter( 'propertyhive_show_page_title', array( __CLASS__, 'maybe_hide_title_for_module_preview' ), 20 );
 

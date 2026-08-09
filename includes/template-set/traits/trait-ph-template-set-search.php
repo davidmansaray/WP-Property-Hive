@@ -8,6 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Search result template set callbacks.
  */
 trait PH_Template_Set_Search {
+	/**
+	 * Add-on callbacks temporarily removed while one search loop renders.
+	 *
+	 * @var array
+	 */
+	private static $scoped_search_action_removals = array();
 
 	/**
 	 * Add template set body classes.
@@ -41,6 +47,10 @@ trait PH_Template_Set_Search {
 
 		if ( self::is_template_editor_active() ) {
 			$classes[] = 'ph-template-editor-active';
+
+			if ( ! $is_detail && PH_Template_Set_Request_Context::is_search_results_request() ) {
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_save_search() ? 'ph-template-show-save-search' : 'ph-template-hide-save-search';
+			}
 		}
 
 		if ( self::is_demo_preview() ) {
@@ -732,6 +742,11 @@ trait PH_Template_Set_Search {
 		}
 
 		remove_action( 'propertyhive_before_search_results_loop', $callback, $priority );
+		self::$scoped_search_action_removals[] = array( 'propertyhive_before_search_results_loop', $callback, $priority );
+
+		if ( 'yes' !== PH_Template_Set_Request_Context::get_show_save_search() && ! self::is_template_editor_active() ) {
+			return $markup;
+		}
 
 		ob_start();
 		call_user_func( $callback );
@@ -1679,6 +1694,17 @@ trait PH_Template_Set_Search {
 		);
 
 		return $markup;
+	}
+
+	/**
+	 * Restore add-on callbacks after the current search loop has finished.
+	 */
+	public static function restore_scoped_search_addon_actions() {
+		foreach ( self::$scoped_search_action_removals as $removal ) {
+			add_action( $removal[0], $removal[1], $removal[2] );
+		}
+
+		self::$scoped_search_action_removals = array();
 	}
 
 	/**

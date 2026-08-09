@@ -517,6 +517,20 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
+	 * Get a template-scoped search visibility setting.
+	 *
+	 * @param string $key Setting key.
+	 * @return string
+	 */
+	public static function get_search_visibility_setting( $key ) {
+		return 'yes' === PH_Template_Set_Settings::get_search_for_template( $key, self::get_search_template() ) ? 'yes' : '';
+	}
+
+	public static function get_show_save_search() {
+		return self::get_search_visibility_setting( 'template_set_show_save_search' );
+	}
+
+	/**
 	 * Get a valid preview template from the query string.
 	 *
 	 * @param string $query_arg Query arg name.

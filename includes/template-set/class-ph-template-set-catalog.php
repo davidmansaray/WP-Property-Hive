@@ -211,6 +211,47 @@ class PH_Template_Set_Catalog {
 	}
 
 	/**
+	 * Shared search controls that are stored per search template.
+	 *
+	 * @return array
+	 */
+	public static function get_search_shared_controls() {
+		return array(
+			'template_set_show_save_search' => array( 'type' => 'checkbox', 'label' => __( 'Show Save Search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
+		);
+	}
+
+	/**
+	 * Get the stable search controls for one template.
+	 *
+	 * @param string $slug Search template slug.
+	 * @return array
+	 */
+	public static function get_search_template_controls( $slug ) {
+		$manifest = self::get_search_template_manifest( $slug );
+
+		return isset( $manifest['controls'] ) && is_array( $manifest['controls'] ) ? $manifest['controls'] : array();
+	}
+
+	/**
+	 * Get search controls whose add-on dependencies are available now.
+	 *
+	 * @param string $slug Search template slug.
+	 * @return array
+	 */
+	public static function get_available_search_template_controls( $slug ) {
+		$controls = self::get_search_template_controls( $slug );
+
+		foreach ( $controls as $key => $control ) {
+			if ( ! self::is_template_control_available( $control ) ) {
+				unset( $controls[ $key ] );
+			}
+		}
+
+		return $controls;
+	}
+
+	/**
 	 * Get all controls valid for a detail template, including locked controls.
 	 *
 	 * @param string $slug Detail template slug.
@@ -259,7 +300,7 @@ class PH_Template_Set_Catalog {
 	 */
 	private static function is_detail_control_available( $control ) {
 		if ( empty( $control['requires_any_shortcode'] ) ) {
-			return true;
+			return self::is_template_control_available( $control );
 		}
 
 		foreach ( (array) $control['requires_any_shortcode'] as $shortcode ) {
@@ -269,6 +310,32 @@ class PH_Template_Set_Catalog {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check an optional premium add-on dependency declared by a control.
+	 *
+	 * @param array $control Control definition.
+	 * @return bool
+	 */
+	private static function is_template_control_available( $control ) {
+		if ( empty( $control['requires_add_on'] ) ) {
+			return true;
+		}
+
+		$slug = sanitize_key( $control['requires_add_on'] );
+		$symbols = array(
+			'propertyhive-save-search' => array( 'class' => 'PH_Save_Search', 'function' => 'PHSS' ),
+		);
+
+		if ( ! isset( $symbols[ $slug ] ) ) {
+			return false;
+		}
+
+		$symbol = $symbols[ $slug ];
+		$loaded = class_exists( $symbol['class'] ) || function_exists( $symbol['function'] );
+
+		return $loaded && class_exists( 'PH_Template_Set' ) && PH_Template_Set::is_add_on_usable( $slug );
 	}
 
 	/**
@@ -328,6 +395,7 @@ class PH_Template_Set_Catalog {
 			'fallback_slug'     => 'portal-style-search-results',
 			'enhanced_by'       => array(),
 			'preview_reload'    => false,
+			'controls'          => self::get_search_shared_controls(),
 		);
 		$manifest  = $defaults;
 
@@ -350,6 +418,7 @@ class PH_Template_Set_Catalog {
 		$manifest['fallback_slug']  = isset( $templates[ $manifest['fallback_slug'] ] ) ? sanitize_title( $manifest['fallback_slug'] ) : self::get_default_search_template();
 		$manifest['enhanced_by']    = array_values( array_filter( array_map( 'sanitize_key', (array) $manifest['enhanced_by'] ) ) );
 		$manifest['preview_reload'] = (bool) $manifest['preview_reload'];
+		$manifest['controls']       = is_array( $manifest['controls'] ) ? $manifest['controls'] : array();
 
 		return $manifest;
 	}
