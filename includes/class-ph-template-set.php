@@ -26,6 +26,7 @@ class PH_Template_Set {
 	const CATALOG_QUERY_ARG = 'ph_template_preview';
 	const EDIT_QUERY_ARG = 'ph_template_edit';
 	const EDIT_CLOSED_QUERY_ARG = 'ph_template_editor_closed';
+	const EDIT_OPEN_QUERY_ARG = 'ph_template_editor_open';
 	const EDITOR_MODE_LEGACY = 'legacy';
 	const EDITOR_MODE_VISUAL = 'visual_editor';
 	const EDITOR_MODE_PAGE_BUILDER = 'page_builder';

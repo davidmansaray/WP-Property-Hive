@@ -201,7 +201,7 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
-	 * Add a front-end WP admin bar menu for switching template previews.
+	 * Add a front-end WP admin bar menu for opening the visual template editor.
 	 *
 	 * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
 	 */
@@ -217,87 +217,20 @@ class PH_Template_Set_Request_Context {
 			return;
 		}
 
-		$catalog         = PH_Template_Set_Catalog::get_template_catalog();
-		$current_slug    = self::get_current_catalog_template();
-		$current_label   = isset( $catalog[ $current_slug ] ) ? $catalog[ $current_slug ]['label'] : __( 'Property Templates', 'propertyhive' );
-		$settings_url    = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
-		$root_id         = 'ph-template-set';
-		$inactive_suffix = self::is_enabled() ? '' : ' ' . __( '(inactive)', 'propertyhive' );
-		$editor_url      = add_query_arg( PH_Template_Set::EDIT_QUERY_ARG, '1', remove_query_arg( PH_Template_Set::EDIT_CLOSED_QUERY_ARG, self::get_current_url() ) );
-		$exit_editor_url = add_query_arg( PH_Template_Set::EDIT_CLOSED_QUERY_ARG, '1', remove_query_arg( PH_Template_Set::EDIT_QUERY_ARG, self::get_current_url() ) );
+		$root_id    = 'ph-template-set';
+		$editor_url = add_query_arg(
+			array(
+				PH_Template_Set::EDIT_QUERY_ARG      => '1',
+				PH_Template_Set::EDIT_OPEN_QUERY_ARG => '1',
+			),
+			remove_query_arg( PH_Template_Set::EDIT_CLOSED_QUERY_ARG, self::get_current_url() )
+		);
 
 		$wp_admin_bar->add_node(
 			array(
 				'id'    => $root_id,
-				'title' => sprintf(
-					/* translators: %s: current template name */
-					__( 'Template: %s', 'propertyhive' ),
-					$current_label
-				) . $inactive_suffix,
-				'href'  => $settings_url,
-			)
-		);
-
-		$wp_admin_bar->add_node(
-			array(
-				'id'     => 'ph-template-set-editor',
-				'parent' => $root_id,
-				'title'  => self::is_template_editor_active() ? __( 'Template editor active', 'propertyhive' ) : __( 'Edit template visually', 'propertyhive' ),
-				'href'   => $editor_url,
-			)
-		);
-
-		if ( self::is_template_editor_active() ) {
-			$wp_admin_bar->add_node(
-				array(
-					'id'     => 'ph-template-set-exit-editor',
-					'parent' => $root_id,
-					'title'  => __( 'Exit template editor', 'propertyhive' ),
-					'href'   => $exit_editor_url,
-				)
-			);
-		}
-
-		foreach ( $catalog as $slug => $template ) {
-			$title = sprintf(
-				/* translators: 1: template group, 2: template name */
-				__( '%1$s: %2$s', 'propertyhive' ),
-				PH_Template_Set_Catalog::get_short_template_group_label( $template['type'] ),
-				$template['label']
-			);
-			if ( $slug === $current_slug ) {
-				$title = sprintf(
-					/* translators: %s: current template name */
-					__( '%s (current)', 'propertyhive' ),
-					$title
-				);
-			}
-
-			$wp_admin_bar->add_node(
-				array(
-					'id'     => 'ph-template-set-' . sanitize_key( $slug ),
-					'parent' => $root_id,
-					'title'  => $title,
-					'href'   => self::get_template_preview_url( $slug ),
-				)
-			);
-		}
-
-		$wp_admin_bar->add_node(
-			array(
-				'id'     => 'ph-template-set-use-saved-default',
-				'parent' => $root_id,
-				'title'  => __( 'Use saved default', 'propertyhive' ),
-				'href'   => remove_query_arg( self::get_preview_clear_query_args(), self::get_current_url() ),
-			)
-		);
-
-		$wp_admin_bar->add_node(
-			array(
-				'id'     => 'ph-template-set-settings',
-				'parent' => $root_id,
-				'title'  => __( 'Open Property Templates settings', 'propertyhive' ),
-				'href'   => $settings_url,
+				'title' => __( 'Open Visual Editor', 'propertyhive' ),
+				'href'  => $editor_url,
 			)
 		);
 	}
@@ -433,7 +366,7 @@ class PH_Template_Set_Request_Context {
 	 * @return array
 	 */
 	public static function get_preview_query_args() {
-		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, 'ph_view' );
+		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, 'ph_view' );
 	}
 
 	/**
