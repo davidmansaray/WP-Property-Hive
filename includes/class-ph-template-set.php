@@ -133,6 +133,8 @@ class PH_Template_Set {
 
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_detail_template_kicker' ), 3 );
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_detail_highlights' ), 25 );
+		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'suppress_hidden_template_addon_detail_actions' ), 1 );
+		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'restore_scoped_detail_addon_actions' ), 46 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_contact_panel' ), 5 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_context_panel' ), 7 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_modules' ), 50 );

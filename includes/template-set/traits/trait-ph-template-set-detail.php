@@ -17,6 +17,13 @@ trait PH_Template_Set_Detail {
 	private static $detail_actions_data = array();
 
 	/**
+	 * Detail callbacks temporarily replaced while the enclosing action runs.
+	 *
+	 * @var array
+	 */
+	private static $scoped_detail_action_removals = array();
+
+	/**
 	 * Render supporting property modules in preview mode.
 	 */
 	public static function render_detail_modules() {
@@ -38,11 +45,13 @@ trait PH_Template_Set_Detail {
 			? self::get_detail_key_facts( $property )
 			: array();
 		$rooms          = self::get_detail_room_items( $property );
+		$show_rooms     = 'yes' === PH_Template_Set_Request_Context::get_show_rooms_breakdown();
+		$editor_active  = self::is_template_editor_active();
 		$material       = self::get_detail_material_information( $property );
 		$features       = $property->get_features();
 		$gallery_images = self::get_property_gallery_images( $property );
 		$duet_images    = ( 'premium-editorial-detail' === $template ) ? array_slice( $gallery_images, 1, 2 ) : array();
-		$description    = empty( $rooms ) ? $property->get_formatted_description() : '';
+		$description    = ( empty( $rooms ) || ! $show_rooms || $editor_active ) ? $property->get_formatted_description() : '';
 
 		// The rich module partials provide their own context-specific heading.
 		// PropertyHive's formatted fallback starts with its own heading, so remove
@@ -101,7 +110,8 @@ trait PH_Template_Set_Detail {
 				'property'            => $property,
 				'template'            => $template,
 				'facts'               => $facts,
-				'rooms'               => $rooms,
+				'rooms'               => ( $show_rooms || $editor_active ) ? $rooms : array(),
+				'show_rooms'          => $show_rooms,
 				'material'            => $material,
 				'features'            => $features,
 				'description'         => $description,
@@ -162,6 +172,38 @@ trait PH_Template_Set_Detail {
 		if ( isset( self::$detail_actions_data['property_id'] ) ) {
 			self::$detail_actions_data['markup'] = $markup;
 		}
+	}
+
+	/**
+	 * Hide the Rooms add-on's classic detail breakdown when the active template
+	 * opts out. The add-on has no presentation filter, so remove only its
+	 * registered output callback for this request and leave the add-on active.
+	 */
+	public static function suppress_hidden_template_addon_detail_actions() {
+		if ( ! self::is_enabled() || ! is_property() || self::is_template_editor_active() || 'yes' === PH_Template_Set_Request_Context::get_show_rooms_breakdown() ) {
+			return;
+		}
+
+		if ( class_exists( 'PH_Rooms' ) && method_exists( 'PH_Rooms', 'instance' ) ) {
+			$callback = array( PH_Rooms::instance(), 'propertyhive_template_single_room_breakdown' );
+			$priority = has_action( 'propertyhive_after_single_property_summary', $callback );
+
+			if ( false !== $priority ) {
+				remove_action( 'propertyhive_after_single_property_summary', $callback, $priority );
+				self::$scoped_detail_action_removals[] = array( 'propertyhive_after_single_property_summary', $callback, $priority );
+			}
+		}
+	}
+
+	/**
+	 * Restore add-on callbacks after their normal render priority has passed.
+	 */
+	public static function restore_scoped_detail_addon_actions() {
+		foreach ( self::$scoped_detail_action_removals as $removal ) {
+			add_action( $removal[0], $removal[1], $removal[2] );
+		}
+
+		self::$scoped_detail_action_removals = array();
 	}
 
 	/**

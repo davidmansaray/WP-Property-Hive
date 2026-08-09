@@ -542,6 +542,10 @@ class PH_Template_Set_Request_Context {
 		return 'yes' === self::get_detail_setting( 'template_set_show_send_to_friend' ) ? 'yes' : '';
 	}
 
+	public static function get_show_rooms_breakdown() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_rooms_breakdown' ) ? 'yes' : '';
+	}
+
 	/**
 	 * Get a valid preview template from the query string.
 	 *

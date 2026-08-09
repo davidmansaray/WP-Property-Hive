@@ -1200,6 +1200,16 @@ body.ph-template-editor-active.ph-template-hide-send-to-friend [id^="sendToFrien
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail .room-breakdown,
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-content],
+body.ph-template-editor-active.ph-template-show-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback] {
+	display: none !important;
+}
+
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback] {
+	display: block !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }

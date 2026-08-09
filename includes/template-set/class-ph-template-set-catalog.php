@@ -205,6 +205,7 @@ class PH_Template_Set_Catalog {
 			'template_set_show_mobile_cta' => array( 'type' => 'checkbox', 'label' => __( 'Show mobile enquiry bar', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'enquiry' ),
 			'template_set_show_shortlist_detail' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
 			'template_set_show_send_to_friend' => array( 'type' => 'checkbox', 'label' => __( 'Show Send To Friend action', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'send-to-friend', 'requires_add_on' => 'propertyhive-send-to-friend' ),
+			'template_set_show_rooms_breakdown' => array( 'type' => 'checkbox', 'label' => __( 'Show room breakdown', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'rooms', 'requires_add_on' => 'propertyhive-rooms' ),
 			'template_set_show_recommended' => array( 'type' => 'checkbox', 'label' => __( 'Show related properties', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'recommended' ),
 			'template_set_recommended_count' => array( 'type' => 'select', 'label' => __( 'Number of properties', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_counts(), 'default' => 3, 'group' => 'recommended' ),
 			'template_set_recommended_layout' => array( 'type' => 'select', 'label' => __( 'Card layout', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_layouts(), 'default' => 'grid', 'group' => 'recommended' ),
@@ -331,6 +332,7 @@ class PH_Template_Set_Catalog {
 			'propertyhive-save-search' => array( 'class' => 'PH_Save_Search', 'function' => 'PHSS' ),
 			'propertyhive-shortlist'   => array( 'class' => 'PH_Shortlist', 'function' => 'PHSL' ),
 			'propertyhive-send-to-friend' => array( 'class' => 'PH_Send_To_Friend', 'function' => 'PHSTF' ),
+			'propertyhive-rooms'          => array( 'class' => 'PH_Rooms', 'function' => 'PHRASA' ),
 		);
 
 		if ( ! isset( $symbols[ $slug ] ) ) {

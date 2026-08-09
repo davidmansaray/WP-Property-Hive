@@ -22,13 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h2><?php esc_html_e( 'Rooms that keep their own company', 'propertyhive' ); ?></h2>
 			<?php if ( $overview ) : ?>
 				<p class="lede"><?php echo esc_html( $overview ); ?></p>
-			<?php elseif ( $description ) : ?>
+			<?php elseif ( $description && empty( $rooms ) ) : ?>
 				<?php echo wp_kses_post( $description ); ?>
 			<?php endif; ?>
 		</section>
 	<?php endif; ?>
 	<?php if ( $rooms ) : ?>
-		<section class="ph-template-module ph-template-editorial-rooms" aria-label="<?php esc_attr_e( 'Room by room', 'propertyhive' ); ?>">
+		<section class="ph-template-module ph-template-editorial-rooms" data-ph-template-rooms-content aria-label="<?php esc_attr_e( 'Room by room', 'propertyhive' ); ?>">
 			<?php foreach ( $rooms as $room ) : ?>
 				<p class="room">
 					<?php if ( $room['name'] ) : ?><strong class="name"><?php echo esc_html( $room['name'] ); ?></strong><?php endif; ?>
@@ -36,6 +36,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php if ( $room['description'] ) : ?><span class="description"><?php echo esc_html( $room['description'] ); ?></span><?php endif; ?>
 				</p>
 			<?php endforeach; ?>
+		</section>
+	<?php endif; ?>
+	<?php if ( $description && $rooms ) : ?>
+		<section class="ph-template-module ph-template-editorial-description" data-ph-template-rooms-fallback>
+			<?php echo wp_kses_post( $description ); ?>
 		</section>
 	<?php endif; ?>
 	<?php if ( ! empty( $duet_images ) ) : ?>

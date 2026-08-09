@@ -38,15 +38,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<section class="ph-template-module ph-template-module-rooms">
 			<h2><?php esc_html_e( 'Room by room', 'propertyhive' ); ?></h2>
 			<?php if ( $rooms ) : ?>
-				<?php foreach ( $rooms as $room ) : ?>
-					<p class="room">
-						<?php if ( $room['name'] ) : ?><strong class="name"><?php echo esc_html( $room['name'] ); ?></strong><?php endif; ?>
-						<?php if ( $room['dimensions'] ) : ?><span class="dimension"><?php echo esc_html( $room['dimensions'] ); ?></span><?php endif; ?>
-						<?php if ( $room['description'] ) : ?><span class="description"><?php echo esc_html( $room['description'] ); ?></span><?php endif; ?>
-					</p>
-				<?php endforeach; ?>
-			<?php else : ?>
-				<?php echo wp_kses_post( $description ); ?>
+				<div data-ph-template-rooms-content>
+					<?php foreach ( $rooms as $room ) : ?>
+						<p class="room">
+							<?php if ( $room['name'] ) : ?><strong class="name"><?php echo esc_html( $room['name'] ); ?></strong><?php endif; ?>
+							<?php if ( $room['dimensions'] ) : ?><span class="dimension"><?php echo esc_html( $room['dimensions'] ); ?></span><?php endif; ?>
+							<?php if ( $room['description'] ) : ?><span class="description"><?php echo esc_html( $room['description'] ); ?></span><?php endif; ?>
+						</p>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
+			<?php if ( $description ) : ?>
+				<div data-ph-template-rooms-fallback><?php echo wp_kses_post( $description ); ?></div>
 			<?php endif; ?>
 		</section>
 	<?php endif; ?>

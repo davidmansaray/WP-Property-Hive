@@ -51,6 +51,7 @@ trait PH_Template_Set_Search {
 			if ( $is_detail ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_detail() ? 'ph-template-show-shortlist-detail' : 'ph-template-hide-shortlist-detail';
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_send_to_friend() ? 'ph-template-show-send-to-friend' : 'ph-template-hide-send-to-friend';
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_rooms_breakdown() ? 'ph-template-show-rooms-breakdown' : 'ph-template-hide-rooms-breakdown';
 			} elseif ( PH_Template_Set_Request_Context::is_search_results_request() ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_save_search() ? 'ph-template-show-save-search' : 'ph-template-hide-save-search';
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_cards() ? 'ph-template-show-shortlist-cards' : 'ph-template-hide-shortlist-cards';
