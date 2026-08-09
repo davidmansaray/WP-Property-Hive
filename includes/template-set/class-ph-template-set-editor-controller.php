@@ -19,7 +19,6 @@ class PH_Template_Set_Editor_Controller {
 
 		$settings     = PH_Template_Set_Settings::get_settings();
 		$context      = self::get_template_editor_context();
-		$exit_url     = add_query_arg( PH_Template_Set::EDIT_CLOSED_QUERY_ARG, '1', remove_query_arg( PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set_Request_Context::get_current_url() ) );
 		$settings_url = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
 		$logo_url     = apply_filters( 'propertyhive_template_editor_logo_url', PH()->plugin_url() . '/assets/images/admin/propertyhive-logo-onboarding.png' );
 
@@ -75,8 +74,7 @@ class PH_Template_Set_Editor_Controller {
 				echo '<footer class="ph-template-editor-footer">';
 					echo '<span data-ph-template-editor-status>' . esc_html__( 'Ready', 'propertyhive' ) . '</span>';
 					echo '<div>';
-						echo '<a class="ph-template-editor-secondary ph-template-editor-exit" href="' . esc_url( $exit_url ) . '">' . esc_html__( 'Exit editor', 'propertyhive' ) . '</a>';
-						echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Settings', 'propertyhive' ) . '</a>';
+						echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
 						echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
 					echo '</div>';
 				echo '</footer>';
