@@ -119,6 +119,28 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
+			array(
+				'id'              => 'radial_search',
+				'slug'            => 'propertyhive-radial-search',
+				'context'         => 'search',
+				'label'           => __( 'Radial Search', 'propertyhive' ),
+				'description'     => __( 'Controls whether visitors can use their current location in search forms.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'radialsearch' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Edit advanced radial search settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'     => 'propertyhive_radial_search',
+				'symbols'         => array( __CLASS__, 'has_radial_search_symbols' ),
+				'controls'        => array(
+					'current_location_enabled' => array(
+						'type'       => 'checkbox',
+						'label'      => __( 'Allow current-location search', 'propertyhive' ),
+						'option_key' => 'current_location_enabled',
+						'default'    => '',
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

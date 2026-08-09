@@ -267,6 +267,9 @@
 			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
 
 			setBodyOption('ph-template-map-search-format-', format);
+		},
+		'ph_template_set_addons[radial_search][current_location_enabled]': function (value, control) {
+			setBodyToggle('ph-template-show-radial-current-location', 'ph-template-hide-radial-current-location', isEnabledValue(value, control));
 		}
 	};
 

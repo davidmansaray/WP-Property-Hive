@@ -1147,6 +1147,10 @@ body.ph-template-editor-active.ph-template-map-search-format-split .ph-template-
 	display: block;
 }
 
+body.ph-template-editor-active.ph-template-hide-radial-current-location .ph-template-search .current-location {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }
