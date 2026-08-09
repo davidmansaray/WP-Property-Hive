@@ -90,6 +90,35 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
+			array(
+				'id'              => 'location_autocomplete',
+				'slug'            => 'propertyhive-location-autocomplete',
+				'context'         => 'search',
+				'label'           => __( 'Location Autocomplete', 'propertyhive' ),
+				'description'     => __( 'Controls the source used for location suggestions in search forms.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'locationautocomplete' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Edit advanced autocomplete settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'post_save'       => array( 'location_autocomplete_rebuild' ),
+				'option_name'     => 'propertyhive_location_autocomplete',
+				'symbols'         => array( __CLASS__, 'has_location_autocomplete_symbols' ),
+				'controls'        => array(
+					'data_source' => array(
+						'type'       => 'select',
+						'label'      => __( 'Suggestion source', 'propertyhive' ),
+						'options'    => array(
+							''          => __( 'Use Existing Property Address Data', 'propertyhive' ),
+							'google'    => __( 'Google Places', 'propertyhive' ),
+							'locations' => __( 'Locations Custom Field', 'propertyhive' ),
+							'manual'    => __( 'Manually Manage Locations', 'propertyhive' ),
+						),
+						'option_key' => 'data_source',
+						'default'    => '',
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );
