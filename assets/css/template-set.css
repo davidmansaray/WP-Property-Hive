@@ -167,8 +167,7 @@ body.admin-bar .ph-template-editor {
 }
 
 .ph-template-editor-header span,
-.ph-template-editor-section h3,
-.ph-template-editor-footer > span {
+.ph-template-editor-section h3 {
 	color: var(--ph-editor-carbon);
 	font-size: 11px;
 	font-weight: 700;
@@ -998,6 +997,7 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	align-items: center;
 	display: flex;
 	gap: 8px;
+	margin-left: auto;
 }
 
 .ph-template-editor-save,
@@ -1021,8 +1021,8 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	cursor: pointer;
 }
 
-.ph-template-editor-save:focus,
-.ph-template-editor-save:hover {
+.ph-template-editor-save:not(:disabled):focus,
+.ph-template-editor-save:not(:disabled):hover {
 	background: var(--ph-editor-honey);
 	border-color: var(--ph-editor-honey);
 	color: var(--ph-editor-carbon);
@@ -1030,8 +1030,8 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 }
 
 .ph-template-editor-save:disabled {
-	cursor: progress;
-	opacity: 0.7;
+	cursor: not-allowed;
+	opacity: 0.55;
 }
 
 .ph-template-editor-secondary {
@@ -1054,8 +1054,8 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-save {
 	font-family: var(--ph-editor-font);
 }
 
-body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:focus,
-body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:hover {
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:not(:disabled):focus,
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:not(:disabled):hover {
 	background: var(--ph-editor-honey);
 	border-color: var(--ph-editor-honey);
 	color: var(--ph-editor-carbon);
@@ -1073,14 +1073,6 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary
 	background: var(--ph-editor-sunlight);
 	border-color: var(--ph-editor-wax);
 	color: var(--ph-editor-carbon);
-}
-
-.ph-template-editor[data-ph-template-editor-state="saved"] .ph-template-editor-footer > span {
-	color: var(--ph-template-brand);
-}
-
-.ph-template-editor[data-ph-template-editor-state="error"] .ph-template-editor-footer > span {
-	color: #b42318;
 }
 
 .ph-template-hide-badges .ph-template-badges,

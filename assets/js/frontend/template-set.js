@@ -6,13 +6,13 @@
 
 	// Keep the existing CSS and public JavaScript contract stable while feature code lives in focused modules.
 	function setEditorStatus(editor, message, state) {
-		var status = editor.querySelector('[data-ph-template-editor-status]');
-
-		if (status) {
-			status.textContent = message;
-		}
+		var saveButton = editor.querySelector('[data-ph-template-editor-save]');
 
 		editor.setAttribute('data-ph-template-editor-state', state || 'ready');
+
+		if (saveButton) {
+			saveButton.disabled = state !== 'changed' && !(state === 'error' && editor.classList.contains('is-dirty'));
+		}
 	}
 
 	function buildEditorFormData(form) {
@@ -381,6 +381,10 @@
 
 			event.preventDefault();
 
+			if (!hasUnsavedEditorChanges(editor, searchFormBuilder)) {
+				return;
+			}
+
 			if (!window.fetch || !window.FormData) {
 				setEditorStatus(editor, labels.error || 'Could not save', 'error');
 				return;
@@ -421,7 +425,7 @@
 				setEditorStatus(editor, error && error.message ? error.message : (labels.error || 'Could not save'), 'error');
 			}).finally(function () {
 				if (saveButton) {
-					saveButton.disabled = false;
+					saveButton.disabled = !hasUnsavedEditorChanges(editor, searchFormBuilder);
 				}
 			});
 		});

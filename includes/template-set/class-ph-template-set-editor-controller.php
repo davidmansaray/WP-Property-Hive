@@ -71,12 +71,11 @@ class PH_Template_Set_Editor_Controller {
 					self::render_detail_manifest_controls( PH_Template_Set_Request_Context::get_detail_template() );
 				}
 
-				echo '<footer class="ph-template-editor-footer">';
-					echo '<span data-ph-template-editor-status>' . esc_html__( 'Ready', 'propertyhive' ) . '</span>';
-					echo '<div>';
-						echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
-						echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
-					echo '</div>';
+			echo '<footer class="ph-template-editor-footer">';
+				echo '<div>';
+					echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
+					echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save disabled>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
+				echo '</div>';
 				echo '</footer>';
 				echo '</form>';
 			echo '<button type="button" class="ph-template-editor-collapse-toggle" data-ph-template-editor-collapse-toggle aria-controls="ph-template-editor-form" aria-expanded="true" data-ph-template-editor-collapse-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" data-ph-template-editor-expand-label="' . esc_attr__( 'Expand template editor', 'propertyhive' ) . '" aria-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" title="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '"><span aria-hidden="true"></span></button>';
