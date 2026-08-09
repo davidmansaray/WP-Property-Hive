@@ -137,6 +137,11 @@
 		var importedEditor;
 		var importedPreview;
 		var importedConfigNode;
+		var isEditorSidebarCollapsed = !!(currentEditor && (
+			currentEditor.classList.contains('is-collapsed')
+			|| currentEditor.getAttribute('data-ph-template-editor-collapsed') === 'true'
+			|| document.body.classList.contains('ph-template-editor-sidebar-collapsed')
+		));
 		var scrollPosition = { x: window.scrollX, y: window.scrollY };
 
 		if (!currentEditor || !nextEditor || !currentPreview || !nextPreview || !nextConfigNode) {
@@ -146,6 +151,11 @@
 		importedEditor = document.importNode(nextEditor, true);
 		importedPreview = document.importNode(nextPreview, true);
 		importedConfigNode = document.importNode(nextConfigNode, true);
+
+		if (isEditorSidebarCollapsed) {
+			importedEditor.classList.add('is-collapsed');
+			importedEditor.setAttribute('data-ph-template-editor-collapsed', 'true');
+		}
 
 		document.querySelectorAll('.ph-template-gallery-lightbox').forEach(function (lightbox) {
 			lightbox.remove();
@@ -160,11 +170,12 @@
 			document.body.appendChild(importedConfigNode);
 		}
 
-			document.body.className = nextDocument.body.className;
-			document.title = nextDocument.title;
-			config = nextConfig;
-			window.phTemplateSet = nextConfig;
-			window.phTemplateSet.refresh = refresh;
+		document.body.className = nextDocument.body.className;
+		document.body.classList.toggle('ph-template-editor-sidebar-collapsed', isEditorSidebarCollapsed);
+		document.title = nextDocument.title;
+		config = nextConfig;
+		window.phTemplateSet = nextConfig;
+		window.phTemplateSet.refresh = refresh;
 
 		if (updateHistory !== false && window.history && typeof window.history.pushState === 'function') {
 			window.history.pushState({ propertyHiveTemplatePreview: true }, '', previewUrl);

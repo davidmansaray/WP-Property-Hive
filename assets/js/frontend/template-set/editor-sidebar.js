@@ -4,6 +4,7 @@
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
 	var activeEditorForm = null;
 	var editorSidebarEventsReady = false;
+	var editorSidebarCollapseStorageKey = 'propertyhive-template-editor-sidebar-collapsed';
 	var fallbackEditorSidebarLayout = {
 		active: { search: 'layout', detail: 'media' },
 		groups: {
@@ -61,6 +62,110 @@
 		} catch (error) {
 			// Storage can be unavailable in privacy modes; the in-page state still works.
 		}
+	}
+
+	function getStoredEditorSidebarCollapsed() {
+		try {
+			var value = window.sessionStorage.getItem(editorSidebarCollapseStorageKey);
+
+			if (value === 'true') {
+				return true;
+			}
+
+			if (value === 'false') {
+				return false;
+			}
+		} catch (error) {
+			// Storage can be unavailable in privacy modes; the in-page state still works.
+		}
+
+		return null;
+	}
+
+	function storeEditorSidebarCollapsed(isCollapsed) {
+		try {
+			window.sessionStorage.setItem(editorSidebarCollapseStorageKey, isCollapsed ? 'true' : 'false');
+		} catch (error) {
+			// Storage can be unavailable in privacy modes; the in-page state still works.
+		}
+	}
+
+	function updateEditorSidebarCollapseLabel(toggle, isCollapsed) {
+		if (!toggle) {
+			return;
+		}
+
+		var labelAttribute = isCollapsed ? 'data-ph-template-editor-expand-label' : 'data-ph-template-editor-collapse-label';
+		var fallbackLabel = isCollapsed ? 'Expand template editor' : 'Collapse template editor';
+		var label = toggle.getAttribute(labelAttribute) || fallbackLabel;
+
+		toggle.setAttribute('aria-label', label);
+		toggle.setAttribute('title', label);
+	}
+
+	function setEditorSidebarCollapsed(editor, isCollapsed, shouldStore) {
+		if (!editor) {
+			return;
+		}
+
+		var toggle = editor.querySelector('[data-ph-template-editor-collapse-toggle]');
+		var form = editor.querySelector('[data-ph-template-editor-form]');
+		var shouldMoveFocus = !!(isCollapsed && form && form.contains(document.activeElement));
+
+		editor.classList.toggle('is-collapsed', isCollapsed);
+		editor.setAttribute('data-ph-template-editor-collapsed', isCollapsed ? 'true' : 'false');
+		document.body.classList.toggle('ph-template-editor-sidebar-collapsed', isCollapsed);
+
+		if (toggle) {
+			toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+			updateEditorSidebarCollapseLabel(toggle, isCollapsed);
+		}
+
+		if (shouldMoveFocus && toggle) {
+			try {
+				toggle.focus({ preventScroll: true });
+			} catch (error) {
+				toggle.focus();
+			}
+		}
+
+		if (form) {
+			form.setAttribute('aria-hidden', isCollapsed ? 'true' : 'false');
+			if ('inert' in form) {
+				form.inert = isCollapsed;
+			}
+		}
+
+		if (shouldStore !== false) {
+			storeEditorSidebarCollapsed(isCollapsed);
+		}
+	}
+
+	function initEditorSidebarCollapse(editor) {
+		var toggle = editor ? editor.querySelector('[data-ph-template-editor-collapse-toggle]') : null;
+
+		if (!editor || !toggle) {
+			return;
+		}
+
+		if (toggle.getAttribute('data-ph-template-editor-collapse-bound') !== 'true') {
+			toggle.addEventListener('click', function () {
+				setEditorSidebarCollapsed(editor, !editor.classList.contains('is-collapsed'), true);
+			});
+			toggle.setAttribute('data-ph-template-editor-collapse-bound', 'true');
+		}
+
+		var markupState = editor.getAttribute('data-ph-template-editor-collapsed');
+		var storedState = getStoredEditorSidebarCollapsed();
+		var isCollapsed = markupState === 'true'
+			? true
+			: markupState === 'false'
+				? false
+				: storedState !== null
+					? storedState
+					: document.body.classList.contains('ph-template-editor-sidebar-collapsed');
+
+		setEditorSidebarCollapsed(editor, isCollapsed, false);
 	}
 
 	function getEditorControlItem(control) {
@@ -323,6 +428,7 @@
 
 	function initEditorSidebarGroups(editor, form, layout) {
 		activeEditorForm = form;
+		initEditorSidebarCollapse(editor);
 		renderEditorSidebarGroups(editor, form, layout);
 
 		if (editorSidebarEventsReady) {

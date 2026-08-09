@@ -24,7 +24,7 @@ class PH_Template_Set_Editor_Controller {
 		$logo_url     = apply_filters( 'propertyhive_template_editor_logo_url', PH()->plugin_url() . '/assets/images/admin/propertyhive-logo-onboarding.png' );
 
 		echo '<aside class="ph-template-editor ph-template-editor-' . esc_attr( sanitize_html_class( $context ) ) . '" data-ph-template-editor data-ph-template-editor-context="' . esc_attr( $context ) . '" aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
-			echo '<form class="ph-template-editor-form" data-ph-template-editor-form>';
+			echo '<form id="ph-template-editor-form" class="ph-template-editor-form" data-ph-template-editor-form>';
 				echo '<header class="ph-template-editor-header">';
 					echo '<div class="ph-template-editor-brand">';
 						if ( ! ( class_exists( 'PH_White_Label' ) && PH_Template_Set::is_add_on_usable( 'propertyhive-white-label' ) && '' !== trim( (string) get_option( 'propertyhive_white_label', '' ) ) ) ) {
@@ -33,7 +33,6 @@ class PH_Template_Set_Editor_Controller {
 						echo '<span>' . esc_html__( 'Template editor', 'propertyhive' ) . '</span>';
 						echo '<h2>' . esc_html( self::get_template_editor_title( $context ) ) . '</h2>';
 					echo '</div>';
-					echo '<a href="' . esc_url( $exit_url ) . '" aria-label="' . esc_attr__( 'Exit template editor', 'propertyhive' ) . '">&times;</a>';
 				echo '</header>';
 
 				echo '<input type="hidden" name="template_set_enabled" value="yes">';
@@ -76,11 +75,13 @@ class PH_Template_Set_Editor_Controller {
 				echo '<footer class="ph-template-editor-footer">';
 					echo '<span data-ph-template-editor-status>' . esc_html__( 'Ready', 'propertyhive' ) . '</span>';
 					echo '<div>';
+						echo '<a class="ph-template-editor-secondary ph-template-editor-exit" href="' . esc_url( $exit_url ) . '">' . esc_html__( 'Exit editor', 'propertyhive' ) . '</a>';
 						echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Settings', 'propertyhive' ) . '</a>';
 						echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
 					echo '</div>';
 				echo '</footer>';
 				echo '</form>';
+			echo '<button type="button" class="ph-template-editor-collapse-toggle" data-ph-template-editor-collapse-toggle aria-controls="ph-template-editor-form" aria-expanded="true" data-ph-template-editor-collapse-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" data-ph-template-editor-expand-label="' . esc_attr__( 'Expand template editor', 'propertyhive' ) . '" aria-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" title="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '"><span aria-hidden="true"></span></button>';
 			echo '</aside>';
 			echo '<script type="application/json" data-ph-template-editor-config>' . wp_json_encode( self::get_script_data(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>';
 	}
