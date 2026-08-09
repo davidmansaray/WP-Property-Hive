@@ -54,6 +54,42 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
+			array(
+				'id'              => 'infinite_scroll',
+				'slug'            => 'propertyhive-infinite-scroll',
+				'context'         => 'search',
+				'label'           => __( 'Infinite Scroll', 'propertyhive' ),
+				'description'     => __( 'Controls how additional search results load on search result pages.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'infinitescroll' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Edit advanced infinite scroll settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_infinite_scroll',
+				'symbols'           => array( __CLASS__, 'has_infinite_scroll_symbols' ),
+				'controls'          => array(
+					'functionality' => array(
+						'type'       => 'select',
+						'label'      => __( 'Load more behaviour', 'propertyhive' ),
+						'options'    => array(
+							''       => __( 'Automatically while scrolling', 'propertyhive' ),
+							'button' => __( 'Load More button', 'propertyhive' ),
+						),
+						'option_key' => 'functionality',
+						'default'   => '',
+					),
+					'devices' => array(
+						'type'       => 'select',
+						'label'      => __( 'Devices', 'propertyhive' ),
+						'options'    => array(
+							''       => __( 'All devices', 'propertyhive' ),
+							'mobile' => __( 'Mobile only', 'propertyhive' ),
+						),
+						'option_key' => 'devices',
+						'default'   => '',
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

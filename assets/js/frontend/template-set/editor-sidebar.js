@@ -14,7 +14,8 @@
 				{ id: 'layout', label: 'Layout', controls: ['template_set_search_layout', 'template_set_search_grid_columns'] },
 				{ id: 'card-appearance', label: 'Card appearance', controls: ['template_set_search_card_size', 'template_set_image_style'] },
 				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] },
-				{ id: 'addon-map_search', label: 'Map Search', controls: ['ph_template_set_addons[map_search][format]'] }
+				{ id: 'addon-map_search', label: 'Map Search', controls: ['ph_template_set_addons[map_search][format]'] },
+				{ id: 'addon-infinite_scroll', label: 'Infinite Scroll', controls: ['ph_template_set_addons[infinite_scroll][functionality]', 'ph_template_set_addons[infinite_scroll][devices]'] }
 			],
 			detail: [
 				{ id: 'template', label: 'Template', controls: ['template_set_detail_template'] },
