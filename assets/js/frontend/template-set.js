@@ -3,6 +3,8 @@
 
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
 	var config = window.phTemplateSet || {};
+	var editorNavigationGuard = null;
+	var activeNavigationConfirmation = null;
 
 	// Keep the existing CSS and public JavaScript contract stable while feature code lives in focused modules.
 	function setEditorStatus(editor, message, state) {
@@ -48,6 +50,143 @@
 		return editor.classList.contains('is-dirty') || !!(searchFormBuilder && typeof searchFormBuilder.isDirty === 'function' && searchFormBuilder.isDirty());
 	}
 
+	function getUnsavedChangesWarning() {
+		return document.querySelector('[data-ph-template-editor-unsaved-warning]');
+	}
+
+	function getUnsavedChangesWarningFocusables(warning) {
+		return Array.prototype.slice.call(warning.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+	}
+
+	function resolveNavigationConfirmation(shouldLeave) {
+		var confirmation = activeNavigationConfirmation;
+
+		if (!confirmation) {
+			return;
+		}
+
+		activeNavigationConfirmation = null;
+		document.removeEventListener('keydown', handleNavigationConfirmationKeydown, true);
+		confirmation.warning.hidden = true;
+		confirmation.warning.setAttribute('aria-hidden', 'true');
+		document.body.classList.remove('ph-template-editor-unsaved-warning-open');
+
+		if (confirmation.previousFocus && document.contains(confirmation.previousFocus) && typeof confirmation.previousFocus.focus === 'function') {
+			confirmation.previousFocus.focus();
+		}
+
+		confirmation.resolve(shouldLeave);
+	}
+
+	function handleNavigationConfirmationKeydown(event) {
+		var confirmation = activeNavigationConfirmation;
+		var focusables;
+
+		if (!confirmation) {
+			return;
+		}
+
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			resolveNavigationConfirmation(false);
+			return;
+		}
+
+		if (event.key !== 'Tab') {
+			return;
+		}
+
+		focusables = getUnsavedChangesWarningFocusables(confirmation.warning);
+
+		if (!focusables.length) {
+			return;
+		}
+
+		if (event.shiftKey && document.activeElement === focusables[0]) {
+			event.preventDefault();
+			focusables[focusables.length - 1].focus();
+		} else if (!event.shiftKey && document.activeElement === focusables[focusables.length - 1]) {
+			event.preventDefault();
+			focusables[0].focus();
+		}
+	}
+
+	function bindUnsavedChangesWarning(warning) {
+		var stayButton;
+		var leaveButton;
+
+		if (!warning || warning.getAttribute('data-ph-template-editor-unsaved-warning-bound') === 'true') {
+			return;
+		}
+
+		warning.setAttribute('data-ph-template-editor-unsaved-warning-bound', 'true');
+		stayButton = warning.querySelector('[data-ph-template-editor-unsaved-warning-stay]');
+		leaveButton = warning.querySelector('[data-ph-template-editor-unsaved-warning-leave]');
+
+		if (stayButton) {
+			stayButton.addEventListener('click', function () {
+				resolveNavigationConfirmation(false);
+			});
+		}
+
+		if (leaveButton) {
+			leaveButton.addEventListener('click', function () {
+				resolveNavigationConfirmation(true);
+			});
+		}
+
+		warning.addEventListener('click', function (event) {
+			if (event.target === warning || (event.target.matches && event.target.matches('[data-ph-template-editor-unsaved-warning-dismiss]'))) {
+				resolveNavigationConfirmation(false);
+			}
+		});
+	}
+
+	function showUnsavedChangesWarning(labels) {
+		var warning = getUnsavedChangesWarning();
+		var fallbackMessage = labels && labels.unsavedNavigation ? labels.unsavedNavigation : 'You have unsaved changes. Leave this page without saving?';
+		var resolveConfirmation;
+		var promise;
+
+		if (!window.Promise) {
+			return window.confirm(fallbackMessage);
+		}
+
+		if (!warning) {
+			return window.Promise.resolve(window.confirm(fallbackMessage));
+		}
+
+		if (activeNavigationConfirmation) {
+			return activeNavigationConfirmation.promise;
+		}
+
+		bindUnsavedChangesWarning(warning);
+		promise = new window.Promise(function (resolve) {
+			resolveConfirmation = resolve;
+		});
+		activeNavigationConfirmation = {
+			promise: promise,
+			previousFocus: document.activeElement,
+			resolve: resolveConfirmation,
+			warning: warning
+		};
+
+		warning.hidden = false;
+		warning.setAttribute('aria-hidden', 'false');
+		document.body.classList.add('ph-template-editor-unsaved-warning-open');
+		document.addEventListener('keydown', handleNavigationConfirmationKeydown, true);
+
+		window.setTimeout(function () {
+			var focusables = getUnsavedChangesWarningFocusables(warning);
+
+			if (focusables.length) {
+				focusables[0].focus();
+			}
+		}, 0);
+
+		return promise;
+	}
+
 	function getControlValue(control) {
 		if (control.type === 'checkbox') {
 			return control.checked ? control.value : '';
@@ -75,7 +214,13 @@
 	}
 
 	function confirmTemplateNavigation(labels) {
-		return window.confirm(labels.unsavedNavigation || 'You have unsaved changes. Leave this page without saving?');
+		return showUnsavedChangesWarning(labels);
+	}
+
+	function allowEditorNavigation() {
+		if (editorNavigationGuard && typeof editorNavigationGuard.allowNavigation === 'function') {
+			editorNavigationGuard.allowNavigation();
+		}
 	}
 
 	function getPreviewLoader(labels) {
@@ -195,11 +340,13 @@
 
 	function loadTemplatePreview(previewUrl, labels, updateHistory) {
 		if (config.requiresFullPreviewNavigation) {
+			allowEditorNavigation();
 			window.location.href = previewUrl;
 			return window.Promise.resolve(false);
 		}
 
 		if (!window.fetch || !window.DOMParser) {
+			allowEditorNavigation();
 			window.location.href = previewUrl;
 			return window.Promise.resolve(false);
 		}
@@ -224,6 +371,7 @@
 			setPreviewLoading(false, labels);
 			return true;
 		}).catch(function () {
+			allowEditorNavigation();
 			window.location.href = previewUrl;
 			return false;
 		});
@@ -298,6 +446,75 @@
 			&& !!config.locationMapProviderConfigured;
 	}
 
+	function initEditorNavigationGuard(editor, searchFormBuilder, labels) {
+		var settingsLink;
+		var allowNavigation = false;
+		var guard;
+
+		if (editorNavigationGuard && typeof editorNavigationGuard.destroy === 'function') {
+			editorNavigationGuard.destroy();
+		}
+
+		settingsLink = editor.querySelector('[data-ph-template-editor-settings-link]');
+
+		function hasChanges() {
+			return hasUnsavedEditorChanges(editor, searchFormBuilder);
+		}
+
+		function handleBeforeUnload(event) {
+			if (allowNavigation || !hasChanges()) {
+				return;
+			}
+
+			event.preventDefault();
+			event.returnValue = '';
+		}
+
+		function handleSettingsLinkClick(event) {
+			if (
+				event.defaultPrevented
+				|| event.button !== 0
+				|| event.metaKey
+				|| event.ctrlKey
+				|| event.shiftKey
+				|| event.altKey
+				|| !hasChanges()
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			confirmTemplateNavigation(labels).then(function (shouldLeave) {
+				if (!shouldLeave) {
+					return;
+				}
+
+				allowNavigation = true;
+				window.location.href = settingsLink.href;
+			});
+		}
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		if (settingsLink) {
+			settingsLink.addEventListener('click', handleSettingsLinkClick);
+		}
+
+		guard = {
+			allowNavigation: function () {
+				allowNavigation = true;
+			},
+			destroy: function () {
+				window.removeEventListener('beforeunload', handleBeforeUnload);
+
+				if (settingsLink) {
+					settingsLink.removeEventListener('click', handleSettingsLinkClick);
+				}
+			}
+		};
+		editorNavigationGuard = guard;
+	}
+
 	function initTemplateEditor() {
 		var editor = document.querySelector('[data-ph-template-editor]');
 		var form;
@@ -336,6 +553,8 @@
 			modules.editorSidebar.init(editor, form, config.editorSidebarLayout || null);
 		}
 
+		initEditorNavigationGuard(editor, searchFormBuilder, labels);
+
 		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
 			control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
 			control.setAttribute('data-ph-template-editor-saved-value', getControlValue(control));
@@ -343,15 +562,25 @@
 			control.addEventListener('change', function () {
 				var previousValue = control.getAttribute('data-ph-template-editor-previous-value') || '';
 				var previewUrl = modules.editorPreview && typeof modules.editorPreview.getTemplatePreviewUrl === 'function' ? modules.editorPreview.getTemplatePreviewUrl(control) : '';
+				var loadPreview = function () {
+					setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
+					loadTemplatePreview(previewUrl, labels, true);
+				};
 
 				if (previewUrl && previewUrl !== window.location.href) {
-					if (hasUnsavedEditorChanges(editor, searchFormBuilder) && !confirmTemplateNavigation(labels)) {
-						restoreControlValue(control, previousValue);
+					if (hasUnsavedEditorChanges(editor, searchFormBuilder)) {
+						confirmTemplateNavigation(labels).then(function (shouldLeave) {
+							if (!shouldLeave) {
+								restoreControlValue(control, previousValue);
+								return;
+							}
+
+							loadPreview();
+						});
 						return;
 					}
 
-					setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
-					loadTemplatePreview(previewUrl, labels, true);
+					loadPreview();
 					return;
 				}
 

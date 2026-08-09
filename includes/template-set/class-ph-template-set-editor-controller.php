@@ -73,13 +73,28 @@ class PH_Template_Set_Editor_Controller {
 
 			echo '<footer class="ph-template-editor-footer">';
 				echo '<div>';
-					echo '<a class="ph-template-editor-secondary" href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
+					echo '<a class="ph-template-editor-secondary" data-ph-template-editor-settings-link href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
 					echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save disabled>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
 				echo '</div>';
 				echo '</footer>';
 				echo '</form>';
 			echo '<button type="button" class="ph-template-editor-collapse-toggle" data-ph-template-editor-collapse-toggle aria-controls="ph-template-editor-form" aria-expanded="true" data-ph-template-editor-collapse-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" data-ph-template-editor-expand-label="' . esc_attr__( 'Expand template editor', 'propertyhive' ) . '" aria-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" title="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '"><span aria-hidden="true"></span></button>';
 			echo '</aside>';
+			echo '<div class="ph-template-editor-unsaved-warning" data-ph-template-editor-unsaved-warning hidden aria-hidden="true">';
+				echo '<div class="ph-template-editor-unsaved-warning-backdrop" data-ph-template-editor-unsaved-warning-dismiss></div>';
+				echo '<div class="ph-template-editor-unsaved-warning-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ph-template-editor-unsaved-warning-title" aria-describedby="ph-template-editor-unsaved-warning-description" tabindex="-1">';
+					echo '<div class="ph-template-editor-unsaved-warning-icon" aria-hidden="true">!</div>';
+					echo '<div class="ph-template-editor-unsaved-warning-copy">';
+						echo '<span class="ph-template-editor-unsaved-warning-label">' . esc_html__( 'Unsaved changes', 'propertyhive' ) . '</span>';
+						echo '<h2 id="ph-template-editor-unsaved-warning-title">' . esc_html__( 'Leave without saving?', 'propertyhive' ) . '</h2>';
+						echo '<p id="ph-template-editor-unsaved-warning-description">' . esc_html__( 'You have changes that have not been saved. If you leave the editor now, those changes will be lost.', 'propertyhive' ) . '</p>';
+					echo '</div>';
+					echo '<div class="ph-template-editor-unsaved-warning-actions">';
+						echo '<button type="button" class="ph-template-editor-unsaved-warning-stay" data-ph-template-editor-unsaved-warning-stay>' . esc_html__( 'Keep editing', 'propertyhive' ) . '</button>';
+						echo '<button type="button" class="ph-template-editor-unsaved-warning-leave" data-ph-template-editor-unsaved-warning-leave>' . esc_html__( 'Leave without saving', 'propertyhive' ) . '</button>';
+					echo '</div>';
+				echo '</div>';
+			echo '</div>';
 			echo '<script type="application/json" data-ph-template-editor-config>' . wp_json_encode( self::get_script_data(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>';
 	}
 
