@@ -1155,6 +1155,16 @@ body.ph-template-editor-active.ph-template-printable-brochures-display-no .ph-te
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-hide-locrating-local-schools .action-locrating-schools,
+body.ph-template-editor-active.ph-template-hide-locrating-local-amenities .action-locrating-amenities,
+body.ph-template-editor-active.ph-template-hide-locrating-local-transport .action-locrating-transport,
+body.ph-template-editor-active.ph-template-hide-locrating-flood-risk .action-locrating-flood-risk,
+body.ph-template-editor-active.ph-template-hide-locrating-broadband-checker .action-locrating-broadband-checker,
+body.ph-template-editor-active.ph-template-hide-locrating-mobile-phone-data .action-locrating-mobile-phone-data,
+body.ph-template-editor-active.ph-template-hide-locrating-all-in-one .action-locrating-all-in-one {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }

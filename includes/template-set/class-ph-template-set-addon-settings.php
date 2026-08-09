@@ -234,6 +234,29 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
++			array(
+				'id'                => 'locrating',
+				'slug'              => 'propertyhive-locrating',
+				'context'           => 'detail',
+				'label'             => __( 'Locrating', 'propertyhive' ),
+				'description'       => __( 'Controls which Locrating property action buttons are shown. Subscription and connection settings remain in the advanced settings.', 'propertyhive' ),
+				'scope'             => 'site_wide',
+				'scope_label'       => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'      => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'locrating' ), admin_url( 'admin.php' ) ),
+				'advanced_label'    => __( 'Edit advanced Locrating settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_locrating',
+				'symbols'           => array( __CLASS__, 'has_locrating_symbols' ),
+				'controls'          => array(
+					'local_schools_button'      => self::get_checkbox_control( __( 'Show Local Schools button', 'propertyhive' ), 'local_schools_button', '1', '1' ),
+					'local_amenities_button'    => self::get_checkbox_control( __( 'Show Local Amenities button', 'propertyhive' ), 'local_amenities_button', '1', '1' ),
+					'local_transport_button'    => self::get_checkbox_control( __( 'Show Local Transport button', 'propertyhive' ), 'local_transport_button', '1', '1' ),
+					'flood_risk_button'         => self::get_checkbox_control( __( 'Show Flood Risk button', 'propertyhive' ), 'flood_risk_button', '', '1' ),
+					'broadband_checker_button'  => self::get_checkbox_control( __( 'Show Broadband Checker button', 'propertyhive' ), 'broadband_checker_button', '1', '1' ),
+					'mobile_phone_data_button'  => self::get_checkbox_control( __( 'Show Mobile Phone Data button', 'propertyhive' ), 'mobile_phone_data_button', '', '1' ),
+					'all_in_one_button'         => self::get_checkbox_control( __( 'Show Local Area Information button', 'propertyhive' ), 'all_in_one_button', '', '1' ),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

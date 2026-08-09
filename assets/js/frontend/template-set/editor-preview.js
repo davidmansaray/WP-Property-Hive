@@ -281,6 +281,27 @@
 		},
 		'ph_template_set_addons[printable_brochures][link_text]': function (value) {
 			applyPrintableBrochureLinkText(value);
+		},
+		'ph_template_set_addons[locrating][local_schools_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-local-schools', 'ph-template-hide-locrating-local-schools', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][local_amenities_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-local-amenities', 'ph-template-hide-locrating-local-amenities', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][local_transport_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-local-transport', 'ph-template-hide-locrating-local-transport', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][flood_risk_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-flood-risk', 'ph-template-hide-locrating-flood-risk', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][broadband_checker_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-broadband-checker', 'ph-template-hide-locrating-broadband-checker', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][mobile_phone_data_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-mobile-phone-data', 'ph-template-hide-locrating-mobile-phone-data', isEnabledValue(value, control));
+		},
+		'ph_template_set_addons[locrating][all_in_one_button]': function (value, control) {
+			setBodyToggle('ph-template-show-locrating-all-in-one', 'ph-template-hide-locrating-all-in-one', isEnabledValue(value, control));
 		}
 	};
 
