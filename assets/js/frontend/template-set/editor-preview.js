@@ -262,6 +262,11 @@
 		},
 		template_set_editorial_show_brief: function (value) {
 			setBodyToggle('ph-template-show-editorial-brief', 'ph-template-hide-editorial-brief', value === 'yes');
+		},
+		'ph_template_set_addons[map_search][format]': function (value) {
+			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
+
+			setBodyOption('ph-template-map-search-format-', format);
 		}
 	};
 

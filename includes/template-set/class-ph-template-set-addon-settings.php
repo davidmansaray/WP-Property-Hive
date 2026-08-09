@@ -27,6 +27,33 @@ class PH_Template_Set_Addon_Settings {
 		$viewing_time_to      = ! empty( $viewing_time_keys ) ? (string) end( $viewing_time_keys ) : '23:00';
 
 		$definitions = array(
+			array(
+				'id'              => 'map_search',
+				'slug'            => 'propertyhive-map-search',
+				'context'         => 'search',
+				'label'           => __( 'Map Search', 'propertyhive' ),
+				'description'     => __( 'Controls how Map Search is shown on search result pages.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'mapsearch' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Edit advanced map settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_map_search',
+				'symbols'           => array( __CLASS__, 'has_map_search_symbols' ),
+				'controls'          => array(
+					'format' => array(
+						'type'       => 'select',
+						'label'      => __( 'Show map search', 'propertyhive' ),
+						'options'    => array(
+							''      => __( "Don't show map", 'propertyhive' ),
+							'view'  => __( 'List and map toggle', 'propertyhive' ),
+							'split' => __( 'Map beside results', 'propertyhive' ),
+						),
+						'option_key' => 'format',
+						'default'   => '',
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

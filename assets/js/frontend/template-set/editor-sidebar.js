@@ -13,7 +13,8 @@
 				{ id: 'search-form', label: 'Search form', controls: ['ph_search_form_builder'] },
 				{ id: 'layout', label: 'Layout', controls: ['template_set_search_layout', 'template_set_search_grid_columns'] },
 				{ id: 'card-appearance', label: 'Card appearance', controls: ['template_set_search_card_size', 'template_set_image_style'] },
-				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] }
+				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] },
+				{ id: 'addon-map_search', label: 'Map Search', controls: ['ph_template_set_addons[map_search][format]'] }
 			],
 			detail: [
 				{ id: 'template', label: 'Template', controls: ['template_set_detail_template'] },
