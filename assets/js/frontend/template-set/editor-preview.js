@@ -272,6 +272,9 @@
 		template_set_show_shortlist_detail: function (value, control) {
 			setBodyToggle('ph-template-show-shortlist-detail', 'ph-template-hide-shortlist-detail', isEnabledValue(value, control));
 		},
+		template_set_show_send_to_friend: function (value, control) {
+			setBodyToggle('ph-template-show-send-to-friend', 'ph-template-hide-send-to-friend', isEnabledValue(value, control));
+		},
 		'ph_template_set_addons[map_search][format]': function (value) {
 			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
 

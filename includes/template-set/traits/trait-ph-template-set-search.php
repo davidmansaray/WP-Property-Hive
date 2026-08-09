@@ -50,6 +50,7 @@ trait PH_Template_Set_Search {
 
 			if ( $is_detail ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_detail() ? 'ph-template-show-shortlist-detail' : 'ph-template-hide-shortlist-detail';
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_send_to_friend() ? 'ph-template-show-send-to-friend' : 'ph-template-hide-send-to-friend';
 			} elseif ( PH_Template_Set_Request_Context::is_search_results_request() ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_save_search() ? 'ph-template-show-save-search' : 'ph-template-hide-save-search';
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_cards() ? 'ph-template-show-shortlist-cards' : 'ph-template-hide-shortlist-cards';
@@ -1728,7 +1729,7 @@ trait PH_Template_Set_Search {
 			return true;
 		}
 
-		if ( class_exists( 'PH_Send_To_Friend' ) || class_exists( 'PH_Send_To_A_Friend' ) ) {
+		if ( class_exists( 'PH_Send_To_Friend' ) ) {
 			return self::is_add_on_usable( 'propertyhive-send-to-friend' );
 		}
 
@@ -1743,7 +1744,7 @@ trait PH_Template_Set_Search {
 	 * @return string
 	 */
 	private static function get_share_button_markup( $class = 'ph-template-button ph-template-button-secondary ph-template-share-button' ) {
-		if ( ! self::is_send_to_friend_available() ) {
+		if ( ( 'yes' !== PH_Template_Set_Request_Context::get_show_send_to_friend() && ! self::is_template_editor_active() ) || ! self::is_send_to_friend_available() ) {
 			return '';
 		}
 

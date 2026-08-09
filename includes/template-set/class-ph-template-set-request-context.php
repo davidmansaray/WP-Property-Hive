@@ -538,6 +538,10 @@ class PH_Template_Set_Request_Context {
 		return 'yes' === self::get_detail_setting( 'template_set_show_shortlist_detail' ) ? 'yes' : '';
 	}
 
+	public static function get_show_send_to_friend() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_send_to_friend' ) ? 'yes' : '';
+	}
+
 	/**
 	 * Get a valid preview template from the query string.
 	 *

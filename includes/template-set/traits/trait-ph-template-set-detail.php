@@ -186,10 +186,17 @@ trait PH_Template_Set_Detail {
 		$enquiry_priority   = has_action( 'propertyhive_property_actions_list_start', 'propertyhive_make_enquiry_button' );
 		$shortlist_callback = null;
 		$shortlist_priority = false;
+		$send_callback      = null;
+		$send_priority      = false;
 
 		if ( class_exists( 'PH_Shortlist' ) && method_exists( 'PH_Shortlist', 'instance' ) ) {
 			$shortlist_callback = array( PH_Shortlist::instance(), 'add_shortlist_action' );
 			$shortlist_priority = has_filter( 'propertyhive_single_property_actions', $shortlist_callback );
+		}
+
+		if ( class_exists( 'PH_Send_To_Friend' ) && method_exists( 'PH_Send_To_Friend', 'instance' ) ) {
+			$send_callback = array( PH_Send_To_Friend::instance(), 'send_to_friend_action' );
+			$send_priority = has_action( 'propertyhive_property_actions_list_end', $send_callback );
 		}
 
 		try {
@@ -199,6 +206,10 @@ trait PH_Template_Set_Detail {
 
 			if ( $shortlist_callback && false !== $shortlist_priority ) {
 				remove_filter( 'propertyhive_single_property_actions', $shortlist_callback, $shortlist_priority );
+			}
+
+			if ( $send_callback && false !== $send_priority && 'yes' !== PH_Template_Set_Request_Context::get_show_send_to_friend() && ! self::is_template_editor_active() ) {
+				remove_action( 'propertyhive_property_actions_list_end', $send_callback, $send_priority );
 			}
 
 			ob_start();
@@ -217,6 +228,10 @@ trait PH_Template_Set_Detail {
 
 			if ( $shortlist_callback && false !== $shortlist_priority ) {
 				add_filter( 'propertyhive_single_property_actions', $shortlist_callback, $shortlist_priority );
+			}
+
+			if ( $send_callback && false !== $send_priority && 'yes' !== PH_Template_Set_Request_Context::get_show_send_to_friend() && ! self::is_template_editor_active() ) {
+				add_action( 'propertyhive_property_actions_list_end', $send_callback, $send_priority );
 			}
 		}
 

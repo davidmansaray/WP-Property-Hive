@@ -1195,6 +1195,11 @@ body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-de
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-hide-send-to-friend .ph-template-detail .action-send-to-friend,
+body.ph-template-editor-active.ph-template-hide-send-to-friend [id^="sendToFriend"] {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }
