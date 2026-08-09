@@ -141,6 +141,28 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
+			array(
+				'id'              => 'search_results_promos',
+				'slug'            => 'propertyhive-search-results-promos',
+				'context'         => 'search',
+				'label'           => __( 'Search Results Promos', 'propertyhive' ),
+				'description'     => __( 'Controls where promotional content is inserted in search results.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'searchresultspromos' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Manage search result promos', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'     => 'propertyhive_search_results_promos',
+				'symbols'         => array( __CLASS__, 'has_search_results_promos_symbols' ),
+				'controls'        => array(
+					'positions' => array(
+						'type'       => 'positive_integer_list',
+						'label'      => __( 'Display after result numbers', 'propertyhive' ),
+						'option_key' => 'positions',
+						'default'    => '5',
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );
