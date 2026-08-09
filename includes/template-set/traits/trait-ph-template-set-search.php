@@ -48,8 +48,11 @@ trait PH_Template_Set_Search {
 		if ( self::is_template_editor_active() ) {
 			$classes[] = 'ph-template-editor-active';
 
-			if ( ! $is_detail && PH_Template_Set_Request_Context::is_search_results_request() ) {
+			if ( $is_detail ) {
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_detail() ? 'ph-template-show-shortlist-detail' : 'ph-template-hide-shortlist-detail';
+			} elseif ( PH_Template_Set_Request_Context::is_search_results_request() ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_save_search() ? 'ph-template-show-save-search' : 'ph-template-hide-save-search';
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_show_shortlist_cards() ? 'ph-template-show-shortlist-cards' : 'ph-template-hide-shortlist-cards';
 			}
 		}
 
@@ -1646,6 +1649,14 @@ trait PH_Template_Set_Search {
 	 */
 	private static function get_shortlist_button_markup( $class = 'ph-template-shortlist-button', $labels = array() ) {
 		if ( ! class_exists( 'PH_Shortlist' ) || ! self::is_add_on_usable( 'propertyhive-shortlist' ) || ! shortcode_exists( 'shortlist_button' ) ) {
+			return '';
+		}
+
+		if ( is_property() ) {
+			if ( 'yes' !== PH_Template_Set_Request_Context::get_show_shortlist_detail() && ! self::is_template_editor_active() ) {
+				return '';
+			}
+		} elseif ( ( PH_Template_Set_Request_Context::is_search_results_request() || self::is_search_card_rendering() ) && 'yes' !== PH_Template_Set_Request_Context::get_show_shortlist_cards() && ! self::is_template_editor_active() ) {
 			return '';
 		}
 

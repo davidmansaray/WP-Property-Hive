@@ -530,6 +530,14 @@ class PH_Template_Set_Request_Context {
 		return self::get_search_visibility_setting( 'template_set_show_save_search' );
 	}
 
+	public static function get_show_shortlist_cards() {
+		return self::get_search_visibility_setting( 'template_set_show_shortlist_cards' );
+	}
+
+	public static function get_show_shortlist_detail() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_shortlist_detail' ) ? 'yes' : '';
+	}
+
 	/**
 	 * Get a valid preview template from the query string.
 	 *

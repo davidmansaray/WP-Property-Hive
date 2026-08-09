@@ -1186,6 +1186,15 @@ body.ph-template-editor-active.ph-template-hide-save-search #save_search_popup {
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search [data-add-to-shortlist],
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .action-shortlist,
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .ph-template-shortlist-button,
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail [data-add-to-shortlist],
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .action-shortlist,
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .ph-template-shortlist-button {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }

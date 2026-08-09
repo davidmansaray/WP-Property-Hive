@@ -203,6 +203,7 @@ class PH_Template_Set_Catalog {
 			'template_set_button_style' => array( 'type' => 'select', 'label' => __( 'Button style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_button_styles(), 'default' => 'filled', 'group' => 'enquiry' ),
 			'template_set_contact_card_style' => array( 'type' => 'select', 'label' => __( 'Contact card style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_contact_card_styles(), 'default' => 'classic', 'group' => 'enquiry' ),
 			'template_set_show_mobile_cta' => array( 'type' => 'checkbox', 'label' => __( 'Show mobile enquiry bar', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'enquiry' ),
+			'template_set_show_shortlist_detail' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
 			'template_set_show_recommended' => array( 'type' => 'checkbox', 'label' => __( 'Show related properties', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'recommended' ),
 			'template_set_recommended_count' => array( 'type' => 'select', 'label' => __( 'Number of properties', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_counts(), 'default' => 3, 'group' => 'recommended' ),
 			'template_set_recommended_layout' => array( 'type' => 'select', 'label' => __( 'Card layout', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_layouts(), 'default' => 'grid', 'group' => 'recommended' ),
@@ -218,6 +219,7 @@ class PH_Template_Set_Catalog {
 	public static function get_search_shared_controls() {
 		return array(
 			'template_set_show_save_search' => array( 'type' => 'checkbox', 'label' => __( 'Show Save Search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
+			'template_set_show_shortlist_cards' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button on cards', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
 		);
 	}
 
@@ -326,6 +328,7 @@ class PH_Template_Set_Catalog {
 		$slug = sanitize_key( $control['requires_add_on'] );
 		$symbols = array(
 			'propertyhive-save-search' => array( 'class' => 'PH_Save_Search', 'function' => 'PHSS' ),
+			'propertyhive-shortlist'   => array( 'class' => 'PH_Shortlist', 'function' => 'PHSL' ),
 		);
 
 		if ( ! isset( $symbols[ $slug ] ) ) {
