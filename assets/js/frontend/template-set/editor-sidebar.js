@@ -90,6 +90,29 @@
 		}
 	}
 
+	function isEditorSidebarOpenRequested() {
+		try {
+			return new window.URLSearchParams(window.location.search).get('ph_template_editor_open') === '1';
+		} catch (error) {
+			return false;
+		}
+	}
+
+	function clearEditorSidebarOpenRequest() {
+		if (!window.history || typeof window.history.replaceState !== 'function') {
+			return;
+		}
+
+		try {
+			var url = new window.URL(window.location.href);
+
+			url.searchParams.delete('ph_template_editor_open');
+			window.history.replaceState(window.history.state, document.title, url.pathname + url.search + url.hash);
+		} catch (error) {
+			// URL APIs can be unavailable in older browsers; the launch state still works.
+		}
+	}
+
 	function updateEditorSidebarCollapseLabel(toggle, isCollapsed) {
 		if (!toggle) {
 			return;
@@ -157,13 +180,21 @@
 
 		var markupState = editor.getAttribute('data-ph-template-editor-collapsed');
 		var storedState = getStoredEditorSidebarCollapsed();
-		var isCollapsed = markupState === 'true'
-			? true
-			: markupState === 'false'
-				? false
-				: storedState !== null
-					? storedState
-					: document.body.classList.contains('ph-template-editor-sidebar-collapsed');
+		var openOnLaunch = isEditorSidebarOpenRequested();
+		var isCollapsed = openOnLaunch
+			? false
+			: markupState === 'true'
+				? true
+				: markupState === 'false'
+					? false
+					: storedState !== null
+						? storedState
+						: document.body.classList.contains('ph-template-editor-sidebar-collapsed');
+
+		if (openOnLaunch) {
+			storeEditorSidebarCollapsed(false);
+			clearEditorSidebarOpenRequest();
+		}
 
 		setEditorSidebarCollapsed(editor, isCollapsed, false);
 	}
