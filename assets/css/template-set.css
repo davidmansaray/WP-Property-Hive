@@ -1135,85 +1135,6 @@ body.ph-template-editor-unsaved-warning-open {
 	overflow: hidden;
 }
 
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-panel,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-toggle,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-dependency,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .propertyhive-views .map-view,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .half-map-view {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-map-search-format-split .ph-template-search .ph-template-map-panel {
-	display: block;
-}
-
-body.ph-template-editor-active.ph-template-hide-radial-current-location .ph-template-search .current-location {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-printable-brochures-display-no .ph-template-detail .action-printable-brochure {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-locrating-local-schools .action-locrating-schools,
-body.ph-template-editor-active.ph-template-hide-locrating-local-amenities .action-locrating-amenities,
-body.ph-template-editor-active.ph-template-hide-locrating-local-transport .action-locrating-transport,
-body.ph-template-editor-active.ph-template-hide-locrating-flood-risk .action-locrating-flood-risk,
-body.ph-template-editor-active.ph-template-hide-locrating-broadband-checker .action-locrating-broadband-checker,
-body.ph-template-editor-active.ph-template-hide-locrating-mobile-phone-data .action-locrating-mobile-phone-data,
-body.ph-template-editor-active.ph-template-hide-locrating-all-in-one .action-locrating-all-in-one {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-onedome-book-viewing .action-onedome-book-viewing,
-body.ph-template-editor-active.ph-template-hide-onedome-book-valuation .action-onedome-book-valuation,
-body.ph-template-editor-active.ph-template-hide-onedome-make-offer .action-onedome-make-offer,
-body.ph-template-editor-active.ph-template-hide-onedome-propertyhive-enquiry .ph-template-detail .action-make-enquiry,
-body.ph-template-editor-active.ph-template-hide-onedome-propertyhive-enquiry .ph-template-detail .ph-template-contact-actions .ph-template-button-primary {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-propertyfile-book-viewing .action-propertyfile-book-viewing,
-body.ph-template-editor-active.ph-template-hide-propertyfile-book-valuation .action-propertyfile-book-valuation,
-body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .action-make-enquiry,
-body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .ph-template-contact-actions .ph-template-button-primary {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-save-search .ph-template-search .propertyhive-save-search-button,
-body.ph-template-editor-active.ph-template-hide-save-search #save_search_button,
-body.ph-template-editor-active.ph-template-hide-save-search #save_search_popup {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search [data-add-to-shortlist],
-body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .action-shortlist,
-body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .ph-template-shortlist-button,
-body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail [data-add-to-shortlist],
-body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .action-shortlist,
-body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .ph-template-shortlist-button {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-send-to-friend .ph-template-detail .action-send-to-friend,
-body.ph-template-editor-active.ph-template-hide-send-to-friend [id^="sendToFriend"] {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail .room-breakdown,
-body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-content],
-body.ph-template-editor-active.ph-template-show-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback] {
-	display: none !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback] {
-	display: block !important;
-}
-
-body.ph-template-editor-active.ph-template-hide-what3words .ph-template-detail .w3w_location {
-	display: none !important;
-}
-
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }
@@ -1336,6 +1257,60 @@ body.ph-template-editor-active.ph-template-hide-what3words .ph-template-detail .
 .ph-template-hide-branch .ph-template-card-branch,
 .ph-template-hide-mobile-cta .ph-template-mobile-cta {
 	display: none !important;
+}
+
+/* Premium add-on controls are preview-only body states. The editor scope keeps
+ * these selectors from changing normal public-site output. */
+body.ph-template-editor-active.ph-template-hide-save-search .ph-template-search .propertyhive-save-search-button,
+body.ph-template-editor-active.ph-template-hide-save-search #save_search_button,
+body.ph-template-editor-active.ph-template-hide-save-search #save_search_popup,
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search [data-add-to-shortlist],
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .action-shortlist,
+body.ph-template-editor-active.ph-template-hide-shortlist-cards .ph-template-search .ph-template-shortlist-button,
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail [data-add-to-shortlist],
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .action-shortlist,
+body.ph-template-editor-active.ph-template-hide-shortlist-detail .ph-template-detail .ph-template-shortlist-button,
+body.ph-template-editor-active.ph-template-hide-send-to-friend .ph-template-detail .action-send-to-friend,
+body.ph-template-editor-active.ph-template-hide-send-to-friend [id^="sendToFriend"],
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail .room-breakdown,
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-content],
+body.ph-template-editor-active.ph-template-show-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback],
+body.ph-template-editor-active.ph-template-hide-what3words .ph-template-detail .w3w_location,
+body.ph-template-editor-active.ph-template-hide-radial-current-location .ph-template-search .current-location,
+body.ph-template-editor-active.ph-template-printable-brochures-display-no .ph-template-detail .action-printable-brochure,
+body.ph-template-editor-active.ph-template-hide-locrating-local-schools .action-locrating-schools,
+body.ph-template-editor-active.ph-template-hide-locrating-local-amenities .action-locrating-amenities,
+body.ph-template-editor-active.ph-template-hide-locrating-local-transport .action-locrating-transport,
+body.ph-template-editor-active.ph-template-hide-locrating-flood-risk .action-locrating-flood-risk,
+body.ph-template-editor-active.ph-template-hide-locrating-broadband-checker .action-locrating-broadband-checker,
+body.ph-template-editor-active.ph-template-hide-locrating-mobile-phone-data .action-locrating-mobile-phone-data,
+body.ph-template-editor-active.ph-template-hide-locrating-all-in-one .action-locrating-all-in-one,
+body.ph-template-editor-active.ph-template-hide-onedome-book-viewing .action-onedome-book-viewing,
+body.ph-template-editor-active.ph-template-hide-onedome-book-valuation .action-onedome-book-valuation,
+body.ph-template-editor-active.ph-template-hide-onedome-make-offer .action-onedome-make-offer,
+body.ph-template-editor-active.ph-template-hide-propertyfile-book-viewing .action-propertyfile-book-viewing,
+body.ph-template-editor-active.ph-template-hide-propertyfile-book-valuation .action-propertyfile-book-valuation,
+body.ph-template-editor-active.ph-template-hide-onedome-propertyhive-enquiry .ph-template-detail .action-make-enquiry,
+body.ph-template-editor-active.ph-template-hide-onedome-propertyhive-enquiry .ph-template-detail .ph-template-contact-actions .ph-template-button-primary,
+body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .action-make-enquiry,
+body.ph-template-editor-active.ph-template-hide-propertyfile-propertyhive-enquiry .ph-template-detail .ph-template-contact-actions .ph-template-button-primary {
+	display: none !important;
+}
+
+body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-detail [data-ph-template-rooms-fallback] {
+	display: block !important;
+}
+
+body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-panel,
+body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-toggle,
+body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-dependency,
+body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .propertyhive-views .map-view,
+body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .half-map-view {
+	display: none !important;
+}
+
+body.ph-template-editor-active.ph-template-map-search-format-split .ph-template-search .ph-template-map-panel {
+	display: block;
 }
 
 .ph-template-button,

@@ -221,7 +221,7 @@ class PH_Template_Set_Catalog {
 	 */
 	public static function get_search_shared_controls() {
 		return array(
-			'template_set_show_save_search' => array( 'type' => 'checkbox', 'label' => __( 'Show Save Search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
+			'template_set_show_save_search'    => array( 'type' => 'checkbox', 'label' => __( 'Show Save Search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
 			'template_set_show_shortlist_cards' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button on cards', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
 		);
 	}
@@ -330,8 +330,8 @@ class PH_Template_Set_Catalog {
 
 		$slug = sanitize_key( $control['requires_add_on'] );
 		$symbols = array(
-			'propertyhive-save-search' => array( 'class' => 'PH_Save_Search', 'function' => 'PHSS' ),
-			'propertyhive-shortlist'   => array( 'class' => 'PH_Shortlist', 'function' => 'PHSL' ),
+			'propertyhive-save-search'   => array( 'class' => 'PH_Save_Search', 'function' => 'PHSS' ),
+			'propertyhive-shortlist'     => array( 'class' => 'PH_Shortlist', 'function' => 'PHSL' ),
 			'propertyhive-send-to-friend' => array( 'class' => 'PH_Send_To_Friend', 'function' => 'PHSTF' ),
 			'propertyhive-rooms'          => array( 'class' => 'PH_Rooms', 'function' => 'PHRASA' ),
 			'propertyhive-what3words'    => array( 'class' => 'PH_What3words', 'function' => 'PHW3W' ),

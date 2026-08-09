@@ -163,7 +163,7 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
-+			array(
+			array(
 				'id'              => 'printable_brochures',
 				'slug'            => 'propertyhive-printable-brochures',
 				'context'         => 'detail',
@@ -197,7 +197,7 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
-+			array(
+			array(
 				'id'                => 'viewing_request',
 				'slug'              => 'propertyhive-viewing-request',
 				'context'           => 'detail',
@@ -234,7 +234,7 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
-+			array(
+			array(
 				'id'                => 'locrating',
 				'slug'              => 'propertyhive-locrating',
 				'context'           => 'detail',
@@ -257,7 +257,7 @@ class PH_Template_Set_Addon_Settings {
 					'all_in_one_button'         => self::get_checkbox_control( __( 'Show Local Area Information button', 'propertyhive' ), 'all_in_one_button', '', '1' ),
 				),
 			),
-+			array(
+			array(
 				'id'                => 'home_reports',
 				'slug'              => 'propertyhive-home-reports',
 				'context'           => 'detail',
@@ -274,7 +274,7 @@ class PH_Template_Set_Addon_Settings {
 					'data_capture' => self::get_checkbox_control( __( 'Require visitor details before emailing a report', 'propertyhive' ), 'data_capture', '', '1' ),
 				),
 			),
-+			array(
+			array(
 				'id'                => 'onedome',
 				'slug'              => 'propertyhive-onedome',
 				'context'           => 'detail',
@@ -294,7 +294,7 @@ class PH_Template_Set_Addon_Settings {
 					'show_onedome_offer_action'        => self::get_checkbox_control( __( 'Show OneDome Make Offer button', 'propertyhive' ), 'show_onedome_offer_action', '', 'yes' ),
 				),
 			),
-+			array(
+			array(
 				'id'                => 'propertyfile',
 				'slug'              => 'propertyhive-propertyfile',
 				'context'           => 'detail',
