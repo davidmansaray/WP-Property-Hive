@@ -163,6 +163,40 @@ class PH_Template_Set_Addon_Settings {
 					),
 				),
 			),
++			array(
+				'id'              => 'printable_brochures',
+				'slug'            => 'propertyhive-printable-brochures',
+				'context'         => 'detail',
+				'label'           => __( 'Printable Brochures', 'propertyhive' ),
+				'description'     => __( 'Controls the printable brochure action on property detail pages.', 'propertyhive' ),
+				'scope'           => 'site_wide',
+				'scope_label'     => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'    => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'printablebrochures' ), admin_url( 'admin.php' ) ),
+				'advanced_label'  => __( 'Edit advanced brochure settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_printable_brochures',
+				'symbols'           => array( __CLASS__, 'has_printable_brochures_symbols' ),
+				'controls'          => array(
+					'display' => array(
+						'type'       => 'select',
+						'label'      => __( 'Display on property details', 'propertyhive' ),
+						'options'    => array(
+							''        => __( 'Always', 'propertyhive' ),
+							'if_none' => __( 'Only if no brochure is uploaded', 'propertyhive' ),
+							'no'      => __( 'Never', 'propertyhive' ),
+						),
+						'option_key' => 'display',
+						'default'   => '',
+					),
+					'link_text' => array(
+						'type'       => 'text',
+						'label'      => __( 'Button text', 'propertyhive' ),
+						'option_key' => 'link_text',
+						'default'   => __( 'Print Details', 'propertyhive' ),
+						'maxlength'  => 120,
+					),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );

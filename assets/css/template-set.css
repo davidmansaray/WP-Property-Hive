@@ -1151,6 +1151,10 @@ body.ph-template-editor-active.ph-template-hide-radial-current-location .ph-temp
 	display: none !important;
 }
 
+body.ph-template-editor-active.ph-template-printable-brochures-display-no .ph-template-detail .action-printable-brochure {
+	display: none !important;
+}
+
 .ph-template-editor-unsaved-warning[hidden] {
 	display: none;
 }

@@ -273,6 +273,14 @@
 		},
 		'ph_template_set_addons[search_results_promos][positions]': function (value) {
 			applySearchPromoPositions(value);
+		},
+		'ph_template_set_addons[printable_brochures][display]': function (value) {
+			var display = ['if_none', 'no'].indexOf(String(value || '')) !== -1 ? String(value) : 'always';
+
+			setBodyOption('ph-template-printable-brochures-display-', display);
+		},
+		'ph_template_set_addons[printable_brochures][link_text]': function (value) {
+			applyPrintableBrochureLinkText(value);
 		}
 	};
 
