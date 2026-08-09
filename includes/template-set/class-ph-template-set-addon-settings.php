@@ -257,6 +257,23 @@ class PH_Template_Set_Addon_Settings {
 					'all_in_one_button'         => self::get_checkbox_control( __( 'Show Local Area Information button', 'propertyhive' ), 'all_in_one_button', '', '1' ),
 				),
 			),
++			array(
+				'id'                => 'home_reports',
+				'slug'              => 'propertyhive-home-reports',
+				'context'           => 'detail',
+				'label'             => __( 'Home Reports', 'propertyhive' ),
+				'description'       => __( 'Controls whether visitors provide their details before a Home Report is emailed. Feed and import settings remain in the advanced settings.', 'propertyhive' ),
+				'scope'             => 'site_wide',
+				'scope_label'       => __( 'Applies across the site.', 'propertyhive' ),
+				'advanced_url'      => add_query_arg( array( 'page' => 'ph-settings', 'tab' => 'home-reports' ), admin_url( 'admin.php' ) ),
+				'advanced_label'    => __( 'Edit advanced Home Reports settings', 'propertyhive' ),
+				'reload_after_save' => false,
+				'option_name'       => 'propertyhive_home_reports',
+				'symbols'           => array( __CLASS__, 'has_home_reports_symbols' ),
+				'controls'          => array(
+					'data_capture' => self::get_checkbox_control( __( 'Require visitor details before emailing a report', 'propertyhive' ), 'data_capture', '', '1' ),
+				),
+			),
 		);
 
 		$definitions = apply_filters( 'propertyhive_template_set_addon_settings_definitions', $definitions );
