@@ -21,6 +21,7 @@
 				{ id: 'template', label: 'Template', controls: ['template_set_detail_template'] },
 				{ id: 'media', label: 'Media', controls: ['template_set_gallery_layout', 'template_set_cinema_card_position', 'template_set_editorial_show_brief', 'template_set_show_floorplans', 'template_set_show_virtual_tours'] },
 				{ id: 'enquiry', label: 'Enquiries', controls: ['template_set_button_style', 'template_set_contact_card_style', 'template_set_show_mobile_cta'] },
+				{ id: 'purchase-calculators', label: 'Purchase calculators', controls: ['template_set_portal_show_costs'] },
 				{ id: 'addon-printable_brochures', label: 'Printable Brochures', controls: ['ph_template_set_addons[printable_brochures][display]', 'ph_template_set_addons[printable_brochures][link_text]'] },
 				{ id: 'recommended', label: 'Related properties', controls: ['template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size'] }
 			]

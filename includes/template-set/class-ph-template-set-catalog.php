@@ -93,7 +93,7 @@ class PH_Template_Set_Catalog {
 						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
 						'options'                => self::get_checkbox_options(),
 						'default'                => 'yes',
-						'group'                  => 'modules',
+						'group'                  => 'purchase-calculators',
 						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
 					),
 				);
@@ -133,7 +133,7 @@ class PH_Template_Set_Catalog {
 						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
 						'options'                => self::get_checkbox_options(),
 						'default'                => 'yes',
-						'group'                  => 'modules',
+						'group'                  => 'purchase-calculators',
 						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
 					),
 				);
@@ -170,7 +170,7 @@ class PH_Template_Set_Catalog {
 						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
 						'options'                => self::get_checkbox_options(),
 						'default'                => 'yes',
-						'group'                  => 'modules',
+						'group'                  => 'purchase-calculators',
 						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'stamp_duty_calculator_scotland', 'stamp_duty_calculator_wales', 'stamp_duty_calculator_commercial', 'mortgage_calculator', 'rental_yield_calculator' ),
 					),
 				);
