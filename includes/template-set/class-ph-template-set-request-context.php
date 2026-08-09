@@ -546,6 +546,10 @@ class PH_Template_Set_Request_Context {
 		return 'yes' === self::get_detail_setting( 'template_set_show_rooms_breakdown' ) ? 'yes' : '';
 	}
 
+	public static function get_show_what3words() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_what3words' ) ? 'yes' : '';
+	}
+
 	/**
 	 * Get a valid preview template from the query string.
 	 *

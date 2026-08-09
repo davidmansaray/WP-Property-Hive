@@ -278,6 +278,9 @@
 		template_set_show_rooms_breakdown: function (value, control) {
 			setBodyToggle('ph-template-show-rooms-breakdown', 'ph-template-hide-rooms-breakdown', isEnabledValue(value, control));
 		},
+		template_set_show_what3words: function (value, control) {
+			setBodyToggle('ph-template-show-what3words', 'ph-template-hide-what3words', isEnabledValue(value, control));
+		},
 		'ph_template_set_addons[map_search][format]': function (value) {
 			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
 

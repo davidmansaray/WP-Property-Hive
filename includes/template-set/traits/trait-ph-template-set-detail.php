@@ -152,8 +152,32 @@ trait PH_Template_Set_Detail {
 
 		$previous_property = $property;
 		$property          = $map_property;
-		get_property_map();
-		$property = $previous_property;
+		$what3words_removed = array();
+
+		if ( 'yes' !== PH_Template_Set_Request_Context::get_show_what3words() && ! self::is_template_editor_active() && class_exists( 'PH_What3words' ) && method_exists( 'PH_What3words', 'instance' ) ) {
+			$what3words = PH_What3words::instance();
+			$callbacks   = array(
+				array( 'propertyhive_property_map_actions', array( $what3words, 'add_custom_locations_to_property_map' ) ),
+				array( 'propertyhive_property_map_after', array( $what3words, 'add_property_map_custom_locations_key' ) ),
+			);
+
+			foreach ( $callbacks as $callback_data ) {
+				$priority = has_action( $callback_data[0], $callback_data[1] );
+				if ( false !== $priority ) {
+					remove_action( $callback_data[0], $callback_data[1], $priority );
+					$what3words_removed[] = array( $callback_data[0], $callback_data[1], $priority );
+				}
+			}
+		}
+
+		try {
+			get_property_map();
+		} finally {
+			foreach ( $what3words_removed as $callback_data ) {
+				add_action( $callback_data[0], $callback_data[1], $callback_data[2] );
+			}
+			$property = $previous_property;
+		}
 	}
 
 	/**
