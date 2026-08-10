@@ -14,16 +14,30 @@
 				{ id: 'layout', label: 'Layout', controls: ['template_set_search_layout', 'template_set_search_grid_columns'] },
 				{ id: 'card-appearance', label: 'Card appearance', controls: ['template_set_search_card_size', 'template_set_image_style'] },
 				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] },
-				{ id: 'addon-map_search', label: 'Map Search', controls: ['ph_template_set_addons[map_search][format]'] },
-				{ id: 'addon-infinite_scroll', label: 'Infinite Scroll', controls: ['ph_template_set_addons[infinite_scroll][functionality]', 'ph_template_set_addons[infinite_scroll][devices]'] }
+				{ id: 'addon-map_search', label: 'Map search', controls: ['ph_template_set_addons[map_search][format]'] },
+				{ id: 'addon-infinite_scroll', label: 'Infinite scroll', controls: ['ph_template_set_addons[infinite_scroll][functionality]', 'ph_template_set_addons[infinite_scroll][devices]'] },
+				{ id: 'addon-location_autocomplete', label: 'Location autocomplete', controls: ['ph_template_set_addons[location_autocomplete][data_source]'] },
+				{ id: 'addon-radial_search', label: 'Radial search', controls: ['ph_template_set_addons[radial_search][current_location_enabled]'] },
+				{ id: 'addon-search_results_promos', label: 'Search results promos', controls: ['ph_template_set_addons[search_results_promos][positions]'] },
+				{ id: 'save-search', label: 'Save search', controls: ['template_set_show_save_search'] },
+				{ id: 'shortlist', label: 'Shortlist', controls: ['template_set_show_shortlist_cards'] }
 			],
 			detail: [
 				{ id: 'template', label: 'Template', controls: ['template_set_detail_template'] },
-				{ id: 'media', label: 'Media', controls: ['template_set_gallery_layout', 'template_set_cinema_card_position', 'template_set_editorial_show_brief', 'template_set_show_floorplans', 'template_set_show_virtual_tours'] },
+				{ id: 'media', label: 'Media', controls: ['template_set_gallery_layout', 'template_set_location_map', 'template_set_cinema_card_position', 'template_set_editorial_show_brief', 'template_set_show_floorplans', 'template_set_show_virtual_tours'] },
 				{ id: 'enquiry', label: 'Enquiries', controls: ['template_set_button_style', 'template_set_contact_card_style', 'template_set_show_mobile_cta'] },
+				{ id: 'shortlist', label: 'Shortlist', controls: ['template_set_show_shortlist_detail'] },
+				{ id: 'send-to-friend', label: 'Send to friend', controls: ['template_set_show_send_to_friend'] },
+				{ id: 'rooms', label: 'Rooms', controls: ['template_set_show_rooms_breakdown'] },
+				{ id: 'what3words', label: 'what3words', controls: ['template_set_show_what3words'] },
+				{ id: 'recommended', label: 'Related properties', controls: ['template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size'] },
 				{ id: 'purchase-calculators', label: 'Purchase calculators', controls: ['template_set_portal_show_costs'] },
-				{ id: 'addon-printable_brochures', label: 'Printable Brochures', controls: ['ph_template_set_addons[printable_brochures][display]', 'ph_template_set_addons[printable_brochures][link_text]'] },
-				{ id: 'recommended', label: 'Related properties', controls: ['template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size'] }
+				{ id: 'addon-printable_brochures', label: 'Printable brochures', controls: ['ph_template_set_addons[printable_brochures][display]', 'ph_template_set_addons[printable_brochures][link_text]'] },
+				{ id: 'addon-viewing_request', label: 'Viewing request', controls: ['ph_template_set_addons[viewing_request][available_days][]', 'ph_template_set_addons[viewing_request][viewing_time_from]', 'ph_template_set_addons[viewing_request][viewing_time_to]'] },
+				{ id: 'addon-locrating', label: 'Locrating', controls: ['ph_template_set_addons[locrating][local_schools_button]', 'ph_template_set_addons[locrating][local_amenities_button]', 'ph_template_set_addons[locrating][local_transport_button]', 'ph_template_set_addons[locrating][flood_risk_button]', 'ph_template_set_addons[locrating][broadband_checker_button]', 'ph_template_set_addons[locrating][mobile_phone_data_button]', 'ph_template_set_addons[locrating][all_in_one_button]'] },
+				{ id: 'addon-home_reports', label: 'Home reports', controls: ['ph_template_set_addons[home_reports][data_capture]'] },
+				{ id: 'addon-onedome', label: 'OneDome', controls: ['ph_template_set_addons[onedome][hide_propertyhive_enquiry_action]', 'ph_template_set_addons[onedome][show_onedome_viewing_action]', 'ph_template_set_addons[onedome][show_onedome_valuation_action]', 'ph_template_set_addons[onedome][show_onedome_offer_action]'] },
+				{ id: 'addon-propertyfile', label: 'PropertyFile', controls: ['ph_template_set_addons[propertyfile][hide_propertyhive_enquiry_action]', 'ph_template_set_addons[propertyfile][show_propertyfile_viewing_action]', 'ph_template_set_addons[propertyfile][show_propertyfile_valuation_action]'] }
 			]
 		}
 	};
@@ -339,7 +353,10 @@
 
 		body.className = 'ph-template-editor-group-body';
 		body.id = 'ph-template-editor-' + layoutId + '-' + group.id;
+		button.id = body.id + '-toggle';
 		body.setAttribute('data-ph-template-editor-group-body', group.id);
+		body.setAttribute('role', 'region');
+		body.setAttribute('aria-labelledby', button.id);
 
 		content.className = 'ph-template-editor-group-content';
 

@@ -275,8 +275,15 @@ class PH_Template_Set_Editor_Controller {
 	 */
 	private static function render_addon_settings_control( $definition, $key, $control, $value, $with_meta ) {
 		$is_multiple = isset( $control['type'] ) && 'multiselect' === $control['type'];
+		$is_checkbox = isset( $control['type'] ) && 'checkbox' === $control['type'];
+		$help        = isset( $control['help'] ) ? (string) $control['help'] : '';
 		$name        = PH_Template_Set_Addon_Settings::get_field_name( $definition['id'], $key, $is_multiple );
-		$field_class = sanitize_html_class( 'ph-template-editor-addon-' . $definition['id'] . '-' . $key );
+		$field_class = 'ph-template-editor-addon-' . sanitize_html_class( $definition['id'] . '-' . $key );
+
+		if ( $is_checkbox ) {
+			$field_class .= ' ph-template-editor-field-checkbox';
+		}
+
 		$meta_attrs  = '';
 
 		if ( $with_meta ) {
@@ -287,7 +294,15 @@ class PH_Template_Set_Editor_Controller {
 		}
 
 		echo '<label class="ph-template-editor-field ' . esc_attr( $field_class ) . '"' . $meta_attrs . '>';
-			echo '<span>' . esc_html( isset( $control['label'] ) ? $control['label'] : '' ) . '</span>';
+			if ( $is_checkbox ) {
+				$checked_value   = isset( $control['checked_value'] ) ? (string) $control['checked_value'] : '1';
+				$unchecked_value = isset( $control['unchecked_value'] ) ? (string) $control['unchecked_value'] : '';
+				echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $unchecked_value ) . '">';
+				echo '<input type="checkbox" name="' . esc_attr( $name ) . '" value="' . esc_attr( $checked_value ) . '"' . checked( $checked_value, $value, false ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+				echo '<span>' . esc_html( isset( $control['label'] ) ? $control['label'] : '' ) . '</span>';
+			} else {
+				echo '<span>' . esc_html( isset( $control['label'] ) ? $control['label'] : '' ) . '</span>';
+			}
 
 			if ( 'multiselect' === $control['type'] ) {
 				$selected_values = array_map( 'strval', is_array( $value ) ? $value : array() );
@@ -304,13 +319,15 @@ class PH_Template_Set_Editor_Controller {
 						echo '<option value="' . esc_attr( $option_value ) . '"' . selected( $option_value, $value, false ) . '>' . esc_html( $option_label ) . '</option>';
 					}
 				echo '</select>';
-			} elseif ( 'checkbox' === $control['type'] ) {
-				$checked_value   = isset( $control['checked_value'] ) ? (string) $control['checked_value'] : '1';
-				$unchecked_value = isset( $control['unchecked_value'] ) ? (string) $control['unchecked_value'] : '';
-				echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $unchecked_value ) . '">';
-				echo '<input type="checkbox" name="' . esc_attr( $name ) . '" value="' . esc_attr( $checked_value ) . '"' . checked( $checked_value, $value, false ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+			} elseif ( $is_checkbox ) {
+				// The checkbox and label are rendered above as one horizontal toggle.
 			} else {
-				echo '<input type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '"' . ( isset( $control['maxlength'] ) ? ' maxlength="' . absint( $control['maxlength'] ) . '"' : '' ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+				$placeholder = isset( $control['placeholder'] ) ? (string) $control['placeholder'] : '';
+				echo '<input type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '"' . ( $placeholder ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '' ) . ( isset( $control['maxlength'] ) ? ' maxlength="' . absint( $control['maxlength'] ) . '"' : '' ) . ' data-ph-template-editor-control data-ph-template-editor-addon-control="' . esc_attr( $definition['id'] ) . '">';
+			}
+
+			if ( $help && ! $is_checkbox ) {
+				echo '<small class="ph-template-editor-field-help">' . esc_html( $help ) . '</small>';
 			}
 
 		echo '</label>';
@@ -340,7 +357,7 @@ class PH_Template_Set_Editor_Controller {
 					$value_label = isset( $control['options'][ $manifest['locked'][ $key ] ] ) ? $control['options'][ $manifest['locked'][ $key ] ] : $manifest['locked'][ $key ];
 					echo '<div class="ph-template-editor-field ph-template-editor-field-locked" data-ph-template-editor-panel-control="' . esc_attr( $key ) . '">';
 						echo '<span>' . esc_html( $control['label'] ) . '</span>';
-						echo '<input type="text" value="' . esc_attr( $value_label ) . '" disabled>';
+						echo '<input type="text" value="' . esc_attr( $value_label ) . '" aria-label="' . esc_attr( $control['label'] ) . '" disabled>';
 						echo '<small>' . esc_html__( "Set by this template's design", 'propertyhive' ) . '</small>';
 						echo '</div>';
 					continue;
@@ -513,7 +530,7 @@ class PH_Template_Set_Editor_Controller {
 			'modules'     => __( 'Modules', 'propertyhive' ),
 			'purchase-calculators' => __( 'Purchase calculators', 'propertyhive' ),
 			'shortlist'   => __( 'Shortlist', 'propertyhive' ),
-			'send-to-friend' => __( 'Send To Friend', 'propertyhive' ),
+			'send-to-friend' => __( 'Send to friend', 'propertyhive' ),
 			'rooms'       => __( 'Rooms', 'propertyhive' ),
 			'what3words'  => __( 'what3words', 'propertyhive' ),
 			'recommended' => __( 'Related properties', 'propertyhive' ),
@@ -526,7 +543,7 @@ class PH_Template_Set_Editor_Controller {
 			if ( ! isset( $groups[ $group ] ) ) {
 				$groups[ $group ] = array(
 					'id'       => $group,
-					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucwords( str_replace( '-', ' ', $group ) ),
+					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucfirst( str_replace( '-', ' ', $group ) ),
 					'controls' => array(),
 				);
 			}
@@ -546,7 +563,7 @@ class PH_Template_Set_Editor_Controller {
 	private static function get_search_control_groups( $template ) {
 		$controls = PH_Template_Set_Catalog::get_available_search_template_controls( $template );
 		$labels   = array(
-			'save-search' => __( 'Save Search', 'propertyhive' ),
+			'save-search' => __( 'Save search', 'propertyhive' ),
 			'shortlist'  => __( 'Shortlist', 'propertyhive' ),
 		);
 		$groups = array();
@@ -557,7 +574,7 @@ class PH_Template_Set_Editor_Controller {
 			if ( ! isset( $groups[ $group ] ) ) {
 				$groups[ $group ] = array(
 					'id'       => $group,
-					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucwords( str_replace( '-', ' ', $group ) ),
+					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucfirst( str_replace( '-', ' ', $group ) ),
 					'controls' => array(),
 				);
 			}

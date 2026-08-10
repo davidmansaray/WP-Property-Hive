@@ -204,7 +204,7 @@ class PH_Template_Set_Catalog {
 			'template_set_contact_card_style' => array( 'type' => 'select', 'label' => __( 'Contact card style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_contact_card_styles(), 'default' => 'classic', 'group' => 'enquiry' ),
 			'template_set_show_mobile_cta' => array( 'type' => 'checkbox', 'label' => __( 'Show mobile enquiry bar', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'enquiry' ),
 			'template_set_show_shortlist_detail' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
-			'template_set_show_send_to_friend' => array( 'type' => 'checkbox', 'label' => __( 'Show Send To Friend action', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'send-to-friend', 'requires_add_on' => 'propertyhive-send-to-friend' ),
+			'template_set_show_send_to_friend' => array( 'type' => 'checkbox', 'label' => __( 'Show send to friend action', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'send-to-friend', 'requires_add_on' => 'propertyhive-send-to-friend' ),
 			'template_set_show_rooms_breakdown' => array( 'type' => 'checkbox', 'label' => __( 'Show room breakdown', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'rooms', 'requires_add_on' => 'propertyhive-rooms' ),
 			'template_set_show_what3words' => array( 'type' => 'checkbox', 'label' => __( 'Show what3words locations', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'what3words', 'requires_add_on' => 'propertyhive-what3words' ),
 			'template_set_show_recommended' => array( 'type' => 'checkbox', 'label' => __( 'Show related properties', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'recommended' ),
@@ -221,7 +221,7 @@ class PH_Template_Set_Catalog {
 	 */
 	public static function get_search_shared_controls() {
 		return array(
-			'template_set_show_save_search'    => array( 'type' => 'checkbox', 'label' => __( 'Show Save Search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
+			'template_set_show_save_search'    => array( 'type' => 'checkbox', 'label' => __( 'Show save search button', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'save-search', 'requires_add_on' => 'propertyhive-save-search' ),
 			'template_set_show_shortlist_cards' => array( 'type' => 'checkbox', 'label' => __( 'Show shortlist button on cards', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'shortlist', 'requires_add_on' => 'propertyhive-shortlist' ),
 		);
 	}
