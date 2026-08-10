@@ -853,7 +853,9 @@
 
 				title.type = 'button';
 				title.className = 'ph-search-form-builder-item-title';
+				title.id = 'ph-search-form-builder-field-' + String(field.id).replace(/[^a-z0-9_-]+/gi, '-') + '-toggle';
 				title.setAttribute('aria-expanded', field.id === state.selectedId ? 'true' : 'false');
+				title.setAttribute('aria-controls', 'ph-search-form-builder-settings-' + String(field.id).replace(/[^a-z0-9_-]+/gi, '-'));
 				titleLabel.className = 'ph-search-form-builder-item-label';
 				titleLabel.textContent = titleText;
 				title.appendChild(titleLabel);
@@ -946,25 +948,32 @@
 			var input = document.createElement(type === 'select' ? 'select' : 'input');
 
 			row.className = 'ph-search-form-builder-setting';
+			if (type === 'checkbox') {
+				row.classList.add('ph-search-form-builder-setting-checkbox');
+			}
 			span.textContent = label;
-			row.appendChild(span);
 
 			if (type === 'checkbox') {
 				input.type = 'checkbox';
 				input.checked = !!field.settings[key];
+				row.appendChild(input);
+				row.appendChild(span);
 			} else if (type === 'number') {
 				input.type = 'number';
 				input.value = field.settings[key] || '';
+				row.appendChild(span);
+				row.appendChild(input);
 			} else {
 				input.type = 'text';
 				input.value = field.settings[key] || '';
+				row.appendChild(span);
+				row.appendChild(input);
 			}
 
 			input.addEventListener('change', function () {
 				updateSelectedSetting(key, type === 'checkbox' ? input.checked : input.value);
 			});
 
-			row.appendChild(input);
 			container.appendChild(row);
 
 			return input;
@@ -1061,6 +1070,10 @@
 				container.appendChild(panel);
 				return;
 			}
+
+			panel.id = 'ph-search-form-builder-settings-' + String(field.id).replace(/[^a-z0-9_-]+/gi, '-');
+			panel.setAttribute('role', 'region');
+			panel.setAttribute('aria-labelledby', 'ph-search-form-builder-field-' + String(field.id).replace(/[^a-z0-9_-]+/gi, '-') + '-toggle');
 
 			heading.textContent = field.title || field.id;
 			panel.appendChild(heading);

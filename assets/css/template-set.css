@@ -291,13 +291,17 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-col
 	background: var(--ph-editor-white);
 	border-bottom: 1px solid var(--ph-editor-smoke);
 	display: grid;
-	gap: 8px;
+	gap: 0;
 	padding: 16px 22px 20px;
 }
 
 .ph-template-editor-group {
 	display: grid;
 	gap: 0;
+}
+
+.ph-template-editor-group + .ph-template-editor-group {
+	margin-top: 8px;
 }
 
 .ph-template-editor-group-toggle,
@@ -314,12 +318,14 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	font-family: var(--ph-editor-font);
 	font-size: 13px;
 	font-weight: 700;
+	gap: 12px;
 	justify-content: space-between;
 	line-height: 1.2;
 	min-height: 42px;
 	padding: 10px 12px;
 	text-align: left;
 	text-decoration: none;
+	overflow-wrap: anywhere;
 	transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 	width: 100%;
 }
@@ -330,7 +336,6 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	font-size: 18px;
 	font-weight: 300;
 	line-height: 1;
-	margin-left: 12px;
 }
 
 .ph-template-editor-group-toggle.is-active::after,
@@ -346,6 +351,12 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	border-color: var(--ph-editor-wax);
 	color: var(--ph-editor-carbon);
 	outline: none;
+}
+
+.ph-template-editor-group-toggle:focus-visible,
+body.ph-template-editor-active .ph-template-editor button.ph-template-editor-group-toggle:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
 }
 
 .ph-template-editor-group-toggle.is-active,
@@ -484,6 +495,64 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	outline: none;
 }
 
+.ph-template-editor-field input[type="text"],
+.ph-template-editor-field input[type="number"] {
+	appearance: none;
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	color: var(--ph-editor-carbon);
+	font-family: var(--ph-editor-font);
+	font-size: 14px;
+	font-weight: 400;
+	min-height: 42px;
+	padding: 8px 12px;
+	width: 100%;
+}
+
+.ph-template-editor-field input[type="text"]:focus,
+.ph-template-editor-field input[type="number"]:focus {
+	border-color: var(--ph-editor-carbon);
+	box-shadow: 0 0 0 1px var(--ph-editor-carbon);
+	outline: none;
+}
+
+.ph-template-editor-field-help {
+	color: var(--ph-editor-muted);
+	display: block;
+	font-size: 12px;
+	line-height: 1.35;
+	margin-top: -2px;
+}
+
+.ph-template-editor-field-locked input:disabled {
+	background: var(--ph-editor-mist);
+	border-color: var(--ph-editor-smoke);
+	color: var(--ph-editor-muted);
+	cursor: not-allowed;
+	opacity: 1;
+}
+
+.ph-template-editor-field-locked small {
+	color: var(--ph-editor-muted);
+	font-size: 11px;
+	line-height: 1.35;
+}
+
+.ph-template-editor-field select[multiple] {
+	appearance: auto;
+	background-image: none;
+	min-height: 144px;
+	padding: 8px 12px;
+}
+
+.ph-template-editor-field select:focus-visible,
+.ph-template-editor-field input[type="text"]:focus-visible,
+.ph-template-editor-field input[type="number"]:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
+}
+
 .ph-template-editor-segmented {
 	display: grid;
 	gap: 8px;
@@ -536,6 +605,31 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	flex: 0 0 auto;
 	height: 18px;
 	width: 18px;
+}
+
+.ph-template-editor-field-checkbox {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	margin: 0;
+	min-height: 22px;
+}
+
+.ph-template-editor-field-checkbox > span {
+	flex: 1 1 auto;
+}
+
+.ph-template-editor-field-checkbox input[type="checkbox"] {
+	accent-color: var(--ph-editor-carbon);
+	flex: 0 0 auto;
+	height: 18px;
+	margin: 0;
+	width: 18px;
+}
+
+.ph-template-editor-field-checkbox input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
 }
 
 .ph-template-editor-field-builder {
@@ -816,6 +910,12 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	outline: none;
 }
 
+.ph-search-form-builder-item-actions button:focus-visible,
+.ph-search-form-builder-add button:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
+}
+
 .ph-search-form-builder-add {
 	border: 1px solid var(--ph-editor-smoke);
 	border-radius: 6px;
@@ -933,6 +1033,13 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	margin: 0;
 }
 
+.ph-search-form-builder-setting-checkbox {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	min-height: 22px;
+}
+
 .ph-search-form-builder-setting.ph-search-form-builder-visibility-setting {
 	border: 1px solid var(--ph-editor-smoke);
 	border-radius: 6px;
@@ -1008,14 +1115,22 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 .ph-search-form-builder-setting input[type="checkbox"] {
 	accent-color: var(--ph-editor-carbon);
 	height: 18px;
+	margin: 0;
 	width: 18px;
 }
 
-.ph-search-form-builder-setting input:focus,
+.ph-search-form-builder-setting input:not([type="checkbox"]):focus,
 .ph-search-form-builder-setting select:focus {
 	border-color: var(--ph-editor-carbon);
 	box-shadow: 0 0 0 1px var(--ph-editor-carbon);
 	outline: none;
+}
+
+.ph-search-form-builder-setting input:not([type="checkbox"]):focus-visible,
+.ph-search-form-builder-setting select:focus-visible,
+.ph-search-form-builder-setting input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
 }
 
 .ph-search-form-builder-advanced {
@@ -1088,6 +1203,14 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 .ph-template-editor-save:disabled {
 	cursor: not-allowed;
 	opacity: 0.55;
+}
+
+.ph-template-editor-save:not(:disabled):focus-visible,
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:not(:disabled):focus-visible,
+.ph-template-editor-secondary:focus-visible,
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
 }
 
 .ph-template-editor-secondary {
