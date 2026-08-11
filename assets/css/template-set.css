@@ -101,6 +101,10 @@ body.ph-template-editor-active.ph-template-editor-sidebar-collapsed {
 	--ph-template-editor-space: 0px;
 }
 
+body.ph-template-editor-active:not(.ph-template-editor-sidebar-collapsed) #wp-admin-bar-ph-template-set.ph-template-editor-admin-bar-item {
+	display: none;
+}
+
 @media (min-width: 721px) {
 	body.ph-template-editor-active .ph-template-search,
 	body.ph-template-editor-active .ph-template-detail {

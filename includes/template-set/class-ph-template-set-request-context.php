@@ -217,8 +217,9 @@ class PH_Template_Set_Request_Context {
 			return;
 		}
 
-		$root_id    = 'ph-template-set';
-		$editor_url = add_query_arg(
+		$root_id          = 'ph-template-set';
+		$is_editor_active = self::is_template_editor_active();
+		$editor_url       = add_query_arg(
 			array(
 				PH_Template_Set::EDIT_QUERY_ARG      => '1',
 				PH_Template_Set::EDIT_OPEN_QUERY_ARG => '1',
@@ -231,6 +232,9 @@ class PH_Template_Set_Request_Context {
 				'id'    => $root_id,
 				'title' => __( 'Open Visual Editor', 'propertyhive' ),
 				'href'  => $editor_url,
+				'meta'  => array(
+					'class' => $is_editor_active ? 'ph-template-editor-admin-bar-item' : '',
+				),
 			)
 		);
 	}
