@@ -718,7 +718,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Cavendish House, Marylebone W1', 'propertyhive' ),
 				'price'   => __( 'Guide price ', 'propertyhive' ) . self::demo_price( '1,250,000' ),
 				'summary' => __( 'A restored period home with generous entertaining space, calm bedrooms and a landscaped west-facing terrace.', 'propertyhive' ),
-				'facts'   => array( __( '3 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( '1,480 sq ft', 'propertyhive' ), __( 'Freehold', 'propertyhive' ) ),
+				'facts'   => array( __( '3 Beds', 'propertyhive' ), __( '2 Baths', 'propertyhive' ), __( '1,480 sq ft', 'propertyhive' ), __( 'Freehold', 'propertyhive' ) ),
 			),
 			array(
 				'image'   => 'cavendish-kitchen-dining.jpg',
@@ -726,7 +726,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Upper Maisonette, Devonshire Street', 'propertyhive' ),
 				'price'   => self::demo_price( '925,000' ),
 				'summary' => __( 'A bright two bedroom maisonette with a refined kitchen, private entrance and a quiet garden outlook.', 'propertyhive' ),
-				'facts'   => array( __( '2 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Share of freehold', 'propertyhive' ) ),
+				'facts'   => array( __( '2 Beds', 'propertyhive' ), __( '2 Baths', 'propertyhive' ), __( 'Share of freehold', 'propertyhive' ) ),
 			),
 			array(
 				'image'   => 'cavendish-exterior.jpg',
@@ -734,7 +734,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Period House, Cavendish Road', 'propertyhive' ),
 				'price'   => __( 'Offers over ', 'propertyhive' ) . self::demo_price( '1,175,000' ),
 				'summary' => __( 'A handsome family house with balanced reception space, off-street parking and a sheltered rear garden.', 'propertyhive' ),
-				'facts'   => array( __( '4 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Garden', 'propertyhive' ) ),
+				'facts'   => array( __( '4 Beds', 'propertyhive' ), __( '2 Baths', 'propertyhive' ), __( 'Garden', 'propertyhive' ) ),
 			),
 			array(
 				'image'   => 'atlas-apartment-living.jpg',
@@ -742,7 +742,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Atlas Apartment, Riverside Quarter', 'propertyhive' ),
 				'price'   => self::demo_price( '2,450' ) . __( ' pcm', 'propertyhive' ),
 				'summary' => __( 'A furnished riverside apartment with concierge, gym access, balcony and fast links into central London.', 'propertyhive' ),
-				'facts'   => array( __( '2 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Furnished', 'propertyhive' ) ),
+				'facts'   => array( __( '2 Beds', 'propertyhive' ), __( '2 Baths', 'propertyhive' ), __( 'Furnished', 'propertyhive' ) ),
 			),
 			array(
 				'image'   => 'elm-yard-development.jpg',
@@ -750,7 +750,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Elm Yard, Wokingham RG40', 'propertyhive' ),
 				'price'   => __( 'From ', 'propertyhive' ) . self::demo_price( '485,000' ),
 				'summary' => __( 'A boutique courtyard development with efficient homes, considered materials and a furnished show home.', 'propertyhive' ),
-				'facts'   => array( __( '1-3 beds', 'propertyhive' ), __( 'EPC A-rated', 'propertyhive' ), __( 'Show home open', 'propertyhive' ) ),
+				'facts'   => array( __( '1-3 Beds', 'propertyhive' ), __( 'EPC A-rated', 'propertyhive' ), __( 'Show home open', 'propertyhive' ) ),
 			),
 			array(
 				'image'   => 'cavendish-garden-terrace.jpg',
@@ -758,7 +758,7 @@ trait PH_Template_Set_Preview {
 				'title'   => __( 'Garden Flat, Weymouth Street', 'propertyhive' ),
 				'price'   => self::demo_price( '1,050,000' ),
 				'summary' => __( 'A lateral apartment with a planted terrace, open-plan living space and a calm position close to the park.', 'propertyhive' ),
-				'facts'   => array( __( '2 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Terrace', 'propertyhive' ) ),
+				'facts'   => array( __( '2 Beds', 'propertyhive' ), __( '2 Baths', 'propertyhive' ), __( 'Terrace', 'propertyhive' ) ),
 			),
 		);
 	}
