@@ -2,6 +2,11 @@
 	'use strict';
 
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
+	var activePreviewDocument = null;
+
+	function getPreviewDocument() {
+		return activePreviewDocument || document;
+	}
 
 	function removePrefixedClass(element, prefix) {
 		Array.prototype.slice.call(element.classList).forEach(function (className) {
@@ -12,22 +17,36 @@
 	}
 
 	function setBodyOption(prefix, value) {
-		removePrefixedClass(document.body, prefix);
-		document.body.classList.add(prefix + value);
+		var previewDocument = getPreviewDocument();
+
+		if (!previewDocument || !previewDocument.body) {
+			return;
+		}
+
+		removePrefixedClass(previewDocument.body, prefix);
+		previewDocument.body.classList.add(prefix + value);
 	}
 
 	function setSearchOption(prefix, value) {
+		var previewDocument = getPreviewDocument();
+
 		setBodyOption(prefix, value);
 
-		document.querySelectorAll('.ph-template-search').forEach(function (search) {
+		previewDocument.querySelectorAll('.ph-template-search').forEach(function (search) {
 			removePrefixedClass(search, prefix);
 			search.classList.add(prefix + value);
 		});
 	}
 
 	function setBodyToggle(showClass, hideClass, enabled) {
-		document.body.classList.toggle(showClass, enabled);
-		document.body.classList.toggle(hideClass, !enabled);
+		var previewDocument = getPreviewDocument();
+
+		if (!previewDocument || !previewDocument.body) {
+			return;
+		}
+
+		previewDocument.body.classList.toggle(showClass, enabled);
+		previewDocument.body.classList.toggle(hideClass, !enabled);
 	}
 
 	function isEnabledValue(value, control) {
@@ -98,8 +117,9 @@
 
 	function applySearchPromoPositions(value) {
 		var positions = getPositiveIntegerList(value);
+		var previewDocument = getPreviewDocument();
 
-		document.querySelectorAll('.ph-template-search li.ph-template-search-promo, .ph-template-search li.promo').forEach(function (promo) {
+		previewDocument.querySelectorAll('.ph-template-search li.ph-template-search-promo, .ph-template-search li.promo').forEach(function (promo) {
 			var position = getSearchPromoPosition(promo);
 
 			if (position > 0) {
@@ -122,15 +142,16 @@
 	}
 
 	function applyPrintableBrochureLinkText(value) {
-		document.querySelectorAll('.action-printable-brochure a, [data-ph-template-printable-brochure]').forEach(function (link) {
+		getPreviewDocument().querySelectorAll('.action-printable-brochure a, [data-ph-template-printable-brochure]').forEach(function (link) {
 			setLinkLabel(link, value);
 		});
 	}
 
 	function applyRecommendedCount(value) {
 		var limit = parseInt(value, 10) || 3;
+		var previewDocument = getPreviewDocument();
 
-		document.querySelectorAll('[data-ph-recommended-properties]').forEach(function (section) {
+		previewDocument.querySelectorAll('[data-ph-recommended-properties]').forEach(function (section) {
 			Array.prototype.slice.call(section.querySelectorAll('[data-ph-recommended-card]')).forEach(function (card, index) {
 				card.hidden = index >= limit;
 			});
@@ -138,9 +159,64 @@
 	}
 
 	function resetGalleryPanel(panelName) {
-		if (modules.gallery && typeof modules.gallery.resetPanel === 'function') {
+		var previewDocument = getPreviewDocument();
+
+		if (previewDocument === document && modules.gallery && typeof modules.gallery.resetPanel === 'function') {
 			modules.gallery.resetPanel(panelName);
+			return;
 		}
+
+		previewDocument.querySelectorAll('[data-ph-template-gallery]').forEach(function (gallery) {
+			var panel = gallery.querySelector('[data-ph-gallery-panel="' + panelName + '"]');
+			var heroImage = gallery.querySelector('[data-ph-gallery-hero-image]');
+			var photoTrigger = gallery.querySelector('[data-ph-gallery-open]');
+
+			if (!panel || panel.hidden) {
+				return;
+			}
+
+			gallery.querySelectorAll('[data-ph-gallery-panel]').forEach(function (galleryPanel) {
+				galleryPanel.hidden = galleryPanel.getAttribute('data-ph-gallery-panel') !== 'photos';
+			});
+			gallery.querySelectorAll('[data-ph-gallery-tab]').forEach(function (tab) {
+				var isPhotos = tab.getAttribute('data-ph-gallery-tab') === 'photos';
+
+				tab.classList.toggle('is-active', isPhotos);
+				tab.setAttribute('aria-selected', isPhotos ? 'true' : 'false');
+			});
+			if (heroImage) {
+				heroImage.hidden = false;
+			}
+			if (photoTrigger) {
+				photoTrigger.hidden = false;
+			}
+			gallery.classList.remove('is-showing-panel');
+		});
+	}
+
+	function setGalleryVariant(value) {
+		var previewDocument = getPreviewDocument();
+
+		if (previewDocument === document && modules.gallery && typeof modules.gallery.setVariant === 'function') {
+			modules.gallery.setVariant(value, false);
+			return;
+		}
+
+		previewDocument.querySelectorAll('[data-ph-template-gallery]').forEach(function (gallery) {
+			gallery.querySelectorAll('[data-ph-gallery-variant]').forEach(function (button) {
+				var isActive = button.getAttribute('data-ph-gallery-variant') === value;
+
+				button.classList.toggle('is-active', isActive);
+				button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+			});
+			Array.prototype.slice.call(gallery.classList).forEach(function (className) {
+				if (className.indexOf('ph-gallery-variant-') === 0) {
+					gallery.classList.remove(className);
+				}
+			});
+			gallery.classList.add('ph-gallery-variant-' + value);
+			gallery.setAttribute('data-ph-gallery-current-variant', value);
+		});
 	}
 
 	function getSelectedOption(control) {
@@ -194,9 +270,7 @@
 
 	var editorControlHandlers = {
 		template_set_gallery_layout: function (value, control) {
-			if (modules.gallery && typeof modules.gallery.setVariant === 'function') {
-				modules.gallery.setVariant(value, false);
-			}
+			setGalleryVariant(value);
 			updateSegmentedControl(control);
 		},
 		template_set_button_style: function (value) {
@@ -344,9 +418,10 @@
 		}
 	};
 
-	function applyEditorControl(control) {
+	function applyEditorControlToDocument(control, previewDocument) {
 		var handler;
 		var value;
+		var previousPreviewDocument = activePreviewDocument;
 
 		if (!control || !control.name) {
 			return;
@@ -362,13 +437,47 @@
 		}
 
 		value = control.type === 'checkbox' ? (control.checked ? 'yes' : '') : control.value;
-		handler(value, control);
+		activePreviewDocument = previewDocument || document;
+
+		try {
+			handler(value, control);
+		} finally {
+			activePreviewDocument = previousPreviewDocument;
+		}
+	}
+
+	function applyEditorControl(control) {
+		var frameDocument;
+
+		applyEditorControlToDocument(control, document);
+
+		if (!modules.editorResponsivePreview || typeof modules.editorResponsivePreview.getDocument !== 'function') {
+			return;
+		}
+
+		frameDocument = modules.editorResponsivePreview.getDocument();
+
+		if (frameDocument && frameDocument !== document) {
+			applyEditorControlToDocument(control, frameDocument);
+		}
+	}
+
+	function mirrorControls(form, previewDocument) {
+		if (!form || !previewDocument) {
+			return;
+		}
+
+		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
+			applyEditorControlToDocument(control, previewDocument);
+		});
 	}
 
 	modules.editorPreview = {
 		applyControl: applyEditorControl,
+		applyControlToDocument: applyEditorControlToDocument,
 		getTemplatePreviewUrl: getTemplatePreviewUrl,
 		isTemplatePreviewControl: isTemplatePreviewControl,
-		maybeNavigateTemplatePreview: maybeNavigateTemplatePreview
+		maybeNavigateTemplatePreview: maybeNavigateTemplatePreview,
+		mirrorControls: mirrorControls
 	};
 }());

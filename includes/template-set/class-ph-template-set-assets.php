@@ -34,10 +34,11 @@ class PH_Template_Set_Assets {
 
 		$base_url       = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/';
 		$search_request = PH_Template_Set_Request_Context::is_search_results_request();
+		$editor_request = PH_Template_Set_Request_Context::is_template_editor_active() || PH_Template_Set_Request_Context::is_template_editor_frame_request();
 		$search_template = $search_request ? PH_Template_Set_Request_Context::get_search_template() : '';
 		$legacy_search   = $search_request && 'portal-style-search-results' === $search_template;
 
-		if ( ! $search_request || $legacy_search || PH_Template_Set_Request_Context::is_template_editor_active() ) {
+		if ( ! $search_request || $legacy_search || $editor_request ) {
 			$styles['propertyhive-template-set'] = array(
 				'src'     => $base_url . 'template-set.css',
 				'deps'    => array( 'propertyhive-general' ),
@@ -48,7 +49,7 @@ class PH_Template_Set_Assets {
 
 		if ( $search_request && ! $legacy_search ) {
 			$structure_dependencies = array( 'propertyhive-general' );
-			if ( PH_Template_Set_Request_Context::is_template_editor_active() ) {
+			if ( $editor_request ) {
 				$structure_dependencies[] = 'propertyhive-template-set';
 			}
 
@@ -99,7 +100,7 @@ class PH_Template_Set_Assets {
 		 */
 		if (
 			PH_Template_Set_Request_Context::is_search_results_request()
-			&& PH_Template_Set_Request_Context::is_template_editor_active()
+			&& ( PH_Template_Set_Request_Context::is_template_editor_active() || PH_Template_Set_Request_Context::is_template_editor_frame_request() )
 			&& PH_Template_Set_Search_Form_Editor::can_manage()
 		) {
 			if ( ! wp_script_is( 'jquery-ui-touch-punch', 'registered' ) ) {
@@ -121,6 +122,10 @@ class PH_Template_Set_Assets {
 		$module_scripts  = array(
 			'propertyhive-template-set-gallery'             => array(
 				'path' => 'assets/js/frontend/template-set/gallery.js',
+				'deps' => array(),
+			),
+			'propertyhive-template-set-editor-responsive-preview' => array(
+				'path' => 'assets/js/frontend/template-set/editor-responsive-preview.js',
 				'deps' => array(),
 			),
 			'propertyhive-template-set-editor-preview'      => array(

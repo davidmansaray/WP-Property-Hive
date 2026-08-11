@@ -27,6 +27,7 @@ class PH_Template_Set {
 	const EDIT_QUERY_ARG = 'ph_template_edit';
 	const EDIT_CLOSED_QUERY_ARG = 'ph_template_editor_closed';
 	const EDIT_OPEN_QUERY_ARG = 'ph_template_editor_open';
+	const EDIT_FRAME_QUERY_ARG = 'ph_template_editor_frame';
 	const EDITOR_MODE_LEGACY = 'legacy';
 	const EDITOR_MODE_VISUAL = 'visual_editor';
 	const EDITOR_MODE_PAGE_BUILDER = 'page_builder';
@@ -102,6 +103,7 @@ class PH_Template_Set {
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_layout' ) );
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_preview' ) );
 		add_action( 'admin_bar_menu', array( __CLASS__, 'add_admin_bar_menu' ), 80 );
+		add_filter( 'show_admin_bar', array( __CLASS__, 'filter_admin_bar_visibility' ), 20 );
 		add_action( 'wp_footer', array( __CLASS__, 'render_template_editor' ), 20 );
 		add_action( 'wp_ajax_propertyhive_template_set_save', array( __CLASS__, 'ajax_save_template_editor' ) );
 		add_action( 'wp_ajax_propertyhive_set_template_experience', array( __CLASS__, 'ajax_set_template_experience' ) );
@@ -366,7 +368,26 @@ class PH_Template_Set {
 	}
 
 	public static function add_admin_bar_menu( $wp_admin_bar ) {
+		if ( PH_Template_Set_Request_Context::is_template_editor_frame_request() ) {
+			return;
+		}
+
 		return PH_Template_Set_Request_Context::add_admin_bar_menu( $wp_admin_bar );
+	}
+
+	/**
+	 * Hide the WordPress admin bar inside an authorized responsive preview
+	 * frame, while leaving it unchanged for every other request.
+	 *
+	 * @param bool $show_admin_bar Whether WordPress should render the admin bar.
+	 * @return bool
+	 */
+	public static function filter_admin_bar_visibility( $show_admin_bar ) {
+		if ( PH_Template_Set_Request_Context::is_template_editor_frame_request() ) {
+			return false;
+		}
+
+		return $show_admin_bar;
 	}
 
 	public static function print_style_variables() {

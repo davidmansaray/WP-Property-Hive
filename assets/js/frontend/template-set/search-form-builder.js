@@ -67,7 +67,7 @@
 		});
 	}
 
-	function dispatchSearchFormReplacementEvent(eventName, previousForm, nextForm) {
+	function dispatchSearchFormReplacementEvent(eventName, previousForm, nextForm, searchFormConfig) {
 		if (typeof window.CustomEvent !== 'function') {
 			return;
 		}
@@ -75,25 +75,33 @@
 		document.dispatchEvent(new window.CustomEvent(eventName, {
 			detail: {
 				form: nextForm,
-				previousForm: previousForm
+				previousForm: previousForm,
+				selector: searchFormConfig && searchFormConfig.previewSelector ? searchFormConfig.previewSelector : ''
 			}
 		}));
 	}
 
-	function initializeReplacedSearchForm(nextForm) {
-		if (typeof window.toggleDepartmentFields === 'function') {
-			window.toggleDepartmentFields();
+	function initializeReplacedSearchForm(nextForm, ownerWindow) {
+		var targetWindow = ownerWindow || window;
+		var targetJQuery = targetWindow.jQuery;
+
+		if (!nextForm) {
+			return;
 		}
 
-		if (typeof window.ph_init_dynamic_population === 'function') {
-			window.ph_init_dynamic_population(nextForm);
-		} else if (typeof window.ph_populate_subsequent_dropdowns === 'function') {
-			window.ph_populate_subsequent_dropdowns(false);
+		if (typeof targetWindow.toggleDepartmentFields === 'function') {
+			targetWindow.toggleDepartmentFields();
 		}
 
-		if (window.jQuery && window.jQuery.fn && window.jQuery.fn.multiselect) {
-			window.jQuery(nextForm).find('select.ph-form-multiselect').each(function () {
-				var select = window.jQuery(this);
+		if (typeof targetWindow.ph_init_dynamic_population === 'function') {
+			targetWindow.ph_init_dynamic_population(nextForm);
+		} else if (typeof targetWindow.ph_populate_subsequent_dropdowns === 'function') {
+			targetWindow.ph_populate_subsequent_dropdowns(false);
+		}
+
+		if (targetJQuery && targetJQuery.fn && targetJQuery.fn.multiselect) {
+			targetJQuery(nextForm).find('select.ph-form-multiselect').each(function () {
+				var select = targetJQuery(this);
 
 				if (select.data('ph-template-editor-multiselect') || select.data('plugin_multiselect')) {
 					return;
@@ -126,7 +134,7 @@
 			return;
 		}
 
-		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replacing', currentForm, nextForm);
+		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replacing', currentForm, nextForm, searchFormConfig);
 		currentForm.parentNode.replaceChild(nextForm, currentForm);
 
 		nextForm.querySelectorAll('script').forEach(function (script) {
@@ -137,7 +145,7 @@
 		});
 
 		initializeReplacedSearchForm(nextForm);
-		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replaced', currentForm, nextForm);
+		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replaced', currentForm, nextForm, searchFormConfig);
 	}
 
 	function initSearchFormBuilder(editor, form, labels) {
@@ -1345,6 +1353,7 @@
 
 	modules.searchFormBuilder = {
 		buildPayload: buildSearchFormPayload,
+		initializeForm: initializeReplacedSearchForm,
 		init: init
 	};
 }());

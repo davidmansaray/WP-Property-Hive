@@ -83,6 +83,7 @@ class PH_Template_Set_Editor_Controller {
 				echo '</form>';
 			echo '<button type="button" class="ph-template-editor-collapse-toggle" data-ph-template-editor-collapse-toggle aria-controls="ph-template-editor-form" aria-expanded="true" data-ph-template-editor-collapse-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" data-ph-template-editor-expand-label="' . esc_attr__( 'Expand template editor', 'propertyhive' ) . '" aria-label="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '" title="' . esc_attr__( 'Collapse template editor', 'propertyhive' ) . '"><span aria-hidden="true"></span></button>';
 			echo '</aside>';
+			self::render_template_editor_preview_workspace( $context );
 			echo '<div class="ph-template-editor-unsaved-warning" data-ph-template-editor-unsaved-warning hidden aria-hidden="true">';
 				echo '<div class="ph-template-editor-unsaved-warning-backdrop" data-ph-template-editor-unsaved-warning-dismiss></div>';
 				echo '<div class="ph-template-editor-unsaved-warning-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ph-template-editor-unsaved-warning-title" aria-describedby="ph-template-editor-unsaved-warning-description" tabindex="-1">';
@@ -118,6 +119,85 @@ class PH_Template_Set_Editor_Controller {
 	 */
 	public static function get_template_editor_title( $context ) {
 		return 'search' === $context ? __( 'Search results', 'propertyhive' ) : __( 'Property pages', 'propertyhive' );
+	}
+
+	/**
+	 * Render the responsive preview workspace outside the editor form.
+	 *
+	 * @param string $context Editor page context.
+	 */
+	private static function render_template_editor_preview_workspace( $context ) {
+		$devices = array(
+			'mobile'  => array(
+				'label' => __( 'Mobile', 'propertyhive' ),
+				'width' => 390,
+			),
+			'tablet'  => array(
+				'label' => __( 'Tablet', 'propertyhive' ),
+				'width' => 768,
+			),
+			'desktop' => array(
+				'label' => __( 'Desktop', 'propertyhive' ),
+				'width' => 1280,
+			),
+		);
+		$default_device  = 'desktop';
+		$preview_url     = self::get_template_editor_preview_url( $context );
+		$iframe_title    = 'search' === $context ? __( 'Search results preview', 'propertyhive' ) : __( 'Property page preview', 'propertyhive' );
+		$workspace_id    = 'ph-template-editor-preview-workspace';
+		$toolbar_id      = 'ph-template-editor-preview-toolbar';
+		$canvas_id       = 'ph-template-editor-preview-canvas';
+
+		echo '<section id="' . esc_attr( $workspace_id ) . '" class="ph-template-editor-preview-workspace" data-ph-template-editor-preview-workspace data-ph-template-editor-preview-context="' . esc_attr( $context ) . '" data-ph-template-editor-preview-device="' . esc_attr( $default_device ) . '" data-ph-template-editor-preview-active-device="' . esc_attr( $default_device ) . '" data-ph-template-editor-preview-url="' . esc_url( $preview_url ) . '" data-ph-template-editor-preview-state="loading" aria-busy="true" aria-label="' . esc_attr__( 'Preview workspace', 'propertyhive' ) . '">';
+			echo '<div id="' . esc_attr( $toolbar_id ) . '" class="ph-template-editor-preview-toolbar" data-ph-template-editor-preview-toolbar role="toolbar" aria-label="' . esc_attr__( 'Preview controls', 'propertyhive' ) . '">';
+				echo '<div class="ph-template-editor-preview-toolbar-group ph-template-editor-preview-toolbar-meta ph-template-editor-preview-toolbar-heading">';
+					echo '<span class="ph-template-editor-preview-toolbar-label ph-template-editor-preview-eyebrow">' . esc_html__( 'Preview', 'propertyhive' ) . '</span>';
+				echo '</div>';
+				echo '<div class="ph-template-editor-preview-toolbar-group ph-template-editor-preview-toolbar-controls">';
+					echo '<div class="ph-template-editor-preview-device-group" data-ph-template-editor-preview-device-group role="group" aria-label="' . esc_attr__( 'Choose preview device', 'propertyhive' ) . '">';
+						foreach ( $devices as $device => $settings ) {
+							$is_active = $default_device === $device;
+							echo '<button type="button" class="ph-template-editor-preview-device" data-ph-template-editor-preview-device="' . esc_attr( $device ) . '" data-ph-template-editor-preview-device-width="' . absint( $settings['width'] ) . '" aria-controls="' . esc_attr( $canvas_id ) . '" aria-pressed="' . ( $is_active ? 'true' : 'false' ) . '">' . esc_html( $settings['label'] ) . '</button>';
+						}
+					echo '</div>';
+				echo '</div>';
+			echo '</div>';
+			echo '<div id="' . esc_attr( $canvas_id ) . '" class="ph-template-editor-preview-canvas" data-ph-template-editor-preview-canvas data-ph-template-editor-preview-state="loading" aria-busy="true">';
+				echo '<div class="ph-template-editor-preview-frame-shell" data-ph-template-editor-preview-frame-shell>';
+					echo '<div class="ph-template-editor-preview-frame ph-template-editor-preview-frame-viewport" data-ph-template-editor-preview-frame-viewport data-ph-template-editor-preview-frame-width="' . absint( $devices[ $default_device ]['width'] ) . '">';
+						echo '<iframe class="ph-template-editor-preview-iframe" data-ph-template-editor-preview-iframe data-ph-template-editor-preview-frame data-ph-template-preview-frame src="' . esc_url( $preview_url ) . '" title="' . esc_attr( $iframe_title ) . '" loading="eager"></iframe>';
+					echo '</div>';
+				echo '</div>';
+				echo '<div class="ph-template-editor-preview-loading" data-ph-template-editor-preview-loading role="status" aria-live="polite"><span class="ph-template-editor-preview-spinner" aria-hidden="true"></span><span>' . esc_html__( 'Loading preview…', 'propertyhive' ) . '</span></div>';
+				echo '<div class="ph-template-editor-preview-error" data-ph-template-editor-preview-error role="alert" hidden aria-hidden="true">';
+					echo '<p>' . esc_html__( 'The preview could not be loaded here.', 'propertyhive' ) . '</p>';
+					echo '<a href="' . esc_url( $preview_url ) . '" data-ph-template-editor-preview-fallback target="_blank" rel="noopener noreferrer">' . esc_html__( 'Open preview in a new tab', 'propertyhive' ) . '</a>';
+				echo '</div>';
+			echo '</div>';
+			echo '<noscript><p class="ph-template-editor-preview-noscript">' . esc_html__( 'JavaScript is required for the responsive preview toolbar.', 'propertyhive' ) . ' <a href="' . esc_url( $preview_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Open preview in a new tab', 'propertyhive' ) . '</a></p></noscript>';
+		echo '</section>';
+	}
+
+	/**
+	 * Build the closed responsive preview frame URL.
+	 *
+	 * @param string $context Editor page context.
+	 * @return string
+	 */
+	private static function get_template_editor_preview_url( $context ) {
+		$template = 'search' === $context ? PH_Template_Set_Request_Context::get_search_template() : PH_Template_Set_Request_Context::get_detail_template();
+		$url      = PH_Template_Set_Request_Context::get_template_preview_url( $template );
+
+		$url = remove_query_arg( PH_Template_Set::EDIT_OPEN_QUERY_ARG, $url );
+
+		return add_query_arg(
+			array(
+				PH_Template_Set::EDIT_QUERY_ARG        => '1',
+				PH_Template_Set::EDIT_CLOSED_QUERY_ARG => '1',
+				PH_Template_Set::EDIT_FRAME_QUERY_ARG  => '1',
+			),
+			$url
+		);
 	}
 
 	/**
@@ -429,6 +509,7 @@ class PH_Template_Set_Editor_Controller {
 			'security'            => wp_create_nonce( PH_Template_Set::EDITOR_NONCE_ACTION ),
 			'editorActive'        => PH_Template_Set_Request_Context::is_template_editor_active(),
 			'editorMode'          => $settings['template_set_editor_mode'],
+			'previewQueryArgs'    => PH_Template_Set_Request_Context::get_preview_query_args(),
 			'settings'            => PH_Template_Set_Settings::get_public_settings( $settings ),
 			'addonSettings'       => PH_Template_Set_Addon_Settings::get_public_definitions( self::get_template_editor_context() ),
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),

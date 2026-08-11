@@ -339,6 +339,10 @@
 		var loader = getPreviewLoader(labels || {});
 		var preview = document.querySelector('.ph-template-detail, .ph-template-search');
 
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.setLoading === 'function') {
+			modules.editorResponsivePreview.setLoading(isLoading, labels && labels.loading ? labels.loading : 'Loading preview...');
+		}
+
 		loader.hidden = !isLoading;
 		document.body.classList.toggle('ph-template-preview-is-loading', isLoading);
 
@@ -422,10 +426,10 @@
 
 		initTemplateEditor();
 		document.dispatchEvent(new window.CustomEvent('ph:template_set_preview_swapped', {
-			detail: { root: importedPreview }
+			detail: { root: importedPreview, previewUrl: previewUrl }
 		}));
 		if (window.jQuery) {
-			window.jQuery(document).trigger('ph:template_set_preview_swapped', [{ root: importedPreview }]);
+			window.jQuery(document).trigger('ph:template_set_preview_swapped', [{ root: importedPreview, previewUrl: previewUrl }]);
 		}
 		window.scrollTo(scrollPosition.x, scrollPosition.y);
 	}
@@ -626,6 +630,10 @@
 
 		if (!editor || !config.editorActive) {
 			return;
+		}
+
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.init === 'function') {
+			modules.editorResponsivePreview.init(config);
 		}
 
 		if (editor.getAttribute('data-ph-template-editor-initialized') === 'true') {

@@ -172,7 +172,11 @@ class PH_Template_Set_Request_Context {
 			PH_Template_Set::DETAIL_QUERY_ARG => self::get_detail_template(),
 		);
 
-		if ( self::is_template_editor_active() ) {
+		if ( self::is_template_editor_frame_request() ) {
+			$args[ PH_Template_Set::EDIT_QUERY_ARG ]        = '1';
+			$args[ PH_Template_Set::EDIT_CLOSED_QUERY_ARG ] = '1';
+			$args[ PH_Template_Set::EDIT_FRAME_QUERY_ARG ]  = '1';
+		} elseif ( self::is_template_editor_active() ) {
 			$args[ PH_Template_Set::EDIT_QUERY_ARG ] = '1';
 		} elseif ( self::is_template_editor_closed_request() ) {
 			$args[ PH_Template_Set::EDIT_CLOSED_QUERY_ARG ] = '1';
@@ -320,6 +324,22 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
+	 * Is this an authorized, closed responsive preview frame request?
+	 *
+	 * @return bool
+	 */
+	public static function is_template_editor_frame_request() {
+		if ( is_admin() || ! self::can_manage_template_set() ) {
+			return false;
+		}
+
+		return self::is_template_editor_request()
+			&& self::is_template_editor_closed_request()
+			&& ! empty( $_GET[ PH_Template_Set::EDIT_FRAME_QUERY_ARG ] )
+			&& empty( $_GET[ PH_Template_Set::EDIT_OPEN_QUERY_ARG ] );
+	}
+
+	/**
 	 * Can a valid template preview render while the global setting is inactive?
 	 *
 	 * @return bool
@@ -370,7 +390,7 @@ class PH_Template_Set_Request_Context {
 	 * @return array
 	 */
 	public static function get_preview_query_args() {
-		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, 'ph_view' );
+		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, PH_Template_Set::EDIT_FRAME_QUERY_ARG, 'ph_view' );
 	}
 
 	/**
