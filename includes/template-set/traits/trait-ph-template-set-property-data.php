@@ -77,7 +77,7 @@ trait PH_Template_Set_Property_Data {
 
 		if ( $property->bedrooms > 0 ) {
 			$facts[] = array(
-				'label' => _n( 'bed', 'beds', absint( $property->bedrooms ), 'propertyhive' ),
+				'label' => _n( 'Bed', 'Beds', absint( $property->bedrooms ), 'propertyhive' ),
 				'value' => $property->bedrooms,
 				'quantity' => true,
 			);
@@ -85,7 +85,7 @@ trait PH_Template_Set_Property_Data {
 
 		if ( $property->bathrooms > 0 ) {
 			$facts[] = array(
-				'label' => _n( 'bath', 'baths', absint( $property->bathrooms ), 'propertyhive' ),
+				'label' => _n( 'Bath', 'Baths', absint( $property->bathrooms ), 'propertyhive' ),
 				'value' => $property->bathrooms,
 				'quantity' => true,
 			);
@@ -93,7 +93,7 @@ trait PH_Template_Set_Property_Data {
 
 		if ( $property->reception_rooms > 0 ) {
 			$facts[] = array(
-				'label' => _n( 'reception', 'receptions', absint( $property->reception_rooms ), 'propertyhive' ),
+				'label' => _n( 'Reception', 'Receptions', absint( $property->reception_rooms ), 'propertyhive' ),
 				'value' => $property->reception_rooms,
 				'quantity' => true,
 			);
