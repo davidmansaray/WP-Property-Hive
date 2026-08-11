@@ -77,7 +77,7 @@ class PH_Template_Set_Editor_Controller {
 			echo '<footer class="ph-template-editor-footer">';
 				echo '<div>';
 					echo '<a class="ph-template-editor-secondary" data-ph-template-editor-settings-link href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Exit to Settings', 'propertyhive' ) . '</a>';
-					echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save disabled>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
+					echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save data-ph-template-editor-save-default-label="' . esc_attr__( 'Save', 'propertyhive' ) . '" aria-live="polite" disabled>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
 				echo '</div>';
 				echo '</footer>';
 				echo '</form>';
@@ -445,6 +445,7 @@ class PH_Template_Set_Editor_Controller {
 				'ready'             => __( 'Ready', 'propertyhive' ),
 				'changed'           => __( 'Unsaved changes', 'propertyhive' ),
 				'loading'           => __( 'Loading...', 'propertyhive' ),
+				'save'              => __( 'Save', 'propertyhive' ),
 				'saving'            => __( 'Saving...', 'propertyhive' ),
 				'saved'             => __( 'Saved', 'propertyhive' ),
 				'error'             => __( 'Could not save', 'propertyhive' ),

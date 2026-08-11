@@ -1205,6 +1205,22 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	opacity: 0.55;
 }
 
+.ph-template-editor-save.is-saving:disabled {
+	cursor: wait;
+	opacity: 0.8;
+}
+
+.ph-template-editor-save.is-saved,
+.ph-template-editor-save.is-saved:disabled,
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-save.is-saved,
+body.ph-template-editor-active .ph-template-editor .ph-template-editor-save.is-saved:disabled {
+	background: var(--ph-editor-honey);
+	border-color: var(--ph-editor-honey);
+	color: var(--ph-editor-carbon);
+	cursor: default;
+	opacity: 1;
+}
+
 .ph-template-editor-save:not(:disabled):focus-visible,
 body.ph-template-editor-active .ph-template-editor .ph-template-editor-save:not(:disabled):focus-visible,
 .ph-template-editor-secondary:focus-visible,

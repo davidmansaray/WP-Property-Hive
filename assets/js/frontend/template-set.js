@@ -7,14 +7,76 @@
 	var activeNavigationConfirmation = null;
 
 	// Keep the existing CSS and public JavaScript contract stable while feature code lives in focused modules.
+	function clearSaveButtonResetTimer(editor) {
+		if (editor && editor._phSaveButtonResetTimer) {
+			window.clearTimeout(editor._phSaveButtonResetTimer);
+			editor._phSaveButtonResetTimer = null;
+		}
+	}
+
+	function getSaveButtonDefaultLabel(saveButton) {
+		var labels = config.labels || {};
+		var storedLabel = saveButton.getAttribute('data-ph-template-editor-save-default-label');
+		var fallbackLabel = labels.save || 'Save';
+
+		if (storedLabel) {
+			return storedLabel;
+		}
+
+		storedLabel = (saveButton.textContent || '').trim() || fallbackLabel;
+		saveButton.setAttribute('data-ph-template-editor-save-default-label', storedLabel);
+
+		return storedLabel;
+	}
+
+	function setSaveButtonLabel(saveButton, label) {
+		if (!saveButton) {
+			return;
+		}
+
+		saveButton.textContent = label;
+	}
+
 	function setEditorStatus(editor, message, state) {
 		var saveButton = editor.querySelector('[data-ph-template-editor-save]');
+		var labels = config.labels || {};
+		var resolvedState = state || 'ready';
+		var defaultSaveLabel;
 
-		editor.setAttribute('data-ph-template-editor-state', state || 'ready');
+		editor.setAttribute('data-ph-template-editor-state', resolvedState);
+		clearSaveButtonResetTimer(editor);
 
-		if (saveButton) {
-			saveButton.disabled = state !== 'changed' && !(state === 'error' && editor.classList.contains('is-dirty'));
+		if (!saveButton) {
+			return;
 		}
+
+		defaultSaveLabel = getSaveButtonDefaultLabel(saveButton);
+		saveButton.disabled = resolvedState !== 'changed' && !(resolvedState === 'error' && editor.classList.contains('is-dirty'));
+		saveButton.classList.toggle('is-saved', resolvedState === 'saved');
+		saveButton.classList.toggle('is-saving', resolvedState === 'saving');
+
+		if (resolvedState === 'saving') {
+			setSaveButtonLabel(saveButton, message || labels.saving || 'Saving...');
+			return;
+		}
+
+		if (resolvedState === 'saved') {
+			setSaveButtonLabel(saveButton, message || labels.saved || 'Saved');
+			editor._phSaveButtonResetTimer = window.setTimeout(function () {
+				editor._phSaveButtonResetTimer = null;
+
+				if (editor.getAttribute('data-ph-template-editor-state') !== 'saved') {
+					return;
+				}
+
+				setSaveButtonLabel(saveButton, defaultSaveLabel);
+				saveButton.classList.remove('is-saved');
+			}, 5000);
+			return;
+		}
+
+		// Ready, changed, error, loading, etc. keep the default Save label.
+		setSaveButtonLabel(saveButton, defaultSaveLabel);
 	}
 
 	function buildEditorFormData(form) {
@@ -604,7 +666,7 @@
 				var previousValue = control.getAttribute('data-ph-template-editor-previous-value') || '';
 				var previewUrl = modules.editorPreview && typeof modules.editorPreview.getTemplatePreviewUrl === 'function' ? modules.editorPreview.getTemplatePreviewUrl(control) : '';
 				var loadPreview = function () {
-					setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
+					setEditorStatus(editor, labels.loading || 'Loading...', 'loading');
 					loadTemplatePreview(previewUrl, labels, true);
 				};
 
