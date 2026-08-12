@@ -510,6 +510,7 @@ class PH_Template_Set_Editor_Controller {
 			'editorActive'        => PH_Template_Set_Request_Context::is_template_editor_active(),
 			'editorMode'          => $settings['template_set_editor_mode'],
 			'previewQueryArgs'    => PH_Template_Set_Request_Context::get_preview_query_args(),
+			'mapSearchPreviewQueryArg' => PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG,
 			'settings'            => PH_Template_Set_Settings::get_public_settings( $settings ),
 			'addonSettings'       => PH_Template_Set_Addon_Settings::get_public_definitions( self::get_template_editor_context() ),
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),

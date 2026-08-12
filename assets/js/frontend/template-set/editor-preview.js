@@ -3,6 +3,26 @@
 
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
 	var activePreviewDocument = null;
+	var mapSearchFormatControlName = 'ph_template_set_addons[map_search][format]';
+	var mapSearchFormatValues = ['view', 'split'];
+
+	function normalizeMapSearchFormat(value) {
+		value = String(value || '').toLowerCase();
+
+		return mapSearchFormatValues.indexOf(value) !== -1 ? value : 'none';
+	}
+
+	function isMapSearchFormatControl(control) {
+		return !!control && control.name === mapSearchFormatControlName;
+	}
+
+	function getMapSearchFormat(control) {
+		if (!isMapSearchFormatControl(control)) {
+			return 'none';
+		}
+
+		return normalizeMapSearchFormat(control.value);
+	}
 
 	function getPreviewDocument() {
 		return activePreviewDocument || document;
@@ -356,9 +376,7 @@
 			setBodyToggle('ph-template-show-what3words', 'ph-template-hide-what3words', isEnabledValue(value, control));
 		},
 		'ph_template_set_addons[map_search][format]': function (value) {
-			var format = ['view', 'split'].indexOf(String(value || '')) !== -1 ? String(value) : 'none';
-
-			setBodyOption('ph-template-map-search-format-', format);
+			setBodyOption('ph-template-map-search-format-', normalizeMapSearchFormat(value));
 		},
 		'ph_template_set_addons[radial_search][current_location_enabled]': function (value, control) {
 			setBodyToggle('ph-template-show-radial-current-location', 'ph-template-hide-radial-current-location', isEnabledValue(value, control));
@@ -476,8 +494,12 @@
 		applyControl: applyEditorControl,
 		applyControlToDocument: applyEditorControlToDocument,
 		getTemplatePreviewUrl: getTemplatePreviewUrl,
+		getMapSearchFormat: getMapSearchFormat,
+		isMapSearchFormatControl: isMapSearchFormatControl,
+		isStructuralPreviewControl: isMapSearchFormatControl,
 		isTemplatePreviewControl: isTemplatePreviewControl,
 		maybeNavigateTemplatePreview: maybeNavigateTemplatePreview,
-		mirrorControls: mirrorControls
+		mirrorControls: mirrorControls,
+		normalizeMapSearchFormat: normalizeMapSearchFormat
 	};
 }());

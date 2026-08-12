@@ -340,6 +340,57 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
+	 * Get the temporary Map Search format requested by an editor frame.
+	 *
+	 * The explicit `none` value represents the add-on's existing empty format
+	 * value. Returning false means that the request does not contain an allowed
+	 * preview override.
+	 *
+	 * @return string|false
+	 */
+	public static function get_map_search_preview_format() {
+		if ( ! self::is_template_editor_frame_request() || ! isset( $_GET[ PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
+
+		$requested_format = $_GET[ PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG ]; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( ! is_scalar( $requested_format ) ) {
+			return false;
+		}
+
+		$format = sanitize_key( (string) wp_unslash( $requested_format ) );
+
+		if ( PH_Template_Set::MAP_SEARCH_REQUIRED_TEMPLATE === self::get_search_template() && PH_Template_Set::MAP_SEARCH_FORMAT_NONE === $format ) {
+			return PH_Template_Set::MAP_SEARCH_REQUIRED_DEFAULT_FORMAT;
+		}
+
+		return in_array( $format, array( PH_Template_Set::MAP_SEARCH_FORMAT_NONE, PH_Template_Set::MAP_SEARCH_FORMAT_VIEW, PH_Template_Set::MAP_SEARCH_FORMAT_SPLIT ), true ) ? $format : false;
+	}
+
+	/**
+	 * Apply the unsaved Map Search format to an authorized preview frame only.
+	 *
+	 * This filter receives the already-loaded option value. It deliberately does
+	 * not call get_option() or update the option, which keeps the override
+	 * request-scoped and avoids filter recursion.
+	 *
+	 * @param mixed $settings Saved Map Search settings.
+	 * @return mixed
+	 */
+	public static function filter_map_search_option( $settings ) {
+		$format = self::get_map_search_preview_format();
+
+		if ( false === $format || ! is_array( $settings ) ) {
+			return $settings;
+		}
+
+		$settings['format'] = PH_Template_Set::MAP_SEARCH_FORMAT_NONE === $format ? '' : $format;
+
+		return $settings;
+	}
+
+	/**
 	 * Can a valid template preview render while the global setting is inactive?
 	 *
 	 * @return bool
@@ -390,7 +441,7 @@ class PH_Template_Set_Request_Context {
 	 * @return array
 	 */
 	public static function get_preview_query_args() {
-		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, PH_Template_Set::EDIT_FRAME_QUERY_ARG, 'ph_view' );
+		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, PH_Template_Set::EDIT_FRAME_QUERY_ARG, PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG, 'ph_view' );
 	}
 
 	/**

@@ -1941,15 +1941,15 @@ body.ph-template-editor-active.ph-template-hide-rooms-breakdown .ph-template-det
 	display: block !important;
 }
 
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-panel,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-toggle,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .ph-template-map-dependency,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .propertyhive-views .map-view,
-body.ph-template-editor-active.ph-template-map-search-format-none .ph-template-search .half-map-view {
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-none .ph-template-search .ph-template-map-panel,
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-none .ph-template-search .ph-template-map-toggle,
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-none .ph-template-search .ph-template-map-dependency,
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-none .ph-template-search .propertyhive-views .map-view,
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-none .ph-template-search .half-map-view {
 	display: none !important;
 }
 
-body.ph-template-editor-active.ph-template-map-search-format-split .ph-template-search .ph-template-map-panel {
+body:is(.ph-template-editor-active, .ph-template-editor-frame).ph-template-map-search-format-split .ph-template-search .ph-template-map-panel {
 	display: block;
 }
 

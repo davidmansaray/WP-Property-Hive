@@ -31,6 +31,7 @@
 	var fitUpdateTimer = null;
 	var frameNavigationPending = false;
 	var lastFrameSubmitter = null;
+	var mirroringFrameControls = false;
 
 	function isElement(value) {
 		return !!value && value.nodeType === 1;
@@ -704,6 +705,10 @@
 	function getCurrentFrameUrl() {
 		var frameWindow;
 
+		if (frameNavigationPending && storedPreviewUrl) {
+			return storedPreviewUrl;
+		}
+
 		try {
 			frameWindow = previewFrame && previewFrame.contentWindow;
 
@@ -717,12 +722,252 @@
 		return storedPreviewUrl || (previewFrame ? previewFrame.getAttribute('src') : '') || window.location.href;
 	}
 
+	function getMapSearchPreviewConfig() {
+		return {
+			queryArg: String(config.mapSearchPreviewQueryArg || ''),
+			noneValue: 'none'
+		};
+	}
+
+	function normalizeMapSearchFormat(value) {
+		var mapPreview = getMapSearchPreviewConfig();
+
+		value = String(value || '').toLowerCase();
+
+		return ['view', 'split'].indexOf(value) !== -1 ? value : mapPreview.noneValue;
+	}
+
+	function getQueryParameterKey(part) {
+		var separator = part.indexOf('=');
+		var key = separator === -1 ? part : part.slice(0, separator);
+
+		try {
+			return decodeURIComponent(key.replace(/\+/g, ' '));
+		} catch (error) {
+			return key;
+		}
+	}
+
+	function updateQueryParameterFallback(url, key, value, remove) {
+		var anchor = document.createElement('a');
+		var query = (anchor.search || '').replace(/^\?/, '');
+		var parts = query ? query.split('&') : [];
+		var encodedKey = encodeURIComponent(key);
+		var nextParts = [];
+		var replaced = false;
+
+		anchor.href = url;
+		query = (anchor.search || '').replace(/^\?/, '');
+		parts = query ? query.split('&') : [];
+
+		parts.forEach(function (part) {
+			if (getQueryParameterKey(part) === key) {
+				if (!remove && !replaced) {
+					nextParts.push(encodedKey + '=' + encodeURIComponent(value));
+				}
+
+				replaced = true;
+				return;
+			}
+
+			nextParts.push(part);
+		});
+
+		if (!remove && !replaced) {
+			nextParts.push(encodedKey + '=' + encodeURIComponent(value));
+		}
+
+		return anchor.protocol + '//' + anchor.host + anchor.pathname + (nextParts.length ? '?' + nextParts.join('&') : '') + (anchor.hash || '');
+	}
+
+	function updateQueryParameter(url, key, value, remove) {
+		var parsedUrl;
+
+		if (!url || !key) {
+			return url || '';
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (!parsedUrl.searchParams) {
+				throw new Error('URLSearchParams is unavailable.');
+			}
+
+			if (remove) {
+				parsedUrl.searchParams.delete(key);
+			} else {
+				parsedUrl.searchParams.set(key, value);
+			}
+
+			return parsedUrl.href;
+		} catch (error) {
+			try {
+				return updateQueryParameterFallback(url, key, value, remove);
+			} catch (fallbackError) {
+				return url;
+			}
+		}
+	}
+
+	function hasQueryParameter(url, key) {
+		var parsedUrl;
+		var query;
+
+		if (!url || !key) {
+			return false;
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (parsedUrl.searchParams) {
+				return parsedUrl.searchParams.has(key);
+			}
+		} catch (error) {
+			// Use the anchor fallback below.
+		}
+
+		try {
+			var anchor = document.createElement('a');
+			anchor.href = url;
+			query = (anchor.search || '').replace(/^\?/, '');
+
+			return !!query && query.split('&').some(function (part) {
+				return getQueryParameterKey(part) === key;
+			});
+		} catch (fallbackError) {
+			return false;
+		}
+	}
+
+	function getQueryParameterValue(url, key) {
+		var parsedUrl;
+		var query;
+		var value = null;
+
+		if (!url || !key) {
+			return value;
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (parsedUrl.searchParams) {
+				return parsedUrl.searchParams.get(key);
+			}
+		} catch (error) {
+			// Use the anchor fallback below.
+		}
+
+		try {
+			var anchor = document.createElement('a');
+			anchor.href = url;
+			query = (anchor.search || '').replace(/^\?/, '');
+
+			if (!query) {
+				return value;
+			}
+
+			query.split('&').some(function (part) {
+				var separator;
+				var rawValue;
+
+				if (getQueryParameterKey(part) !== key) {
+					return false;
+				}
+
+				separator = part.indexOf('=');
+				rawValue = separator === -1 ? '' : part.slice(separator + 1);
+
+				try {
+					value = decodeURIComponent(rawValue.replace(/\+/g, ' '));
+				} catch (decodeError) {
+					value = rawValue;
+				}
+
+				return true;
+			});
+		} catch (fallbackError) {
+			return value;
+		}
+
+		return value;
+	}
+
+	function getNavigationPreviewUrl(url, options) {
+		var targetUrl = url || storedPreviewUrl || window.location.href;
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var currentValue;
+
+		if (!(options && options.preserveMapSearchPreview === false) && mapPreview.queryArg) {
+			currentUrl = getCurrentFrameUrl();
+			currentValue = getQueryParameterValue(currentUrl, mapPreview.queryArg);
+
+			if (currentValue !== null && !hasQueryParameter(targetUrl, mapPreview.queryArg)) {
+				targetUrl = updateQueryParameter(targetUrl, mapPreview.queryArg, currentValue, false);
+			}
+		}
+
+		return getPreviewUrl(targetUrl);
+	}
+
+	function setMapSearchPreviewFormat(value, options) {
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var previewUrl;
+		var format = normalizeMapSearchFormat(value);
+		var forceReload = !options || options.force !== false;
+
+		if (mirroringFrameControls || !mapPreview.queryArg) {
+			return false;
+		}
+
+		currentUrl = getCurrentFrameUrl();
+		previewUrl = updateQueryParameter(currentUrl, mapPreview.queryArg, format, false);
+
+		// The add-on treats an explicit list request as incompatible with split
+		// mode. Remove that stale toggle state so split renders its normal map.
+		if (format === 'split' && getQueryParameterValue(previewUrl, 'view') === 'list') {
+			previewUrl = updateQueryParameter(previewUrl, 'view', '', true);
+		}
+
+		return navigate(previewUrl, { force: forceReload });
+	}
+
+	function clearMapSearchPreviewFormat(options) {
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var previewUrl;
+		var forceReload = !options || options.force !== false;
+
+		if (!mapPreview.queryArg) {
+			return false;
+		}
+
+		currentUrl = getCurrentFrameUrl();
+
+		if (!hasQueryParameter(currentUrl, mapPreview.queryArg)) {
+			return true;
+		}
+
+		previewUrl = updateQueryParameter(currentUrl, mapPreview.queryArg, '', true);
+
+		return navigate(previewUrl, { force: forceReload, preserveMapSearchPreview: false });
+	}
+
 	function buildFrameFormSubmissionUrl(form, submitter, action) {
 		action = action || form.action || getCurrentFrameUrl();
 		var sourceUrl;
 		var targetUrl;
 		var formData;
-		var contextKeys = config.previewQueryArgs || ['ph_detail_template', 'ph_search_template', 'ph_module_template', 'ph_template_preview', 'ph_view'];
+		var mapPreview = getMapSearchPreviewConfig();
+		var contextKeys = config.previewQueryArgs && typeof config.previewQueryArgs.slice === 'function' ? config.previewQueryArgs.slice() : ['ph_detail_template', 'ph_search_template', 'ph_module_template', 'ph_template_preview', 'ph_view'];
+
+		if (mapPreview.queryArg && contextKeys.indexOf(mapPreview.queryArg) === -1) {
+			contextKeys.push(mapPreview.queryArg);
+		}
 
 		if (!action || !isSameOrigin(action) || !window.URL || !window.FormData) {
 			return '';
@@ -1039,7 +1284,14 @@
 		bindFrameNavigation(frameDocument);
 
 		if (modules.editorPreview && typeof modules.editorPreview.mirrorControls === 'function') {
-			modules.editorPreview.mirrorControls(form, frameDocument);
+			// Frame-load reconciliation is a one-way DOM mirror. Keep it fenced from
+			// the parent change handler so it cannot schedule another navigation.
+			mirroringFrameControls = true;
+			try {
+				modules.editorPreview.mirrorControls(form, frameDocument);
+			} finally {
+				mirroringFrameControls = false;
+			}
 		}
 
 		sourceSearchForm = querySearchForm(document, searchFormSelector);
@@ -1086,7 +1338,7 @@
 	}
 
 	function navigate(url, options) {
-		var previewUrl = getPreviewUrl(url || storedPreviewUrl || window.location.href);
+		var previewUrl = getNavigationPreviewUrl(url, options);
 		var currentFrameUrl;
 		var forceReload = !!(options && options.force);
 
@@ -1121,7 +1373,7 @@
 		var url = detail.previewUrl || window.location.href;
 
 		refresh();
-		navigate(url, { force: true });
+		navigate(url, { force: true, preserveMapSearchPreview: false });
 	}
 
 	function bindPreviewSwapEvent() {
@@ -1225,21 +1477,26 @@
 		rootInitialized = false;
 		frameNavigationPending = false;
 		lastFrameSubmitter = null;
+		mirroringFrameControls = false;
 	}
 
 	modules.editorResponsivePreview = {
 		buildPreviewUrl: getPreviewUrl,
+		clearMapSearchPreviewFormat: clearMapSearchPreviewFormat,
 		destroy: destroy,
 		getDocument: function () {
 			return frameDocument || getFrameDocument();
 		},
+		getMapSearchPreviewConfig: getMapSearchPreviewConfig,
 		getState: function () {
 			return { device: state.device, width: getDevice().width };
 		},
 		init: init,
 		navigate: navigate,
+		reconcileMapSearchPreview: clearMapSearchPreviewFormat,
 		refresh: refresh,
 		setError: setError,
-		setLoading: setLoading
+		setLoading: setLoading,
+		setMapSearchPreviewFormat: setMapSearchPreviewFormat
 	};
 }());
