@@ -190,7 +190,7 @@ class PH_Template_Set_Editor_Controller {
 
 		$url = remove_query_arg( PH_Template_Set::EDIT_OPEN_QUERY_ARG, $url );
 
-		return add_query_arg(
+		$url = add_query_arg(
 			array(
 				PH_Template_Set::EDIT_QUERY_ARG        => '1',
 				PH_Template_Set::EDIT_CLOSED_QUERY_ARG => '1',
@@ -198,6 +198,16 @@ class PH_Template_Set_Editor_Controller {
 			),
 			$url
 		);
+
+		if ( 'search' === $context && PH_Template_Set::MAP_SEARCH_REQUIRED_TEMPLATE === $template ) {
+			$map_state = PH_Template_Set_Request_Context::get_map_search_state();
+
+			if ( ! empty( $map_state['available'] ) && ! empty( $map_state['usable'] ) && ! in_array( $map_state['format'], array( PH_Template_Set::MAP_SEARCH_FORMAT_VIEW, PH_Template_Set::MAP_SEARCH_FORMAT_SPLIT ), true ) ) {
+				$url = add_query_arg( PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG, PH_Template_Set::MAP_SEARCH_REQUIRED_DEFAULT_FORMAT, $url );
+			}
+		}
+
+		return $url;
 	}
 
 	/**
