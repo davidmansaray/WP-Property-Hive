@@ -208,6 +208,17 @@ trait PH_Template_Set_Search {
 			// existing ordering template and its query-string behaviour.
 			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_result_count', 20 );
 			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_catalog_ordering', 30 );
+
+			// Prototype templates render their own single list/map toggle inside the
+			// shared toolbar. Remove the add-on's second pair of view links instead
+			// of rendering and hiding duplicate controls elsewhere on the page.
+			if ( class_exists( 'PH_Map_Search' ) ) {
+				$map_views_callback = array( PH_Map_Search::instance(), 'propertyhive_results_views' );
+				if ( false !== has_action( 'propertyhive_before_search_results_loop', $map_views_callback ) ) {
+					remove_action( 'propertyhive_before_search_results_loop', $map_views_callback, 25 );
+					self::$scoped_search_action_removals[] = array( 'propertyhive_before_search_results_loop', $map_views_callback, 25 );
+				}
+			}
 		}
 
 		$hook = 'propertyhive_after_search_results_loop_item_title';

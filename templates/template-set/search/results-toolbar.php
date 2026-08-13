@@ -35,9 +35,6 @@ $map_label = ! empty( $map_state['requested_view'] ) && 'map' === $map_state['re
 		</p>
 	<?php endif; ?>
 	<div class="ph-template-results-toolbar-actions">
-		<?php if ( '' !== $save_search_button ) : ?>
-			<?php echo $save_search_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Save Search add-on anchor markup. ?>
-		<?php endif; ?>
 		<?php if ( '' !== $shortlist_button ) : ?>
 			<?php echo $shortlist_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Shortlist add-on anchor markup. ?>
 		<?php endif; ?>
@@ -54,6 +51,9 @@ $map_label = ! empty( $map_state['requested_view'] ) && 'map' === $map_state['re
 				<span><?php esc_html_e( 'Sort', 'propertyhive' ); ?></span>
 				<?php echo $ordering_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core/theme ordering template markup. ?>
 			</label>
+		<?php endif; ?>
+		<?php if ( '' !== $save_search_button ) : ?>
+			<?php echo $save_search_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Existing Save Search add-on anchor markup. ?>
 		<?php endif; ?>
 	</div>
 </div>
