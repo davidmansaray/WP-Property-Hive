@@ -934,6 +934,42 @@ body.ph-search-template-map-led-search-results {
 	gap: 0;
 }
 
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-facts > li + li {
+	margin-inline-start: 0.6875rem;
+	padding-inline-start: 0.75rem;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-facts > li::before,
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-facts > li::after {
+	content: none;
+	display: none;
+	background: none;
+	border: 0;
+	padding: 0;
+	width: 0;
+	height: 0;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-facts > li + li::before {
+	content: "";
+	display: block;
+	position: absolute;
+	inset-block: 0.1rem;
+	inset-inline-start: 0;
+	inset-inline-end: auto;
+	inline-size: 1px;
+	block-size: auto;
+	width: 1px;
+	height: auto;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background: var(--ph-search-line, #d7d8d2);
+	color: transparent;
+	font-size: 0;
+	line-height: 0;
+}
+
 .ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-card-actions {
 	position: absolute;
 	inset-block-start: clamp(0.9rem, 1.8vw, 1.25rem);
