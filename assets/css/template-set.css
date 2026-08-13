@@ -2503,6 +2503,10 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 	grid-template-rows: minmax(0, 1fr) auto;
 }
 
+.ph-template-search.ph-search-layout-list ul.properties li.ph-template-card {
+	grid-template-rows: auto auto;
+}
+
 .ph-template-set ul.properties li.ph-template-card .thumbnail {
 	grid-column: 1;
 	grid-row: 1 / span 2;
@@ -2514,7 +2518,7 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 	aspect-ratio: auto;
 	position: absolute;
 	inset: 0;
-	height: auto;
+	height: 100%;
 	min-height: 100%;
 }
 

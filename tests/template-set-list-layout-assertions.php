@@ -75,6 +75,18 @@ $assert(
 );
 
 $assert(
+	'list_cards_size_rows_from_content_without_grid_stretch',
+	(bool) preg_match(
+		'/\.ph-template-search\.ph-search-layout-list ul\.properties li\.ph-template-card\s*\{[^}]*grid-template-rows:\s*auto auto/s',
+		$template_css
+	)
+		&& (bool) preg_match(
+			'/\.ph-template-search\.ph-search-layout-list\.ph-search-template-portal-style-search-results[^\{]*\{[^}]*height:\s*100%/s',
+			$template_css
+		)
+);
+
+$assert(
 	'grid_cards_reset_sections_to_one_explicit_column',
 	false !== strpos( $template_css, 'li.ph-template-card > .thumbnail,' )
 		&& false !== strpos( $template_css, 'li.ph-template-card > .details,' )
