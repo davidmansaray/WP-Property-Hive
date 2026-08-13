@@ -834,14 +834,23 @@ body.ph-search-template-map-led-search-results {
 	min-block-size: var(--ph-search-map-min-height);
 }
 
-.ph-template-search.ph-search-template-map-led-search-results .property-search-form {
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form,
+.ph-template-search.ph-search-template-map-led-search-results form.property-search-form {
+	--ph-search-strip-height: 4rem;
 	display: grid;
 	grid-template-columns: minmax(10rem, 1.5fr) repeat(3, minmax(8rem, 1fr)) auto auto;
+	align-items: stretch;
 	gap: 0;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+	border: 1px solid var(--ph-search-line, #d9ddd9);
+	border-radius: 0;
+	background: #fff;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results:not(.ph-search-map-split) > .property-search-form {
-	padding: 0.875rem 1.5rem 0;
+	padding: 0;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results .property-search-form > .control {
@@ -849,11 +858,87 @@ body.ph-search-template-map-led-search-results {
 }
 
 .ph-template-search.ph-search-template-map-led-search-results .property-search-form > :is(.control-address_keyword, .control-maximum_price, .control-minimum_bedrooms, .control-property_type) {
-	display: block !important;
+	display: grid !important;
+	flex: none;
+	grid-template-rows: auto minmax(1.375rem, 1fr);
+	align-content: start;
+	align-items: start;
+	gap: 0.25rem;
+	min-block-size: var(--ph-search-strip-height);
+	margin: 0;
+	padding: 0.5rem 1rem;
+	border: 0;
+	border-inline-end: 1px solid var(--ph-search-line, #d9ddd9);
+	border-radius: 0;
+	background: #fff;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form > .control > label {
+	grid-row: 1;
+	margin: 0;
+	line-height: 1.2;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form > .control :is(input:not([type='submit']), select) {
+	grid-row: 2;
+	align-self: center;
+	inline-size: 100%;
+	min-height: 1.375rem;
+	min-block-size: 1.375rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	line-height: 1.375rem;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form > .ph-template-search-advanced-filters,
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form > input[type='submit'],
+.ph-template-set.ph-search-template-map-led-search-results .property-search-form > input[type='submit'] {
+	display: block;
+	align-self: stretch;
+	inline-size: auto;
+	min-inline-size: 9.5rem;
+	min-block-size: var(--ph-search-strip-height);
+	min-height: var(--ph-search-strip-height);
+	block-size: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	color: #fff;
+	background: var(--ph-search-ink, #17211d);
+	font-size: 0.8125rem;
+	font-weight: 700;
+	line-height: 1;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results .property-search-form > input[type='submit'] {
-	min-inline-size: 8.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 1.5rem;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results .ph-template-search-advanced-filters > summary {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-block-size: var(--ph-search-strip-height);
+	padding: 0 1.5rem;
+	border-radius: 0;
+	white-space: nowrap;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results .property-search-form .control-address_keyword .current-location {
+	inset-block-start: auto !important;
+	inset-block-end: 0.55rem !important;
+	inset-inline-end: 0.75rem !important;
+	translate: none;
 }
 
 /* Keep the borderless form cells while retaining a visible keyboard focus indicator. */
@@ -1101,7 +1186,8 @@ body.admin-bar .ph-template-search {
 
 @media (max-width: 70rem) {
 	.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form,
-	.ph-template-search.ph-search-template-map-led-search-results .property-search-form {
+	.ph-template-search.ph-search-template-map-led-search-results .property-search-form,
+	.ph-template-search.ph-search-template-map-led-search-results form.property-search-form {
 		grid-template-columns: minmax(10rem, 1.5fr) repeat(2, minmax(8rem, 1fr)) auto auto;
 	}
 
@@ -1128,8 +1214,10 @@ body.admin-bar .ph-template-search {
 	}
 
 	.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form,
-	.ph-template-search.ph-search-template-map-led-search-results .property-search-form {
+	.ph-template-search.ph-search-template-map-led-search-results .property-search-form,
+	.ph-template-search.ph-search-template-map-led-search-results form.property-search-form {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		max-inline-size: 100%;
 	}
 
 	.ph-template-search.ph-search-template-portal-grid-search-results .property-search-form > .control:nth-of-type(n + 2),
@@ -1143,7 +1231,9 @@ body.admin-bar .ph-template-search {
 	}
 
 	.ph-template-search .ph-template-search-advanced-filters,
-	.ph-template-search .property-search-form > input[type='submit'] {
+	.ph-template-search .property-search-form > input[type='submit'],
+	.ph-template-search.ph-search-template-map-led-search-results .property-search-form > .ph-template-search-advanced-filters,
+	.ph-template-search.ph-search-template-map-led-search-results .property-search-form > input[type='submit'] {
 		min-inline-size: 0;
 		inline-size: 100%;
 	}
