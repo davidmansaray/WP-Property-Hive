@@ -288,6 +288,43 @@
 	justify-content: flex-end;
 }
 
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card {
+	grid-template-columns: minmax(9rem, 38%) minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr) auto;
+	min-block-size: 11rem;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .thumbnail {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	min-block-size: 100%;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .thumbnail a {
+	aspect-ratio: auto;
+	position: absolute;
+	inset: 0;
+	block-size: auto;
+	min-block-size: 100%;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .details {
+	grid-column: 2;
+	grid-row: 1;
+	padding-inline-end: 3.25rem;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-card-footer {
+	grid-column: 2;
+	grid-row: 2;
+	margin-inline: 0;
+	padding: 0 1.35rem 1.1rem;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .actions {
+	margin-block-start: 0.5rem;
+}
+
 .ph-template-search.ph-search-template-map-led-search-results .ph-template-search-intro {
 	grid-template-columns: minmax(0, 42rem);
 	padding-inline-start: clamp(1rem, 2vw, 1.5rem);
