@@ -28,6 +28,15 @@ class PH_Template_Set {
 	const EDIT_CLOSED_QUERY_ARG = 'ph_template_editor_closed';
 	const EDIT_OPEN_QUERY_ARG = 'ph_template_editor_open';
 	const EDIT_FRAME_QUERY_ARG = 'ph_template_editor_frame';
+	const MAP_SEARCH_FORMAT_QUERY_ARG = 'ph_template_map_search_format';
+	const SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG = 'ph_template_search_result_order';
+	const SEARCH_RESULT_FIELDS_QUERY_ARG = 'ph_template_search_result_fields';
+	const SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG = 'ph_template_search_result_image_size';
+	const MAP_SEARCH_FORMAT_NONE = 'none';
+	const MAP_SEARCH_FORMAT_VIEW = 'view';
+	const MAP_SEARCH_FORMAT_SPLIT = 'split';
+	const MAP_SEARCH_REQUIRED_TEMPLATE = 'map-led-search-results';
+	const MAP_SEARCH_REQUIRED_DEFAULT_FORMAT = self::MAP_SEARCH_FORMAT_VIEW;
 	const EDITOR_MODE_LEGACY = 'legacy';
 	const EDITOR_MODE_VISUAL = 'visual_editor';
 	const EDITOR_MODE_PAGE_BUILDER = 'page_builder';
@@ -80,10 +89,18 @@ class PH_Template_Set {
 	 * Hook in methods.
 	 */
 	public static function init() {
+		// Register before plugins_loaded so add-ons that read this option during
+		// their setup observe the request-scoped preview format.
+		add_filter( 'option_propertyhive_map_search', array( 'PH_Template_Set_Request_Context', 'filter_map_search_option' ), 1 );
+		add_filter( 'default_option_propertyhive_map_search', array( 'PH_Template_Set_Request_Context', 'filter_map_search_option' ), 1 );
+		add_filter( 'option_propertyhive_template_assistant', array( 'PH_Template_Set_Request_Context', 'filter_template_assistant_option' ), 1 );
+		add_filter( 'default_option_propertyhive_template_assistant', array( 'PH_Template_Set_Request_Context', 'filter_template_assistant_option' ), 1 );
+
 		PH_Template_Set_Search_Form_Editor::init();
 
 		add_filter( 'propertyhive_enqueue_styles', array( __CLASS__, 'enqueue_styles' ) );
 		add_filter( 'body_class', array( __CLASS__, 'body_classes' ) );
+		add_filter( 'body_class', array( __CLASS__, 'frame_body_classes' ), 20 );
 		add_filter( 'post_class', array( __CLASS__, 'post_classes' ), 25, 3 );
 		add_filter( 'loop_search_results_columns', array( __CLASS__, 'search_result_columns' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'preserve_template_preview_on_property_links' ), 20, 2 );
@@ -142,7 +159,6 @@ class PH_Template_Set {
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_modules' ), 50 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_similar_properties' ), 60 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_mobile_cta_bar' ), 95 );
-		add_action( 'propertyhive_property_actions_end', array( __CLASS__, 'render_trust_note' ), 20 );
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'render_preview_masthead' ), 5 );
 	}
@@ -388,6 +404,23 @@ class PH_Template_Set {
 		}
 
 		return $show_admin_bar;
+	}
+
+	/**
+	 * Add a marker to the body of an authorized responsive preview frame.
+	 *
+	 * The frame intentionally does not use the active editor class because the
+	 * editor sidebar lives in the parent document.
+	 *
+	 * @param array $classes Body classes.
+	 * @return array
+	 */
+	public static function frame_body_classes( $classes ) {
+		if ( PH_Template_Set_Request_Context::is_template_editor_frame_request() ) {
+			$classes[] = 'ph-template-editor-frame';
+		}
+
+		return $classes;
 	}
 
 	public static function print_style_variables() {

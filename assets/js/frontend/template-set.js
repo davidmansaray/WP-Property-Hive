@@ -542,6 +542,58 @@
 			&& !!config.locationMapProviderConfigured;
 	}
 
+	function isStructuralPreviewControl(control) {
+		return !!(modules.editorPreview
+			&& typeof modules.editorPreview.isStructuralPreviewControl === 'function'
+			&& modules.editorPreview.isStructuralPreviewControl(control));
+	}
+
+	function isSearchResultServerPreviewControl(control) {
+		return !!control && [
+			'search_result_default_order',
+			'search_result_image_size',
+			'search_result_fields[]'
+		].indexOf(control.name) !== -1;
+	}
+
+	function scheduleSearchResultPreviewReload(control) {
+		if (!isSearchResultServerPreviewControl(control)) {
+			return;
+		}
+
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.scheduleSearchResultSettingsReload === 'function') {
+			modules.editorResponsivePreview.scheduleSearchResultSettingsReload();
+		}
+	}
+
+	function applyStructuralPreviewControl(control, editor, labels) {
+		var format = control.value;
+
+		if (modules.editorPreview && typeof modules.editorPreview.applyControl === 'function') {
+			// Keep the immediate class update as a useful loading/error fallback. The
+			// structural request below is deliberately contained to the iframe.
+			modules.editorPreview.applyControl(control);
+		}
+
+		if (modules.editorPreview && typeof modules.editorPreview.getMapSearchFormat === 'function') {
+			format = modules.editorPreview.getMapSearchFormat(control);
+		}
+
+		control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+		editor.classList.add('is-dirty');
+		setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.setMapSearchPreviewFormat === 'function') {
+			modules.editorResponsivePreview.setMapSearchPreviewFormat(format, { force: true });
+		}
+	}
+
+	function reconcileStructuralPreviewAfterSave() {
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.reconcileMapSearchPreview === 'function') {
+			modules.editorResponsivePreview.reconcileMapSearchPreview();
+		}
+	}
+
 	function initEditorNavigationGuard(editor, searchFormBuilder, labels) {
 		var settingsLinks;
 		var allowNavigation = false;
@@ -678,6 +730,11 @@
 					loadTemplatePreview(previewUrl, labels, true);
 				};
 
+				if (isStructuralPreviewControl(control)) {
+					applyStructuralPreviewControl(control, editor, labels);
+					return;
+				}
+
 				if (previewUrl && previewUrl !== window.location.href) {
 					if (hasUnsavedEditorChanges(editor, searchFormBuilder)) {
 						confirmTemplateNavigation(labels).then(function (shouldLeave) {
@@ -701,6 +758,7 @@
 				control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
 				editor.classList.add('is-dirty');
 				setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+				scheduleSearchResultPreviewReload(control);
 			});
 
 			if (control.type === 'color') {
@@ -769,6 +827,7 @@
 					control.setAttribute('data-ph-template-editor-saved-value', getControlValue(control));
 				});
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
+				reconcileStructuralPreviewAfterSave();
 
 				if (reloadRequired) {
 					window.location.reload();

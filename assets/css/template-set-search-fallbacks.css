@@ -358,8 +358,7 @@
 		line-height: 1.3;
 	}
 
-	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .ph-template-badge,
-	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .ph-template-card-gallery-controls {
+	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .ph-template-badge {
 		border: 0;
 		border-radius: 0;
 		padding: 0.4rem 0.55rem;
@@ -653,15 +652,6 @@
 		padding-inline-start: 0.75rem;
 	}
 
-	:where(.ph-template-search.ph-search-template-map-led-search-results) .ph-template-facts > li + li::before {
-		content: "";
-		position: absolute;
-		inset-block: 0.1rem;
-		inset-inline-start: 0;
-		inline-size: 1px;
-		background: var(--ph-search-line);
-	}
-
 	:where(.ph-template-search.ph-search-template-map-led-search-results) .ph-template-card-actions {
 		display: grid;
 		inline-size: 2.125rem;
@@ -681,7 +671,9 @@
 		position: absolute;
 		inset: 0;
 		overflow: hidden;
+		border: 0;
 		color: inherit;
+		background: transparent;
 		text-indent: -9999px;
 		text-decoration: none;
 	}

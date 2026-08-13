@@ -60,6 +60,7 @@ class PH_Template_Set_Editor_Controller {
 					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch contact details', 'propertyhive' ), $settings['template_set_show_branch'] );
 					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property labels', 'propertyhive' ), $settings['template_set_show_badges'] );
 					self::render_template_editor_section_end();
+					self::render_search_result_global_controls( $settings );
 					self::render_search_manifest_controls( PH_Template_Set_Request_Context::get_search_template() );
 					self::render_addon_settings_sections( $context );
 				} else {
@@ -118,7 +119,7 @@ class PH_Template_Set_Editor_Controller {
 	 * @return string
 	 */
 	public static function get_template_editor_title( $context ) {
-		return 'search' === $context ? __( 'Search results', 'propertyhive' ) : __( 'Property pages', 'propertyhive' );
+		return 'search' === $context ? __( 'Search results', 'propertyhive' ) : __( 'Property details', 'propertyhive' );
 	}
 
 	/**
@@ -190,7 +191,7 @@ class PH_Template_Set_Editor_Controller {
 
 		$url = remove_query_arg( PH_Template_Set::EDIT_OPEN_QUERY_ARG, $url );
 
-		return add_query_arg(
+		$url = add_query_arg(
 			array(
 				PH_Template_Set::EDIT_QUERY_ARG        => '1',
 				PH_Template_Set::EDIT_CLOSED_QUERY_ARG => '1',
@@ -198,6 +199,16 @@ class PH_Template_Set_Editor_Controller {
 			),
 			$url
 		);
+
+		if ( 'search' === $context && PH_Template_Set::MAP_SEARCH_REQUIRED_TEMPLATE === $template ) {
+			$map_state = PH_Template_Set_Request_Context::get_map_search_state();
+
+			if ( ! empty( $map_state['available'] ) && ! empty( $map_state['usable'] ) && ! in_array( $map_state['format'], array( PH_Template_Set::MAP_SEARCH_FORMAT_VIEW, PH_Template_Set::MAP_SEARCH_FORMAT_SPLIT ), true ) ) {
+				$url = add_query_arg( PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG, PH_Template_Set::MAP_SEARCH_REQUIRED_DEFAULT_FORMAT, $url );
+			}
+		}
+
+		return $url;
 	}
 
 	/**
@@ -235,6 +246,99 @@ class PH_Template_Set_Editor_Controller {
 				}
 			echo '</select>';
 		echo '</label>';
+	}
+
+	/**
+	 * Render a safe editor textarea control.
+	 *
+	 * @param string $name  Control name.
+	 * @param string $label Control label.
+	 * @param mixed  $value Current value.
+	 * @param int    $rows  Textarea rows.
+	 */
+	public static function render_template_editor_textarea( $name, $label, $value, $rows = 8 ) {
+		echo '<label class="ph-template-editor-field ph-template-editor-field-' . esc_attr( sanitize_html_class( $name ) ) . '">';
+			echo '<span>' . esc_html( $label ) . '</span>';
+			echo '<textarea name="' . esc_attr( $name ) . '" rows="' . absint( $rows ) . '" data-ph-template-editor-control>' . esc_textarea( (string) $value ) . '</textarea>';
+		echo '</label>';
+	}
+
+	/**
+	 * Whether search-result image sizes apply to the configured photo storage.
+	 *
+	 * @return bool
+	 */
+	public static function should_render_search_result_image_size_control() {
+		return 'urls' !== get_option( 'propertyhive_images_stored_as', '' );
+	}
+
+	/**
+	 * Render the ordered legacy global search-result settings.
+	 *
+	 * These controls intentionally do not include the old columns or layout
+	 * settings. Those concerns are owned by the template-set controls above.
+	 *
+	 * @param array $settings Current template-assistant settings.
+	 */
+	private static function render_search_result_global_controls( $settings ) {
+		$settings      = is_array( $settings ) ? $settings : PH_Template_Set_Settings::get_settings();
+		$legacy        = PH_Template_Set_Settings::get_search_result_global_settings( $settings );
+		$order_options = PH_Template_Set_Settings::get_search_result_order_options();
+		$image_options = PH_Template_Set_Settings::get_search_result_image_size_options();
+
+		self::render_template_editor_section_start( __( 'Search result settings', 'propertyhive' ) );
+		self::render_template_editor_select( 'search_result_default_order', __( 'Default sort order', 'propertyhive' ), $order_options, $legacy['search_result_default_order'] );
+		self::render_search_result_fields_control( $settings, $legacy['search_result_fields'] );
+		// URL-backed photos do not have WordPress image sizes to select. Match
+		// the legacy settings screen and omit this control for that storage mode.
+		if ( self::should_render_search_result_image_size_control() ) {
+			self::render_template_editor_select( 'search_result_image_size', __( 'Image size', 'propertyhive' ), $image_options, $legacy['search_result_image_size'] );
+		}
+		self::render_template_editor_textarea( 'search_result_css', __( 'Custom CSS', 'propertyhive' ), $legacy['search_result_css'], 8 );
+		self::render_template_editor_checkbox( 'search_result_css_all_pages', __( 'Apply custom CSS to all pages', 'propertyhive' ), $legacy['search_result_css_all_pages'] );
+		self::render_template_editor_section_end();
+	}
+
+	/**
+	 * Render the ordered search-result field selector.
+	 *
+	 * @param array $settings Current template-assistant settings.
+	 * @param array $selected Ordered selected field tokens.
+	 */
+	private static function render_search_result_fields_control( $settings, $selected ) {
+		$options  = PH_Template_Set_Settings::get_search_result_field_options( $settings );
+		$selected = PH_Template_Set_Settings::sanitize_search_result_fields( $selected, '', $settings );
+		$ordered  = array();
+
+		foreach ( $selected as $field ) {
+			if ( array_key_exists( $field, $options ) ) {
+				$ordered[ $field ] = $options[ $field ];
+			}
+		}
+
+		foreach ( $options as $field => $label ) {
+			if ( ! array_key_exists( $field, $ordered ) ) {
+				$ordered[ $field ] = $label;
+			}
+		}
+
+		echo '<div class="ph-template-editor-field ph-template-editor-field-search-result-fields ph-template-editor-search-result-settings" data-ph-template-editor-search-result-settings>';
+			echo '<span>' . esc_html__( 'Fields shown (in order)', 'propertyhive' ) . '</span>';
+			// A native form submission omits unchecked checkboxes entirely. Keep a
+			// presence marker so selecting zero fields is distinguishable from a
+			// detail-editor save that does not include search-result settings.
+			echo '<input type="hidden" name="search_result_fields_present" value="1">';
+			echo '<div class="ph-template-editor-search-result-fields-list" data-ph-template-editor-search-result-fields-list role="list" aria-label="' . esc_attr__( 'Search result fields in display order', 'propertyhive' ) . '">';
+			foreach ( $ordered as $field => $label ) {
+				$is_selected = in_array( $field, $selected, true );
+				echo '<div class="ph-template-editor-search-result-field" data-ph-template-editor-search-result-field="' . esc_attr( $field ) . '" data-ph-template-editor-search-result-field-label="' . esc_attr( $label ) . '" role="listitem">';
+					echo '<button type="button" class="ph-template-editor-search-result-field-handle" data-ph-template-editor-search-result-field-handle draggable="true" aria-label="' . esc_attr( sprintf( __( 'Reorder %s', 'propertyhive' ), $label ) ) . '" title="' . esc_attr__( 'Drag to reorder', 'propertyhive' ) . '">↕</button>';
+					echo '<label><input type="checkbox" name="search_result_fields[]" value="' . esc_attr( $field ) . '"' . checked( $is_selected, true, false ) . ' data-ph-template-editor-control data-ph-template-editor-search-result-field-checkbox><span>' . esc_html( $label ) . '</span></label>';
+				echo '</div>';
+			}
+			echo '</div>';
+			echo '<small class="ph-template-editor-field-help">' . esc_html__( 'Select the fields to show. Their order here is used on each result card.', 'propertyhive' ) . '</small>';
+		echo '</div>';
 	}
 
 	/**
@@ -510,7 +614,14 @@ class PH_Template_Set_Editor_Controller {
 			'editorActive'        => PH_Template_Set_Request_Context::is_template_editor_active(),
 			'editorMode'          => $settings['template_set_editor_mode'],
 			'previewQueryArgs'    => PH_Template_Set_Request_Context::get_preview_query_args(),
+			'mapSearchPreviewQueryArg' => PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG,
+			'searchResultPreviewQueryArgs' => array(
+				'defaultOrder' => PH_Template_Set::SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG,
+				'fields'       => PH_Template_Set::SEARCH_RESULT_FIELDS_QUERY_ARG,
+				'imageSize'    => PH_Template_Set::SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG,
+			),
 			'settings'            => PH_Template_Set_Settings::get_public_settings( $settings ),
+			'searchResultEditor'  => self::get_search_result_editor_data( $settings ),
 			'addonSettings'       => PH_Template_Set_Addon_Settings::get_public_definitions( self::get_template_editor_context() ),
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'editorSidebarLayout' => self::get_editor_sidebar_layout(),
@@ -535,6 +646,23 @@ class PH_Template_Set_Editor_Controller {
 					/* translators: 1: number of currently displayed results, 2: total number of results */
 					__( 'Showing %1$s of %2$s', 'propertyhive' ),
 			),
+		);
+	}
+
+	/**
+	 * Public, sanitised data for the legacy search-result controls.
+	 *
+	 * @param array $settings Current template-assistant settings.
+	 * @return array
+	 */
+	public static function get_search_result_editor_data( $settings = array() ) {
+		$settings = is_array( $settings ) ? $settings : PH_Template_Set_Settings::get_settings();
+
+		return array(
+			'settings'        => PH_Template_Set_Settings::get_search_result_global_settings( $settings ),
+			'orderOptions'    => PH_Template_Set_Settings::get_search_result_order_options(),
+			'fieldOptions'    => PH_Template_Set_Settings::get_search_result_field_options( $settings ),
+			'imageSizeOptions' => PH_Template_Set_Settings::get_search_result_image_size_options(),
 		);
 	}
 
@@ -581,6 +709,11 @@ class PH_Template_Set_Editor_Controller {
 				'id'       => 'details',
 				'label'    => __( 'Details shown', 'propertyhive' ),
 				'controls' => array( 'template_set_show_branch', 'template_set_show_badges' ),
+			),
+			array(
+				'id'       => 'result-settings',
+				'label'    => __( 'Result settings', 'propertyhive' ),
+				'controls' => array( 'search_result_default_order', 'search_result_fields[]', 'search_result_image_size', 'search_result_css', 'search_result_css_all_pages' ),
 			),
 		);
 		$search_groups = array_merge( $search_groups, PH_Template_Set_Addon_Settings::get_sidebar_groups( 'search' ) );

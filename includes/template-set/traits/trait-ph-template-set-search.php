@@ -1295,6 +1295,46 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
+	 * Apply the legacy result-field room preference to template-set card facts.
+	 *
+	 * Sites that have never configured the legacy result fields do not have a
+	 * `search_result_fields` key. Preserve the template-set default facts for
+	 * those sites, while an explicitly saved empty selection still hides room
+	 * counts as requested by the visual editor.
+	 *
+	 * @param array      $facts             Card facts.
+	 * @param array|null $template_assistant Optional legacy settings.
+	 * @return array
+	 */
+	private static function filter_search_card_facts( $facts, $template_assistant = null ) {
+		if ( ! is_array( $facts ) ) {
+			return array();
+		}
+
+		if ( null === $template_assistant ) {
+			$template_assistant = get_option( 'propertyhive_template_assistant', array() );
+		}
+
+		if ( ! is_array( $template_assistant ) || ! array_key_exists( 'search_result_fields', $template_assistant ) ) {
+			return $facts;
+		}
+
+		$configured_fields = is_array( $template_assistant['search_result_fields'] ) ? $template_assistant['search_result_fields'] : array();
+		if ( in_array( 'rooms', $configured_fields, true ) ) {
+			return $facts;
+		}
+
+		return array_values(
+			array_filter(
+				$facts,
+				static function ( $fact ) {
+					return ! is_array( $fact ) || empty( $fact['quantity'] );
+				}
+			)
+		);
+	}
+
+	/**
 	 * Render card footer with branch contact and facts.
 	 */
 	public static function render_card_footer() {
@@ -1309,7 +1349,7 @@ trait PH_Template_Set_Search {
 		}
 
 		$settings = self::get_settings();
-		$facts    = self::get_fact_items( $property, self::get_search_fact_limit() );
+		$facts    = self::filter_search_card_facts( self::get_fact_items( $property, self::get_search_fact_limit() ) );
 
 		if ( 'map-led-search-results' === self::get_search_template() ) {
 			$facts = array_values(

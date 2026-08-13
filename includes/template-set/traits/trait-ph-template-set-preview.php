@@ -189,7 +189,7 @@ trait PH_Template_Set_Preview {
 	 * @param PH_Property $property Property object.
 	 * @return array
 	 */
-	private static function get_property_gallery_images( $property ) {
+	private static function get_property_gallery_images( $property, $image_size = '' ) {
 		$images = array();
 
 		if ( ! $property ) {
@@ -227,7 +227,8 @@ trait PH_Template_Set_Preview {
 		}
 
 		foreach ( $property->get_gallery_attachment_ids() as $index => $attachment_id ) {
-			$src   = wp_get_attachment_image_src( $attachment_id, apply_filters( 'propertyhive_single_property_image_size', 'large' ) );
+			$src_size = '' !== $image_size ? $image_size : apply_filters( 'propertyhive_single_property_image_size', 'large' );
+			$src      = wp_get_attachment_image_src( $attachment_id, $src_size );
 			$thumb = wp_get_attachment_image_src( $attachment_id, apply_filters( 'single_property_small_thumbnail_size', 'medium' ) );
 
 			if ( empty( $src[0] ) ) {
@@ -277,20 +278,8 @@ trait PH_Template_Set_Preview {
 			return;
 		}
 
-		$images = self::get_property_gallery_images( $property );
+		$images = self::get_property_gallery_images( $property, apply_filters( 'property_search_results_thumbnail_size', 'medium' ) );
 		self::render_card_gallery_data_script( $images );
-
-		if ( 'portal-grid-search-results' === self::get_search_template() && count( $images ) > 1 ) {
-			echo '<span class="ph-template-card-gallery-controls" aria-label="' . esc_attr( sprintf(
-				/* translators: %d: number of property photos */
-				__( '%d property photos', 'propertyhive' ),
-				count( $images )
-			) ) . '">' . esc_html( sprintf(
-				/* translators: %d: total number of property photos */
-				__( '1 / %d', 'propertyhive' ),
-				count( $images )
-			) ) . '</span>';
-		}
 	}
 
 	/**
@@ -336,6 +325,16 @@ trait PH_Template_Set_Preview {
 		$property = self::get_current_property();
 		$template = self::get_detail_template();
 		$images   = self::get_property_gallery_images( $property );
+		$editor_preview = self::is_template_editor_active() || PH_Template_Set_Request_Context::is_template_editor_frame_request();
+		$has_coordinates = $property
+			&& '' !== (string) $property->latitude
+			&& '0' !== (string) $property->latitude
+			&& '' !== (string) $property->longitude
+			&& '0' !== (string) $property->longitude;
+		$map_provider = (string) get_option( 'propertyhive_maps_provider' );
+		$location_map_available = 'real-map' === PH_Template_Set_Request_Context::get_location_map()
+			&& $has_coordinates
+			&& ( '' !== $map_provider || self::is_demo_preview() );
 
 		PH_Template_Set_Template_Loader::render(
 			'detail',
@@ -346,8 +345,11 @@ trait PH_Template_Set_Preview {
 				'template'            => $template,
 				'images'              => $images,
 				'is_preview'          => self::is_demo_preview(),
+				'is_editor_preview'   => $editor_preview,
 				'gallery_layout'      => self::get_gallery_layout(),
 				'location'            => self::get_property_location_label( $property ),
+				'location_map_available' => $location_map_available,
+				'property'            => $property,
 				'has_floor_map'       => self::should_render_floorplans( $property ),
 				'has_virtual_tour'    => self::should_render_virtual_tours( $property ),
 				'virtual_tours'       => $property ? $property->get_virtual_tours() : array(),

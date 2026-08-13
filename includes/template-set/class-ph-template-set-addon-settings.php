@@ -326,12 +326,18 @@ class PH_Template_Set_Addon_Settings {
 	/**
 	 * Get definitions that are relevant and usable in an editor context.
 	 *
-	 * @param string $context Editor context.
+	 * @param string $context         Editor context.
+	 * @param string $search_template Optional search template slug.
 	 * @return array
 	 */
-	public static function get_available_definitions( $context = '' ) {
-		$context     = sanitize_key( $context );
-		$definitions = array();
+	public static function get_available_definitions( $context = '', $search_template = '' ) {
+		$context         = sanitize_key( $context );
+		$search_template = sanitize_title( $search_template );
+		$definitions     = array();
+
+		if ( 'search' === $context && '' === $search_template && class_exists( 'PH_Template_Set_Request_Context' ) ) {
+			$search_template = PH_Template_Set_Request_Context::get_search_template();
+		}
 
 		foreach ( self::get_definitions() as $definition ) {
 			if ( ! is_array( $definition ) || empty( $definition['id'] ) || empty( $definition['slug'] ) ) {
@@ -345,6 +351,8 @@ class PH_Template_Set_Addon_Settings {
 			if ( ! self::is_definition_available( $definition ) ) {
 				continue;
 			}
+
+			$definition = self::apply_search_template_constraints( $definition, $search_template );
 
 			$definitions[] = $definition;
 		}
@@ -482,10 +490,11 @@ class PH_Template_Set_Addon_Settings {
 	 * @return array|WP_Error
 	 */
 	public static function prepare_save( $raw_request, $context ) {
-		$raw_request = is_array( $raw_request ) ? wp_unslash( $raw_request ) : array();
-		$context     = sanitize_key( $context );
-		$submitted   = isset( $raw_request[ self::REQUEST_NAMESPACE ] ) && is_array( $raw_request[ self::REQUEST_NAMESPACE ] ) ? $raw_request[ self::REQUEST_NAMESPACE ] : array();
-		$prepared    = array(
+		$raw_request     = is_array( $raw_request ) ? wp_unslash( $raw_request ) : array();
+		$context         = sanitize_key( $context );
+		$search_template = isset( $raw_request['template_set_search_template'] ) ? sanitize_title( $raw_request['template_set_search_template'] ) : '';
+		$submitted       = isset( $raw_request[ self::REQUEST_NAMESPACE ] ) && is_array( $raw_request[ self::REQUEST_NAMESPACE ] ) ? $raw_request[ self::REQUEST_NAMESPACE ] : array();
+		$prepared        = array(
 			'updates'          => array(),
 			'changed'          => false,
 			'reload_after_save' => false,
@@ -495,7 +504,7 @@ class PH_Template_Set_Addon_Settings {
 			return $prepared;
 		}
 
-		foreach ( self::get_available_definitions( $context ) as $definition ) {
+		foreach ( self::get_available_definitions( $context, $search_template ) as $definition ) {
 			$definition_id = sanitize_key( $definition['id'] );
 			$group         = isset( $submitted[ $definition_id ] ) && is_array( $submitted[ $definition_id ] ) ? $submitted[ $definition_id ] : array();
 
@@ -868,6 +877,34 @@ class PH_Template_Set_Addon_Settings {
 		}
 
 		return class_exists( 'PH_Template_Set' ) && PH_Template_Set::is_add_on_usable( $definition['slug'] );
+	}
+
+	/**
+	 * Remove settings that conflict with the selected search template.
+	 *
+	 * Map Atlas is a map-led template, so it must always use one of Map Search's
+	 * map-enabled formats. Existing sites with the legacy empty format fall back
+	 * to the least disruptive map-enabled presentation in the editor.
+	 *
+	 * @param array  $definition     Add-on definition.
+	 * @param string $search_template Search template slug.
+	 * @return array
+	 */
+	private static function apply_search_template_constraints( $definition, $search_template ) {
+		if (
+			PH_Template_Set::MAP_SEARCH_REQUIRED_TEMPLATE !== $search_template
+			|| empty( $definition['id'] )
+			|| 'map_search' !== $definition['id']
+			|| empty( $definition['controls']['format'] )
+		) {
+			return $definition;
+		}
+
+		unset( $definition['controls']['format']['options'][''] );
+		$definition['controls']['format']['default'] = PH_Template_Set::MAP_SEARCH_REQUIRED_DEFAULT_FORMAT;
+		$definition['controls']['format']['help']    = __( 'Map Atlas always includes a map.', 'propertyhive' );
+
+		return $definition;
 	}
 
 	/**

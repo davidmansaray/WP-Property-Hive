@@ -4,6 +4,612 @@
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
 	var activeConfig = {};
 	var activeHelpers = {};
+	var activeSearchResultSettings = null;
+
+	/*
+	 * The older Frontend settings screen stored search-result fields as an
+	 * ordered array of checked checkboxes. The visual editor uses the same
+	 * names so the normal editor FormData serializer can persist that option
+	 * without a second save request. This small adapter adds the missing
+	 * ordering and preview affordances to whatever markup the PHP controller
+	 * supplies (the data attributes are preferred, with name/id fallbacks for
+	 * compatibility with older markup).
+	 */
+	function getClosestElement(element, selector) {
+		if (!element || !selector) {
+			return null;
+		}
+
+		if (element.nodeType !== 1) {
+			element = element.parentElement;
+		}
+
+		return element && element.closest ? element.closest(selector) : null;
+	}
+
+	function getSearchResultSettingsRoots(editor, form) {
+		var roots = [];
+		var selectors = [
+			'[data-ph-template-editor-search-result-settings]',
+			'[data-ph-search-result-settings]',
+			'.ph-template-editor-search-result-settings'
+		];
+		var searchRoot;
+
+		selectors.forEach(function (selector) {
+			(form || editor || document).querySelectorAll(selector).forEach(function (root) {
+				if (roots.indexOf(root) === -1) {
+					roots.push(root);
+				}
+			});
+		});
+
+		if (roots.length) {
+			return roots;
+		}
+
+		searchRoot = form || editor;
+		if (searchRoot && searchRoot.querySelector && (
+			searchRoot.querySelector('input[name="search_result_fields[]"]')
+			|| searchRoot.querySelector('textarea[name="search_result_css"]')
+		)) {
+			roots.push(searchRoot);
+		}
+
+		return roots;
+	}
+
+	function getSearchResultFieldsList(root) {
+		var selectors = [
+			'[data-ph-template-editor-search-result-fields-list]',
+			'[data-ph-search-result-fields-list]',
+			'.ph-template-editor-search-result-fields-list',
+			'.ph-search-result-fields-list',
+			'#sortable_options'
+		];
+		var list = null;
+
+		if (!root) {
+			return null;
+		}
+
+		selectors.some(function (selector) {
+			list = root.querySelector(selector);
+			return !!list;
+		});
+
+		if (list) {
+			return list;
+		}
+
+		if (root.matches && root.matches(
+			'[data-ph-template-editor-search-result-fields], [data-ph-search-result-fields], .ph-template-editor-search-result-fields'
+		)) {
+			return root;
+		}
+
+		return root.querySelector(
+			'[data-ph-template-editor-search-result-fields], [data-ph-search-result-fields], .ph-template-editor-search-result-fields'
+		) || null;
+	}
+
+	function getSearchResultFieldCheckbox(item) {
+		if (!item || !item.querySelector) {
+			return null;
+		}
+
+		return item.querySelector(
+			'input[type="checkbox"][name="search_result_fields[]"], '
+			+ 'input[data-ph-template-editor-search-result-field-checkbox], '
+			+ 'input[data-ph-search-result-field-checkbox]'
+		);
+	}
+
+	function getSearchResultFieldItems(list) {
+		var items;
+
+		if (!list) {
+			return [];
+		}
+
+		items = Array.prototype.filter.call(list.children || [], function (item) {
+			return !!getSearchResultFieldCheckbox(item)
+				|| !!(item.matches && item.matches('[data-ph-template-editor-search-result-field], [data-ph-search-result-field]'));
+		});
+
+		return items;
+	}
+
+	function getSearchResultFieldHandle(item) {
+		if (!item || !item.querySelector) {
+			return null;
+		}
+
+		return item.querySelector(
+			'[data-ph-template-editor-search-result-field-handle], '
+			+ '[data-ph-search-result-field-handle], '
+			+ '.ph-template-editor-search-result-field-handle, '
+			+ '.ph-search-result-field-handle, '
+			+ '.fa-reorder, .fa-arrows, [draggable="true"]'
+		);
+	}
+
+	function getSearchResultFieldLabel(item) {
+		var checkbox = getSearchResultFieldCheckbox(item);
+		var label;
+
+		if (!item) {
+			return 'Search result field';
+		}
+
+		label = item.getAttribute('data-ph-template-editor-search-result-field-label')
+			|| item.getAttribute('data-ph-search-result-field-label');
+
+		if (!label && checkbox) {
+			label = checkbox.getAttribute('aria-label');
+		}
+
+		if (!label) {
+			label = (item.textContent || '').replace(/\s+/g, ' ').trim();
+		}
+
+		return label || 'Search result field';
+	}
+
+	function getSearchResultCssControl(form, root) {
+		var scope = root || form || document;
+
+		return scope.querySelector(
+			'textarea[name="search_result_css"], '
+			+ 'textarea[data-ph-template-editor-search-result-css], '
+			+ 'textarea[data-ph-search-result-css]'
+		) || (form && form.querySelector ? form.querySelector('textarea[name="search_result_css"]') : null);
+	}
+
+	function getSearchResultPreviewDocuments() {
+		var frameDocument;
+
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.getDocument === 'function') {
+			try {
+				frameDocument = modules.editorResponsivePreview.getDocument();
+			} catch (error) {
+				frameDocument = null;
+			}
+
+			if (frameDocument) {
+				return [frameDocument];
+			}
+		}
+
+		// The preview is rendered in an iframe. Do not fall back to the parent
+		// document: arbitrary, valid search CSS must never be allowed to style
+		// the editor sidebar or its surrounding application chrome.
+		return [];
+	}
+
+	function normalizeSearchResultCss(value) {
+		return String(value || '')
+			.replace(/<style\b[^>]*>/gi, '')
+			.replace(/<\/style>/gi, '')
+			.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+	}
+
+	function applySearchResultCss(control) {
+		var css = normalizeSearchResultCss(control ? control.value : '');
+
+		getSearchResultPreviewDocuments().forEach(function (previewDocument) {
+			var style;
+
+			if (!previewDocument || !previewDocument.createElement) {
+				return;
+			}
+
+			style = previewDocument.querySelector('style[data-ph-template-editor-search-result-css]');
+			if (!style) {
+				style = previewDocument.createElement('style');
+				style.setAttribute('data-ph-template-editor-search-result-css', '');
+				style.setAttribute('data-ph-template-editor-generated', 'true');
+				(previewDocument.head || previewDocument.documentElement || previewDocument.body).appendChild(style);
+			}
+
+			style.textContent = css;
+		});
+	}
+
+	function removeSearchResultCss() {
+		getSearchResultPreviewDocuments().forEach(function (previewDocument) {
+			if (!previewDocument || !previewDocument.querySelectorAll) {
+				return;
+			}
+
+			previewDocument.querySelectorAll('style[data-ph-template-editor-search-result-css][data-ph-template-editor-generated="true"]').forEach(function (style) {
+				style.parentNode.removeChild(style);
+			});
+		});
+	}
+
+	function announceSearchResultChange(root, message) {
+		var live = root ? root.querySelector(
+			'[data-ph-template-editor-search-result-fields-status], '
+			+ '[data-ph-search-result-fields-status], '
+			+ '[data-ph-template-editor-search-result-settings-status]'
+		) : null;
+
+		if (live) {
+			live.textContent = message || '';
+		}
+	}
+
+	function markSearchResultSettingsDirty(editor, labels, helpers, root, message, reloadPreview) {
+		var saveButton;
+
+		if (!editor) {
+			return;
+		}
+
+		editor.classList.add('is-dirty');
+		editor.setAttribute('data-ph-template-editor-state', 'changed');
+		saveButton = editor.querySelector('[data-ph-template-editor-save]');
+
+		if (saveButton) {
+			saveButton.disabled = false;
+			saveButton.classList.remove('is-saving', 'is-saved');
+		}
+
+		if (helpers && typeof helpers.setEditorStatus === 'function') {
+			helpers.setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+		}
+
+		announceSearchResultChange(root, message || labels.changed || 'Unsaved changes');
+
+		if (typeof window.CustomEvent === 'function') {
+			document.dispatchEvent(new window.CustomEvent('ph:template_set_search_result_settings_changed', {
+				detail: {
+					editor: editor,
+					root: root || null,
+					reloadPreview: !!reloadPreview
+				}
+			}));
+		}
+	}
+
+	function initSearchResultFieldList(list, editor, labels, helpers) {
+		var draggedItem = null;
+		var boundAttribute = 'data-ph-template-editor-search-result-fields-bound';
+
+		if (!list || list.getAttribute(boundAttribute) === 'true') {
+			return null;
+		}
+
+		list.setAttribute(boundAttribute, 'true');
+		list.classList.add('ph-template-editor-search-result-fields-list');
+		list.setAttribute('role', list.getAttribute('role') || 'list');
+
+		function updateFieldMetadata() {
+			var items = getSearchResultFieldItems(list);
+			var orderInput = list.closest('form') ? list.closest('form').querySelector(
+				'input[name="search_result_fields_order"], '
+				+ 'input[data-ph-template-editor-search-result-fields-order]'
+			) : null;
+			var order = [];
+
+			items.forEach(function (item, index) {
+				var checkbox = getSearchResultFieldCheckbox(item);
+				var handle = getSearchResultFieldHandle(item);
+				var label = getSearchResultFieldLabel(item);
+				var fieldId = checkbox ? checkbox.value : (item.getAttribute('data-ph-search-result-field') || String(index));
+
+				item.classList.add('ph-template-editor-search-result-field');
+				item.setAttribute('role', item.getAttribute('role') || 'listitem');
+				item.setAttribute('aria-posinset', String(index + 1));
+				item.setAttribute('aria-setsize', String(items.length));
+				item.setAttribute('data-ph-template-editor-search-result-field', fieldId);
+
+				if (checkbox) {
+					checkbox.setAttribute('data-ph-template-editor-search-result-field-checkbox', '');
+					checkbox.setAttribute('aria-label', label);
+					if (checkbox.checked) {
+						order.push(fieldId);
+					}
+				}
+
+				if (handle) {
+					handle.setAttribute('data-ph-template-editor-search-result-field-handle', '');
+					handle.setAttribute('aria-label', 'Reorder ' + label + '. Use the arrow keys to move it.');
+					handle.setAttribute('title', 'Reorder ' + label);
+					handle.setAttribute('draggable', items.length > 1 ? 'true' : 'false');
+					if (handle.tagName && handle.tagName.toLowerCase() !== 'button' && !handle.hasAttribute('tabindex')) {
+						handle.setAttribute('tabindex', '0');
+					}
+					if (!handle.getAttribute('role') && (!handle.tagName || handle.tagName.toLowerCase() !== 'button')) {
+						handle.setAttribute('role', 'button');
+					}
+				}
+			});
+
+			if (orderInput) {
+				orderInput.value = order.join('|');
+			}
+		}
+
+		function moveField(item, direction, shouldFocus) {
+			var items = getSearchResultFieldItems(list);
+			var index = items.indexOf(item);
+			var target = index + direction;
+			var handle;
+
+			if (index < 0 || target < 0 || target >= items.length) {
+				return;
+			}
+
+			if (direction < 0) {
+				list.insertBefore(item, items[target]);
+			} else {
+				list.insertBefore(item, items[target].nextSibling);
+			}
+
+			updateFieldMetadata();
+			markSearchResultSettingsDirty(editor, labels, helpers, list, 'Field order changed', true);
+
+			if (shouldFocus) {
+				handle = getSearchResultFieldHandle(item);
+				if (handle && typeof handle.focus === 'function') {
+					handle.focus();
+				}
+			}
+		}
+
+		function getItemFromEventTarget(target) {
+			var item = getClosestElement(target, '[data-ph-template-editor-search-result-field], .ph-template-editor-search-result-field');
+
+			return item && item.parentNode === list ? item : null;
+		}
+
+		list.addEventListener('change', function (event) {
+			var checkbox = event.target && event.target.matches && event.target.matches(
+				'input[type="checkbox"][name="search_result_fields[]"], '
+				+ 'input[data-ph-template-editor-search-result-field-checkbox], '
+				+ 'input[data-ph-search-result-field-checkbox]'
+			) ? event.target : null;
+
+			if (checkbox) {
+				updateFieldMetadata();
+				markSearchResultSettingsDirty(editor, labels, helpers, list, 'Field visibility changed', true);
+			}
+		});
+
+		list.addEventListener('keydown', function (event) {
+			var handle = getClosestElement(event.target, '[data-ph-template-editor-search-result-field-handle]');
+			var item;
+
+			if (!handle || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
+				return;
+			}
+
+			item = getItemFromEventTarget(handle);
+			if (!item) {
+				return;
+			}
+
+			event.preventDefault();
+			moveField(item, event.key === 'ArrowUp' ? -1 : 1, true);
+		});
+
+		list.addEventListener('dragstart', function (event) {
+			var handle = getClosestElement(event.target, '[data-ph-template-editor-search-result-field-handle]');
+			var item = handle ? getItemFromEventTarget(handle) : null;
+
+			if (!item || getSearchResultFieldItems(list).length < 2) {
+				event.preventDefault();
+				return;
+			}
+
+			draggedItem = item;
+			item.classList.add('is-dragging');
+			if (event.dataTransfer) {
+				event.dataTransfer.effectAllowed = 'move';
+				event.dataTransfer.setData('text/plain', item.getAttribute('data-ph-template-editor-search-result-field') || '');
+			}
+		});
+
+		list.addEventListener('dragover', function (event) {
+			var item;
+			var rect;
+
+			if (!draggedItem) {
+				return;
+			}
+
+			item = getItemFromEventTarget(event.target);
+			if (!item || item === draggedItem) {
+				return;
+			}
+
+			event.preventDefault();
+			list.querySelectorAll('.is-drop-before, .is-drop-after').forEach(function (candidate) {
+				candidate.classList.remove('is-drop-before', 'is-drop-after');
+			});
+			rect = item.getBoundingClientRect();
+			item.classList.add(event.clientY > rect.top + (rect.height / 2) ? 'is-drop-after' : 'is-drop-before');
+		});
+
+		list.addEventListener('drop', function (event) {
+			var item;
+			var rect;
+			var after;
+
+			if (!draggedItem) {
+				return;
+			}
+
+			item = getItemFromEventTarget(event.target);
+			if (!item || item === draggedItem) {
+				event.preventDefault();
+				draggedItem.classList.remove('is-dragging');
+				draggedItem = null;
+				return;
+			}
+
+			event.preventDefault();
+			rect = item.getBoundingClientRect();
+			after = event.clientY > rect.top + (rect.height / 2);
+			if (after) {
+				list.insertBefore(draggedItem, item.nextSibling);
+			} else {
+				list.insertBefore(draggedItem, item);
+			}
+
+			draggedItem.classList.remove('is-dragging');
+			list.querySelectorAll('.is-drop-before, .is-drop-after').forEach(function (candidate) {
+				candidate.classList.remove('is-drop-before', 'is-drop-after');
+			});
+			updateFieldMetadata();
+			markSearchResultSettingsDirty(editor, labels, helpers, list, 'Field order changed', true);
+			draggedItem = null;
+		});
+
+		list.addEventListener('dragend', function () {
+			if (draggedItem) {
+				draggedItem.classList.remove('is-dragging');
+			}
+
+			list.querySelectorAll('.is-drop-before, .is-drop-after').forEach(function (candidate) {
+				candidate.classList.remove('is-drop-before', 'is-drop-after');
+			});
+			draggedItem = null;
+		});
+
+		updateFieldMetadata();
+
+		return {
+			refresh: updateFieldMetadata,
+			destroy: function () {
+				list.removeAttribute(boundAttribute);
+			}
+		};
+	}
+
+	function initSearchResultSettings(editor, form, labels, helpers) {
+		var roots = getSearchResultSettingsRoots(editor, form);
+		var lists = [];
+		var cssControl = null;
+		var inputHandler;
+		var changeHandler;
+		var frameLoadedHandler;
+		var observer;
+		var instance;
+
+		if (activeSearchResultSettings && typeof activeSearchResultSettings.destroy === 'function') {
+			activeSearchResultSettings.destroy();
+			activeSearchResultSettings = null;
+		}
+
+		if (!roots.length) {
+			return null;
+		}
+
+		roots.forEach(function (root) {
+			var list = getSearchResultFieldsList(root);
+			var listInstance;
+
+			if (list && lists.indexOf(list) === -1) {
+				listInstance = initSearchResultFieldList(list, editor, labels, helpers);
+				if (listInstance) {
+					lists.push(list);
+				}
+			}
+
+			if (!cssControl) {
+				cssControl = getSearchResultCssControl(form, root);
+			}
+		});
+
+		if (!cssControl) {
+			cssControl = getSearchResultCssControl(form);
+		}
+
+		if (!lists.length && !cssControl) {
+			return null;
+		}
+
+		inputHandler = function (event) {
+			if (!cssControl || event.target !== cssControl) {
+				return;
+			}
+
+			applySearchResultCss(cssControl);
+			markSearchResultSettingsDirty(editor, labels, helpers, cssControl, 'Custom CSS changed');
+		};
+		changeHandler = function (event) {
+			if (cssControl && event.target === cssControl) {
+				applySearchResultCss(cssControl);
+				markSearchResultSettingsDirty(editor, labels, helpers, cssControl, 'Custom CSS changed');
+			}
+		};
+
+		if (cssControl) {
+			cssControl.setAttribute('data-ph-template-editor-search-result-css', '');
+			cssControl.addEventListener('input', inputHandler);
+			cssControl.addEventListener('change', changeHandler);
+			applySearchResultCss(cssControl);
+		}
+
+		frameLoadedHandler = function () {
+			if (cssControl) {
+				applySearchResultCss(cssControl);
+			}
+		};
+		document.addEventListener('ph:template_set_preview_frame_loaded', frameLoadedHandler);
+
+		if (window.MutationObserver && editor) {
+			observer = new window.MutationObserver(function () {
+				if (!editor.classList.contains('is-dirty') && cssControl) {
+					applySearchResultCss(cssControl);
+				}
+			});
+			observer.observe(editor, { attributes: true, attributeFilter: ['class'] });
+		}
+
+		instance = {
+			isDirty: function () {
+				return !!(editor && editor.classList.contains('is-dirty'));
+			},
+			refresh: function () {
+				lists.forEach(function (list) {
+					var listInstance = initSearchResultFieldList(list, editor, labels, helpers);
+
+					if (listInstance && typeof listInstance.refresh === 'function') {
+						listInstance.refresh();
+					}
+				});
+				if (cssControl) {
+					applySearchResultCss(cssControl);
+				}
+			},
+			destroy: function () {
+				if (cssControl) {
+					cssControl.removeEventListener('input', inputHandler);
+					cssControl.removeEventListener('change', changeHandler);
+				}
+				document.removeEventListener('ph:template_set_preview_frame_loaded', frameLoadedHandler);
+				removeSearchResultCss();
+				if (observer) {
+					observer.disconnect();
+				}
+				lists.forEach(function (list) {
+					list.removeAttribute('data-ph-template-editor-search-result-fields-bound');
+				});
+				if (activeSearchResultSettings === instance) {
+					activeSearchResultSettings = null;
+				}
+			}
+		};
+
+		activeSearchResultSettings = instance;
+
+		return instance;
+	}
+
 	function cloneSearchFormField(field) {
 		return JSON.parse(JSON.stringify(field || {}));
 	}
@@ -1345,15 +1951,25 @@
 	}
 
 	function init(config, editor, form, labels, helpers) {
+		var searchFormBuilder;
+
 		activeConfig = config || {};
 		activeHelpers = helpers || {};
 
-		return initSearchFormBuilder(editor, form, labels || {});
+		searchFormBuilder = initSearchFormBuilder(editor, form, labels || {});
+		initSearchResultSettings(editor, form, labels || {}, helpers || {});
+
+		return searchFormBuilder;
 	}
 
 	modules.searchFormBuilder = {
 		buildPayload: buildSearchFormPayload,
 		initializeForm: initializeReplacedSearchForm,
 		init: init
+	};
+
+	modules.searchResultSettings = {
+		applyCss: applySearchResultCss,
+		init: initSearchResultSettings
 	};
 }());

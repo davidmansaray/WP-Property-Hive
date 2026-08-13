@@ -51,7 +51,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h4><?php esc_html_e( 'Documents and viewing', 'propertyhive' ); ?></h4>
 			<div class="ph-template-doc-row">
 				<?php foreach ( $documents as $document ) : ?>
-					<span class="ph-template-doc-pill ph-template-doc-pill-<?php echo esc_attr( sanitize_html_class( $document['type'] ) ); ?>"><span class="ph-template-doc-icon" aria-hidden="true"></span><?php echo esc_html( $document['label'] ); ?></span>
+					<?php $document_class = 'ph-template-doc-pill ph-template-doc-pill-' . sanitize_html_class( $document['type'] ); ?>
+					<?php if ( ! empty( $document['url'] ) ) : ?>
+						<a class="<?php echo esc_attr( $document_class ); ?>" href="<?php echo esc_url( $document['url'] ); ?>" target="_blank" rel="noopener noreferrer"<?php if ( ! empty( $document['attributes'] ) && is_array( $document['attributes'] ) ) : ?><?php foreach ( $document['attributes'] as $name => $value ) : ?> <?php echo esc_attr( $name ); ?>="<?php echo esc_attr( $value ); ?>"<?php endforeach; ?><?php endif; ?>><span class="ph-template-doc-icon" aria-hidden="true"></span><?php echo esc_html( $document['label'] ); ?></a>
+					<?php else : ?>
+						<span class="<?php echo esc_attr( $document_class ); ?>"><span class="ph-template-doc-icon" aria-hidden="true"></span><?php echo esc_html( $document['label'] ); ?></span>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
 			<?php if ( $office ) : ?>

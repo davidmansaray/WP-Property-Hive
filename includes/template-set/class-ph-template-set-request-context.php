@@ -340,6 +340,135 @@ class PH_Template_Set_Request_Context {
 	}
 
 	/**
+	 * Get the temporary Map Search format requested by an editor frame.
+	 *
+	 * The explicit `none` value represents the add-on's existing empty format
+	 * value. Returning false means that the request does not contain an allowed
+	 * preview override.
+	 *
+	 * @return string|false
+	 */
+	public static function get_map_search_preview_format() {
+		if ( ! self::is_template_editor_frame_request() || ! isset( $_GET[ PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
+
+		$requested_format = $_GET[ PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG ]; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( ! is_scalar( $requested_format ) ) {
+			return false;
+		}
+
+		$format = sanitize_key( (string) wp_unslash( $requested_format ) );
+
+		if ( PH_Template_Set::MAP_SEARCH_REQUIRED_TEMPLATE === self::get_search_template() && PH_Template_Set::MAP_SEARCH_FORMAT_NONE === $format ) {
+			return PH_Template_Set::MAP_SEARCH_REQUIRED_DEFAULT_FORMAT;
+		}
+
+		return in_array( $format, array( PH_Template_Set::MAP_SEARCH_FORMAT_NONE, PH_Template_Set::MAP_SEARCH_FORMAT_VIEW, PH_Template_Set::MAP_SEARCH_FORMAT_SPLIT ), true ) ? $format : false;
+	}
+
+	/**
+	 * Apply the unsaved Map Search format to an authorized preview frame only.
+	 *
+	 * This filter receives the already-loaded option value. It deliberately does
+	 * not call get_option() or update the option, which keeps the override
+	 * request-scoped and avoids filter recursion.
+	 *
+	 * @param mixed $settings Saved Map Search settings.
+	 * @return mixed
+	 */
+	public static function filter_map_search_option( $settings ) {
+		$format = self::get_map_search_preview_format();
+
+		if ( false === $format || ! is_array( $settings ) ) {
+			return $settings;
+		}
+
+		$settings['format'] = PH_Template_Set::MAP_SEARCH_FORMAT_NONE === $format ? '' : $format;
+
+		return $settings;
+	}
+
+	/**
+	 * Get unsaved search-result settings supplied by the visual editor frame.
+	 *
+	 * The editor cannot save each control before showing it. Instead, the
+	 * responsive frame carries the current form values in query arguments. The
+	 * values are accepted only on an authorized, closed editor frame request and
+	 * are passed through the same sanitisation used by the save endpoint.
+	 *
+	 * @param array $stored_settings Settings before the option filter runs.
+	 * @return array|false
+	 */
+	public static function get_search_result_preview_settings( $stored_settings = array() ) {
+		// This option is read during plugin bootstrap, before WordPress loads the
+		// pluggable current-user functions. Preview overrides are only relevant on
+		// the later, authenticated front-end request.
+		if ( ! function_exists( 'wp_get_current_user' ) || ! function_exists( 'current_user_can' ) ) {
+			return false;
+		}
+
+		if ( ! self::is_template_editor_frame_request() ) {
+			return false;
+		}
+
+		$raw_settings = array();
+		$has_override = false;
+
+		if ( isset( $_GET[ PH_Template_Set::SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG ] ) && is_scalar( $_GET[ PH_Template_Set::SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw_settings['search_result_default_order'] = wp_unslash( $_GET[ PH_Template_Set::SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$has_override = true;
+		}
+
+		if ( isset( $_GET[ PH_Template_Set::SEARCH_RESULT_FIELDS_QUERY_ARG ] ) && is_scalar( $_GET[ PH_Template_Set::SEARCH_RESULT_FIELDS_QUERY_ARG ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$fields = (string) wp_unslash( $_GET[ PH_Template_Set::SEARCH_RESULT_FIELDS_QUERY_ARG ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw_settings['search_result_fields'] = '' === $fields ? array() : explode( '|', $fields );
+			$has_override = true;
+		}
+
+		if ( isset( $_GET[ PH_Template_Set::SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG ] ) && is_scalar( $_GET[ PH_Template_Set::SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw_settings['search_result_image_size'] = wp_unslash( $_GET[ PH_Template_Set::SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$has_override = true;
+		}
+
+		if ( ! $has_override ) {
+			return false;
+		}
+
+		return PH_Template_Set_Settings::sanitize_search_result_global_settings(
+			$raw_settings,
+			is_array( $stored_settings ) ? $stored_settings : array()
+		);
+	}
+
+	/**
+	 * Apply request-scoped search-result settings to the legacy option value.
+	 *
+	 * Existing renderers read this option directly, so filtering it keeps the
+	 * normal server-side hooks, templates, and add-ons in sync with the frame.
+	 * No values are written to the database.
+	 *
+	 * @param mixed $settings Stored option value.
+	 * @return mixed
+	 */
+	public static function filter_template_assistant_option( $settings ) {
+		$preview_settings = self::get_search_result_preview_settings( $settings );
+
+		if ( false === $preview_settings || ! is_array( $settings ) ) {
+			return $settings;
+		}
+
+		foreach ( array( 'search_result_default_order', 'search_result_fields', 'search_result_image_size' ) as $key ) {
+			if ( array_key_exists( $key, $preview_settings ) ) {
+				$settings[ $key ] = $preview_settings[ $key ];
+			}
+		}
+
+		return $settings;
+	}
+
+	/**
 	 * Can a valid template preview render while the global setting is inactive?
 	 *
 	 * @return bool
@@ -390,7 +519,20 @@ class PH_Template_Set_Request_Context {
 	 * @return array
 	 */
 	public static function get_preview_query_args() {
-		return array( PH_Template_Set::DETAIL_QUERY_ARG, PH_Template_Set::SEARCH_QUERY_ARG, PH_Template_Set::MODULE_QUERY_ARG, PH_Template_Set::CATALOG_QUERY_ARG, PH_Template_Set::EDIT_QUERY_ARG, PH_Template_Set::EDIT_OPEN_QUERY_ARG, PH_Template_Set::EDIT_FRAME_QUERY_ARG, 'ph_view' );
+		return array(
+			PH_Template_Set::DETAIL_QUERY_ARG,
+			PH_Template_Set::SEARCH_QUERY_ARG,
+			PH_Template_Set::MODULE_QUERY_ARG,
+			PH_Template_Set::CATALOG_QUERY_ARG,
+			PH_Template_Set::EDIT_QUERY_ARG,
+			PH_Template_Set::EDIT_OPEN_QUERY_ARG,
+			PH_Template_Set::EDIT_FRAME_QUERY_ARG,
+			PH_Template_Set::MAP_SEARCH_FORMAT_QUERY_ARG,
+			PH_Template_Set::SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG,
+			PH_Template_Set::SEARCH_RESULT_FIELDS_QUERY_ARG,
+			PH_Template_Set::SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG,
+			'ph_view',
+		);
 	}
 
 	/**

@@ -31,6 +31,10 @@
 	var fitUpdateTimer = null;
 	var frameNavigationPending = false;
 	var lastFrameSubmitter = null;
+	var mirroringFrameControls = false;
+	var searchResultReloadTimer = null;
+	var searchResultSettingsChangeHandlerBound = false;
+	var searchResultSettingsChangeHandler = null;
 
 	function isElement(value) {
 		return !!value && value.nodeType === 1;
@@ -704,6 +708,10 @@
 	function getCurrentFrameUrl() {
 		var frameWindow;
 
+		if (frameNavigationPending && storedPreviewUrl) {
+			return storedPreviewUrl;
+		}
+
 		try {
 			frameWindow = previewFrame && previewFrame.contentWindow;
 
@@ -717,12 +725,395 @@
 		return storedPreviewUrl || (previewFrame ? previewFrame.getAttribute('src') : '') || window.location.href;
 	}
 
+	function getMapSearchPreviewConfig() {
+		return {
+			queryArg: String(config.mapSearchPreviewQueryArg || ''),
+			noneValue: 'none'
+		};
+	}
+
+	function getSearchResultPreviewQueryArgs() {
+		var configured = config.searchResultPreviewQueryArgs || {};
+
+		return {
+			defaultOrder: String(configured.defaultOrder || 'ph_template_search_result_order'),
+			fields: String(configured.fields || 'ph_template_search_result_fields'),
+			imageSize: String(configured.imageSize || 'ph_template_search_result_image_size')
+		};
+	}
+
+	function getEditorForm() {
+		var editor = document.querySelector('[data-ph-template-editor]');
+
+		return editor ? editor.querySelector('[data-ph-template-editor-form]') : null;
+	}
+
+	function getSearchResultPreviewState(form) {
+		var orderControl;
+		var imageSizeControl;
+		var fieldControls;
+
+		if (!form || !form.querySelector) {
+			return null;
+		}
+
+		orderControl = form.querySelector('[name="search_result_default_order"]');
+		imageSizeControl = form.querySelector('[name="search_result_image_size"]');
+		fieldControls = Array.prototype.slice.call(form.querySelectorAll('input[type="checkbox"][name="search_result_fields[]"]'));
+
+		if (!orderControl && !imageSizeControl && !fieldControls.length) {
+			return null;
+		}
+
+		return {
+			defaultOrder: orderControl ? String(orderControl.value || '') : '',
+			fields: fieldControls.filter(function (control) {
+				return control.checked;
+			}).map(function (control) {
+				return String(control.value || '');
+			}).filter(function (value) {
+				return !!value;
+			}),
+			imageSize: imageSizeControl ? String(imageSizeControl.value || '') : ''
+		};
+	}
+
+	function buildSearchResultSettingsPreviewUrl(url) {
+		var state = getSearchResultPreviewState(getEditorForm());
+		var args;
+		var parsedUrl;
+
+		if (!state || !window.URL) {
+			return getNavigationPreviewUrl(url);
+		}
+
+		args = getSearchResultPreviewQueryArgs();
+
+		try {
+			parsedUrl = new window.URL(getNavigationPreviewUrl(url), window.location.href);
+			parsedUrl.searchParams.set(args.defaultOrder, state.defaultOrder);
+			parsedUrl.searchParams.set(args.fields, state.fields.join('|'));
+			parsedUrl.searchParams.set(args.imageSize, state.imageSize);
+
+			return getPreviewUrl(parsedUrl.href);
+		} catch (error) {
+			return getNavigationPreviewUrl(url);
+		}
+	}
+
+	function reloadSearchResultSettings(options) {
+		var previewUrl;
+
+		if (!getSearchResultPreviewState(getEditorForm()) || !previewRoot || !previewFrame) {
+			return false;
+		}
+
+		previewUrl = buildSearchResultSettingsPreviewUrl(getCurrentFrameUrl());
+
+		return navigate(previewUrl, {
+			force: !options || options.force !== false
+		});
+	}
+
+	function scheduleSearchResultSettingsReload() {
+		if (!getSearchResultPreviewState(getEditorForm())) {
+			return false;
+		}
+
+		if (searchResultReloadTimer) {
+			window.clearTimeout(searchResultReloadTimer);
+		}
+
+		searchResultReloadTimer = window.setTimeout(function () {
+			searchResultReloadTimer = null;
+			reloadSearchResultSettings();
+		}, 140);
+
+		return true;
+	}
+
+	function handleSearchResultSettingsChanged(event) {
+		var detail = event && event.detail ? event.detail : {};
+
+		if (detail.reloadPreview || detail.previewReload) {
+			scheduleSearchResultSettingsReload();
+		}
+	}
+
+	function bindSearchResultSettingsEvent() {
+		if (searchResultSettingsChangeHandlerBound) {
+			return;
+		}
+
+		searchResultSettingsChangeHandler = handleSearchResultSettingsChanged;
+		document.addEventListener('ph:template_set_search_result_settings_changed', searchResultSettingsChangeHandler);
+		searchResultSettingsChangeHandlerBound = true;
+	}
+
+	function normalizeMapSearchFormat(value) {
+		var mapPreview = getMapSearchPreviewConfig();
+
+		value = String(value || '').toLowerCase();
+
+		return ['view', 'split'].indexOf(value) !== -1 ? value : mapPreview.noneValue;
+	}
+
+	function getQueryParameterKey(part) {
+		var separator = part.indexOf('=');
+		var key = separator === -1 ? part : part.slice(0, separator);
+
+		try {
+			return decodeURIComponent(key.replace(/\+/g, ' '));
+		} catch (error) {
+			return key;
+		}
+	}
+
+	function updateQueryParameterFallback(url, key, value, remove) {
+		var anchor = document.createElement('a');
+		var query = (anchor.search || '').replace(/^\?/, '');
+		var parts = query ? query.split('&') : [];
+		var encodedKey = encodeURIComponent(key);
+		var nextParts = [];
+		var replaced = false;
+
+		anchor.href = url;
+		query = (anchor.search || '').replace(/^\?/, '');
+		parts = query ? query.split('&') : [];
+
+		parts.forEach(function (part) {
+			if (getQueryParameterKey(part) === key) {
+				if (!remove && !replaced) {
+					nextParts.push(encodedKey + '=' + encodeURIComponent(value));
+				}
+
+				replaced = true;
+				return;
+			}
+
+			nextParts.push(part);
+		});
+
+		if (!remove && !replaced) {
+			nextParts.push(encodedKey + '=' + encodeURIComponent(value));
+		}
+
+		return anchor.protocol + '//' + anchor.host + anchor.pathname + (nextParts.length ? '?' + nextParts.join('&') : '') + (anchor.hash || '');
+	}
+
+	function updateQueryParameter(url, key, value, remove) {
+		var parsedUrl;
+
+		if (!url || !key) {
+			return url || '';
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (!parsedUrl.searchParams) {
+				throw new Error('URLSearchParams is unavailable.');
+			}
+
+			if (remove) {
+				parsedUrl.searchParams.delete(key);
+			} else {
+				parsedUrl.searchParams.set(key, value);
+			}
+
+			return parsedUrl.href;
+		} catch (error) {
+			try {
+				return updateQueryParameterFallback(url, key, value, remove);
+			} catch (fallbackError) {
+				return url;
+			}
+		}
+	}
+
+	function hasQueryParameter(url, key) {
+		var parsedUrl;
+		var query;
+
+		if (!url || !key) {
+			return false;
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (parsedUrl.searchParams) {
+				return parsedUrl.searchParams.has(key);
+			}
+		} catch (error) {
+			// Use the anchor fallback below.
+		}
+
+		try {
+			var anchor = document.createElement('a');
+			anchor.href = url;
+			query = (anchor.search || '').replace(/^\?/, '');
+
+			return !!query && query.split('&').some(function (part) {
+				return getQueryParameterKey(part) === key;
+			});
+		} catch (fallbackError) {
+			return false;
+		}
+	}
+
+	function getQueryParameterValue(url, key) {
+		var parsedUrl;
+		var query;
+		var value = null;
+
+		if (!url || !key) {
+			return value;
+		}
+
+		try {
+			parsedUrl = new window.URL(url, window.location.href);
+
+			if (parsedUrl.searchParams) {
+				return parsedUrl.searchParams.get(key);
+			}
+		} catch (error) {
+			// Use the anchor fallback below.
+		}
+
+		try {
+			var anchor = document.createElement('a');
+			anchor.href = url;
+			query = (anchor.search || '').replace(/^\?/, '');
+
+			if (!query) {
+				return value;
+			}
+
+			query.split('&').some(function (part) {
+				var separator;
+				var rawValue;
+
+				if (getQueryParameterKey(part) !== key) {
+					return false;
+				}
+
+				separator = part.indexOf('=');
+				rawValue = separator === -1 ? '' : part.slice(separator + 1);
+
+				try {
+					value = decodeURIComponent(rawValue.replace(/\+/g, ' '));
+				} catch (decodeError) {
+					value = rawValue;
+				}
+
+				return true;
+			});
+		} catch (fallbackError) {
+			return value;
+		}
+
+		return value;
+	}
+
+	function getNavigationPreviewUrl(url, options) {
+		var targetUrl = url || storedPreviewUrl || window.location.href;
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var currentValue;
+
+		if (!(options && options.preserveMapSearchPreview === false) && mapPreview.queryArg) {
+			currentUrl = getCurrentFrameUrl();
+			currentValue = getQueryParameterValue(currentUrl, mapPreview.queryArg);
+
+			if (currentValue !== null && !hasQueryParameter(targetUrl, mapPreview.queryArg)) {
+				targetUrl = updateQueryParameter(targetUrl, mapPreview.queryArg, currentValue, false);
+			}
+		}
+
+		return getPreviewUrl(targetUrl);
+	}
+
+	function setMapSearchPreviewFormat(value, options) {
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var previewUrl;
+		var format = normalizeMapSearchFormat(value);
+		var forceReload = !options || options.force !== false;
+
+		if (mirroringFrameControls || !mapPreview.queryArg) {
+			return false;
+		}
+
+		currentUrl = getCurrentFrameUrl();
+		previewUrl = updateQueryParameter(currentUrl, mapPreview.queryArg, format, false);
+
+		// The add-on treats an explicit list request as incompatible with split
+		// mode. Remove that stale toggle state so split renders its normal map.
+		if (format === 'split' && getQueryParameterValue(previewUrl, 'view') === 'list') {
+			previewUrl = updateQueryParameter(previewUrl, 'view', '', true);
+		}
+
+		return navigate(previewUrl, { force: forceReload });
+	}
+
+	function clearMapSearchPreviewFormat(options) {
+		var mapPreview = getMapSearchPreviewConfig();
+		var currentUrl;
+		var previewUrl;
+		var forceReload = !options || options.force !== false;
+
+		if (!mapPreview.queryArg) {
+			return false;
+		}
+
+		currentUrl = getCurrentFrameUrl();
+
+		if (!hasQueryParameter(currentUrl, mapPreview.queryArg)) {
+			return true;
+		}
+
+		previewUrl = updateQueryParameter(currentUrl, mapPreview.queryArg, '', true);
+
+		return navigate(previewUrl, { force: forceReload, preserveMapSearchPreview: false });
+	}
+
+	/**
+	 * Reconcile the request-scoped Map Search format after a successful save.
+	 *
+	 * Map Atlas removes the legacy empty option from its editor control and
+	 * exposes `view` as the effective default. The add-on can still retain an
+	 * empty value in its legacy option, so simply removing the temporary query
+	 * override here would make the just-saved preview fall back to the wrong
+	 * presentation. Reapply the value currently shown by the editor control;
+	 * ordinary templates with an empty value still clear the override.
+	 *
+	 * @param object options Navigation options.
+	 * @return bool
+	 */
+	function reconcileMapSearchPreview(options) {
+		var form = getEditorForm();
+		var control = form ? form.querySelector('[name="ph_template_set_addons[map_search][format]"]') : null;
+		var value = control ? control.value : '';
+
+		if (value && normalizeMapSearchFormat(value) !== getMapSearchPreviewConfig().noneValue) {
+			return setMapSearchPreviewFormat(value, options);
+		}
+
+		return clearMapSearchPreviewFormat(options);
+	}
+
 	function buildFrameFormSubmissionUrl(form, submitter, action) {
 		action = action || form.action || getCurrentFrameUrl();
 		var sourceUrl;
 		var targetUrl;
 		var formData;
-		var contextKeys = config.previewQueryArgs || ['ph_detail_template', 'ph_search_template', 'ph_module_template', 'ph_template_preview', 'ph_view'];
+		var mapPreview = getMapSearchPreviewConfig();
+		var contextKeys = config.previewQueryArgs && typeof config.previewQueryArgs.slice === 'function' ? config.previewQueryArgs.slice() : ['ph_detail_template', 'ph_search_template', 'ph_module_template', 'ph_template_preview', 'ph_view'];
+
+		if (mapPreview.queryArg && contextKeys.indexOf(mapPreview.queryArg) === -1) {
+			contextKeys.push(mapPreview.queryArg);
+		}
 
 		if (!action || !isSameOrigin(action) || !window.URL || !window.FormData) {
 			return '';
@@ -1039,7 +1430,14 @@
 		bindFrameNavigation(frameDocument);
 
 		if (modules.editorPreview && typeof modules.editorPreview.mirrorControls === 'function') {
-			modules.editorPreview.mirrorControls(form, frameDocument);
+			// Frame-load reconciliation is a one-way DOM mirror. Keep it fenced from
+			// the parent change handler so it cannot schedule another navigation.
+			mirroringFrameControls = true;
+			try {
+				modules.editorPreview.mirrorControls(form, frameDocument);
+			} finally {
+				mirroringFrameControls = false;
+			}
 		}
 
 		sourceSearchForm = querySearchForm(document, searchFormSelector);
@@ -1086,7 +1484,7 @@
 	}
 
 	function navigate(url, options) {
-		var previewUrl = getPreviewUrl(url || storedPreviewUrl || window.location.href);
+		var previewUrl = getNavigationPreviewUrl(url, options);
 		var currentFrameUrl;
 		var forceReload = !!(options && options.force);
 
@@ -1121,7 +1519,7 @@
 		var url = detail.previewUrl || window.location.href;
 
 		refresh();
-		navigate(url, { force: true });
+		navigate(url, { force: true, preserveMapSearchPreview: false });
 	}
 
 	function bindPreviewSwapEvent() {
@@ -1141,6 +1539,7 @@
 		restoreState();
 		bindPreviewSwapEvent();
 		bindSearchFormReplacementEvent();
+		bindSearchResultSettingsEvent();
 		root = getPreviewRoot();
 
 		if (!root) {
@@ -1212,10 +1611,21 @@
 			fitUpdateTimer = null;
 		}
 
+		if (searchResultReloadTimer) {
+			window.clearTimeout(searchResultReloadTimer);
+			searchResultReloadTimer = null;
+		}
+
 		if (searchFormReplacementHandlerBound && searchFormReplacementHandler) {
 			document.removeEventListener('propertyhive_template_set_search_form_replaced', searchFormReplacementHandler);
 			searchFormReplacementHandlerBound = false;
 			searchFormReplacementHandler = null;
+		}
+
+		if (searchResultSettingsChangeHandlerBound && searchResultSettingsChangeHandler) {
+			document.removeEventListener('ph:template_set_search_result_settings_changed', searchResultSettingsChangeHandler);
+			searchResultSettingsChangeHandlerBound = false;
+			searchResultSettingsChangeHandler = null;
 		}
 
 		previewRoot = null;
@@ -1225,21 +1635,28 @@
 		rootInitialized = false;
 		frameNavigationPending = false;
 		lastFrameSubmitter = null;
+		mirroringFrameControls = false;
 	}
 
 	modules.editorResponsivePreview = {
 		buildPreviewUrl: getPreviewUrl,
+		clearMapSearchPreviewFormat: clearMapSearchPreviewFormat,
 		destroy: destroy,
 		getDocument: function () {
 			return frameDocument || getFrameDocument();
 		},
+		getMapSearchPreviewConfig: getMapSearchPreviewConfig,
 		getState: function () {
 			return { device: state.device, width: getDevice().width };
 		},
 		init: init,
 		navigate: navigate,
+		reloadSearchResultSettings: reloadSearchResultSettings,
+		reconcileMapSearchPreview: reconcileMapSearchPreview,
 		refresh: refresh,
+		scheduleSearchResultSettingsReload: scheduleSearchResultSettingsReload,
 		setError: setError,
-		setLoading: setLoading
+		setLoading: setLoading,
+		setMapSearchPreviewFormat: setMapSearchPreviewFormat
 	};
 }());
