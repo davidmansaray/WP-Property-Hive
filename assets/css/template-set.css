@@ -2365,6 +2365,16 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 .ph-template-set ul.properties li.ph-template-card .thumbnail {
 	grid-column: 1;
 	grid-row: 1 / span 2;
+	min-height: 100%;
+}
+
+.ph-search-template-portal-style-search-results ul.properties li.ph-template-card .thumbnail a,
+.ph-template-search.ph-search-template-portal-style-search-results ul.properties li.ph-template-card .thumbnail a {
+	aspect-ratio: auto;
+	position: absolute;
+	inset: 0;
+	height: auto;
+	min-height: 100%;
 }
 
 .ph-template-set ul.properties li.ph-template-card .details {
