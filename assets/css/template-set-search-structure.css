@@ -308,6 +308,10 @@
 	min-block-size: 100%;
 }
 
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .thumbnail img {
+	block-size: 100% !important;
+}
+
 .ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .details {
 	grid-column: 2;
 	grid-row: 1;
@@ -319,10 +323,47 @@
 	grid-row: 2;
 	margin-inline: 0;
 	padding: 0 1.35rem 1.1rem;
+	border-block-start: 0;
+	box-shadow: none;
 }
 
 .ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .actions {
 	margin-block-start: 0.5rem;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts,
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts > li {
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts > li {
+	padding: 0;
+	margin: 0;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts > li + li {
+	margin-inline-start: 0.6875rem;
+	padding-inline-start: 0.75rem;
+	border-inline-start: 1px solid var(--ph-search-line, #d4d8d5);
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts > li + li:before,
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-facts > li::after {
+	content: none;
+	display: none;
+}
+
+.ph-template-search.ph-search-template-portal-grid-search-results.ph-search-layout-list ul.properties > li.ph-template-card .ph-template-card-meta {
+	padding-block-start: 0.45rem;
+	border-block-start: 0;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results .ph-template-search-intro {
