@@ -69,9 +69,16 @@ $assert(
 $assert(
 	'portal_style_list_thumbnail_fills_card_cell',
 	(bool) preg_match(
-		'/\.ph-search-template-portal-style-search-results ul\.properties li\.ph-template-card \.thumbnail a\s*\{[^}]*position:\s*absolute/s',
+		'/\.ph-template-search\.ph-search-layout-list\.ph-search-template-portal-style-search-results ul\.properties li\.ph-template-card \.thumbnail a[^\{]*\{[^}]*position:\s*absolute/s',
 		$template_css
 	)
+);
+
+$assert(
+	'grid_cards_reset_sections_to_one_explicit_column',
+	false !== strpos( $template_css, 'li.ph-template-card > .thumbnail,' )
+		&& false !== strpos( $template_css, 'li.ph-template-card > .details,' )
+		&& false !== strpos( $template_css, 'li.ph-template-card > .ph-template-card-footer {' )
 );
 
 $assert(
