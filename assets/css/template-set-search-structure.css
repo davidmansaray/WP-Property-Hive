@@ -975,6 +975,58 @@ body.ph-search-template-map-led-search-results {
 	inset-block-start: clamp(0.9rem, 1.8vw, 1.25rem);
 	inset-inline-end: clamp(0.9rem, 1.8vw, 1.25rem);
 	z-index: 1;
+	display: grid;
+	inline-size: 2.125rem;
+	block-size: 2.125rem;
+	place-items: center;
+	overflow: visible;
+	border: 0;
+	border-radius: 50%;
+	color: var(--ph-search-ink, #17211d);
+	background: transparent;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-card-actions:hover,
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-card-actions:focus-within {
+	color: var(--ph-search-pin-active, #1f6b4a);
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-card-actions a,
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-card-actions .ph-template-shortlist-button {
+	position: absolute;
+	inset: 0;
+	display: block;
+	overflow: hidden;
+	align-items: stretch;
+	justify-content: stretch;
+	inline-size: auto;
+	block-size: auto;
+	min-inline-size: 0;
+	min-block-size: 0;
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	color: inherit;
+	background: transparent;
+	box-shadow: none;
+	font-size: 0;
+	line-height: 0;
+	text-indent: -9999px;
+	text-decoration: none;
+}
+
+.ph-template-search.ph-search-template-map-led-search-results ul.properties > li.ph-template-card .ph-template-shortlist-icon {
+	position: relative;
+	z-index: 1;
+	inline-size: 1.25rem;
+	block-size: 1.25rem;
+	fill: none;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.7;
+	pointer-events: none;
 }
 
 .ph-template-search .ph-template-search-advanced-filters {
