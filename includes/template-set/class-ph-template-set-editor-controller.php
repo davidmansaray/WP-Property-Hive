@@ -324,6 +324,10 @@ class PH_Template_Set_Editor_Controller {
 
 		echo '<div class="ph-template-editor-field ph-template-editor-field-search-result-fields ph-template-editor-search-result-settings" data-ph-template-editor-search-result-settings>';
 			echo '<span>' . esc_html__( 'Fields shown (in order)', 'propertyhive' ) . '</span>';
+			// A native form submission omits unchecked checkboxes entirely. Keep a
+			// presence marker so selecting zero fields is distinguishable from a
+			// detail-editor save that does not include search-result settings.
+			echo '<input type="hidden" name="search_result_fields_present" value="1">';
 			echo '<div class="ph-template-editor-search-result-fields-list" data-ph-template-editor-search-result-fields-list role="list" aria-label="' . esc_attr__( 'Search result fields in display order', 'propertyhive' ) . '">';
 			foreach ( $ordered as $field => $label ) {
 				$is_selected = in_array( $field, $selected, true );

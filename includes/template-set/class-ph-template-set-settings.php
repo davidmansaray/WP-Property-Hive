@@ -319,7 +319,7 @@ class PH_Template_Set_Settings {
 			$sanitised['search_result_default_order'] = self::sanitize_search_result_order( $raw_settings['search_result_default_order'] );
 		}
 
-		if ( array_key_exists( 'search_result_fields', $raw_settings ) || array_key_exists( 'search_result_fields_custom_field', $raw_settings ) ) {
+		if ( array_key_exists( 'search_result_fields', $raw_settings ) || array_key_exists( 'search_result_fields_custom_field', $raw_settings ) || array_key_exists( 'search_result_fields_present', $raw_settings ) ) {
 			$fields = array_key_exists( 'search_result_fields', $raw_settings ) ? $raw_settings['search_result_fields'] : array();
 			$custom = isset( $raw_settings['search_result_fields_custom_field'] ) ? $raw_settings['search_result_fields_custom_field'] : '';
 			$sanitised['search_result_fields'] = self::sanitize_search_result_fields( $fields, $custom, $current_settings );

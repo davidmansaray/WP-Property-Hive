@@ -1078,6 +1078,31 @@
 		return navigate(previewUrl, { force: forceReload, preserveMapSearchPreview: false });
 	}
 
+	/**
+	 * Reconcile the request-scoped Map Search format after a successful save.
+	 *
+	 * Map Atlas removes the legacy empty option from its editor control and
+	 * exposes `view` as the effective default. The add-on can still retain an
+	 * empty value in its legacy option, so simply removing the temporary query
+	 * override here would make the just-saved preview fall back to the wrong
+	 * presentation. Reapply the value currently shown by the editor control;
+	 * ordinary templates with an empty value still clear the override.
+	 *
+	 * @param object options Navigation options.
+	 * @return bool
+	 */
+	function reconcileMapSearchPreview(options) {
+		var form = getEditorForm();
+		var control = form ? form.querySelector('[name="ph_template_set_addons[map_search][format]"]') : null;
+		var value = control ? control.value : '';
+
+		if (value && normalizeMapSearchFormat(value) !== getMapSearchPreviewConfig().noneValue) {
+			return setMapSearchPreviewFormat(value, options);
+		}
+
+		return clearMapSearchPreviewFormat(options);
+	}
+
 	function buildFrameFormSubmissionUrl(form, submitter, action) {
 		action = action || form.action || getCurrentFrameUrl();
 		var sourceUrl;
@@ -1627,7 +1652,7 @@
 		init: init,
 		navigate: navigate,
 		reloadSearchResultSettings: reloadSearchResultSettings,
-		reconcileMapSearchPreview: clearMapSearchPreviewFormat,
+		reconcileMapSearchPreview: reconcileMapSearchPreview,
 		refresh: refresh,
 		scheduleSearchResultSettingsReload: scheduleSearchResultSettingsReload,
 		setError: setError,

@@ -42,6 +42,29 @@ $assert(
 	2 === count( $facts_method->invoke( null, $sample_facts, array( 'search_result_fields' => array( 'rooms' ) ) ) )
 );
 
+$sentinel_settings = PH_Template_Set_Settings::sanitize_search_result_global_settings(
+	array( 'search_result_fields_present' => '1' ),
+	array( 'search_result_fields' => array( 'price' ) )
+);
+$assert(
+	'explicit_empty_result_fields_sentinel_clears_existing_fields',
+	array_key_exists( 'search_result_fields', $sentinel_settings ) && array() === $sentinel_settings['search_result_fields']
+);
+
+$preview_js = file_get_contents( dirname( __DIR__ ) . '/assets/js/frontend/template-set/editor-responsive-preview.js' );
+$assert(
+	'map_atlas_save_reconciles_effective_format_from_editor_control',
+	false !== strpos( $preview_js, 'function reconcileMapSearchPreview(options)' )
+		&& false !== strpos( $preview_js, 'setMapSearchPreviewFormat(value, options)' )
+		&& false !== strpos( $preview_js, 'reconcileMapSearchPreview: reconcileMapSearchPreview' )
+);
+
+$editor_controller = file_get_contents( dirname( __DIR__ ) . '/includes/template-set/class-ph-template-set-editor-controller.php' );
+$assert(
+	'editor_marks_search_result_fields_as_present_when_none_are_checked',
+	false !== strpos( $editor_controller, 'name="search_result_fields_present" value="1"' )
+);
+
 $image_storage_filter = static function () {
 	return 'urls';
 };
