@@ -4559,6 +4559,11 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 }
 
 @media (max-width: 899px) {
+	.ph-template-search {
+		box-sizing: border-box;
+		padding-inline: clamp(16px, 3vw, 24px);
+	}
+
 	.ph-template-search .half-map-view,
 	.ph-template-search .half-list-view {
 		float: none !important;
@@ -4573,6 +4578,12 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	.ph-template-set .propertyhive-map-canvas-wrapper {
 		height: 360px;
 		min-height: 320px;
+	}
+}
+
+@media (max-width: 520px) {
+	.ph-template-search {
+		padding-inline: 12px;
 	}
 }
 

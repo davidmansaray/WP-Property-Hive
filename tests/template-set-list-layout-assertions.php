@@ -106,6 +106,12 @@ $assert(
 );
 
 $assert(
+	'search_pages_have_responsive_viewport_gutters',
+	false !== strpos( $template_css, 'padding-inline: clamp(16px, 3vw, 24px);' )
+		&& false !== strpos( $template_css, 'padding-inline: 12px;' )
+);
+
+$assert(
 	'portal_grid_list_layout_uses_horizontal_cards',
 	false !== strpos(
 		$structure_css,
