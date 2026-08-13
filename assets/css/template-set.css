@@ -4258,6 +4258,38 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 	min-height: 420px;
 }
 
+.ph-template-search.ph-search-template-portal-style-search-results form.property-search-form,
+.ph-search-template-portal-style-search-results .ph-template-search form.property-search-form {
+	align-items: stretch;
+	gap: 12px 14px;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control,
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form .control {
+	justify-content: flex-start;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form select,
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form input[type="text"],
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form input[type="search"],
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form input[type="number"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form select,
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form input[type="text"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form input[type="search"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form input[type="number"] {
+	min-height: 44px;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form input[type="submit"],
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form button[type="submit"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form input[type="submit"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form button[type="submit"] {
+	align-self: stretch;
+	min-height: 44px;
+	height: auto;
+	padding: 0 20px;
+}
+
 @media (max-width: 720px) {
 	.ph-template-set form.property-search-form {
 		align-items: stretch;
