@@ -4434,6 +4434,7 @@ body:not(.ph-search-view-grid) .ph-template-editor-field-template_set_search_gri
 .ph-template-set .propertyhive-ordering + .propertyhive-save-search-button {
 	align-items: center;
 	display: inline-flex;
+	float: right;
 	justify-content: center;
 	margin: 0 0 18px;
 	min-height: 38px;
@@ -4450,6 +4451,10 @@ body:not(.ph-search-view-grid) .ph-template-editor-field-template_set_search_gri
 	.ph-template-set .propertyhive-ordering,
 	.ph-template-set .propertyhive-ordering + .propertyhive-save-search-button {
 		margin-bottom: 10px;
+	}
+
+	.ph-template-set .propertyhive-ordering + .propertyhive-save-search-button {
+		float: none;
 	}
 }
 

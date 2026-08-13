@@ -93,6 +93,7 @@ $assert(
 	'classic_save_search_sits_with_ordering_control',
 	false !== strpos( $template_css, '.ph-template-set .propertyhive-ordering + .propertyhive-save-search-button' )
 		&& false !== strpos( $template_css, 'min-height: 38px;' )
+		&& false !== strpos( $template_css, 'float: right;' )
 );
 
 $assert(
