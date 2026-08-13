@@ -1652,6 +1652,147 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	opacity: 0.75;
 }
 
+/* ----- Legacy global search-result settings in the visual editor ----- */
+
+.ph-template-editor-search-result-fields-list {
+	display: grid;
+	gap: 8px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.ph-template-editor-search-result-field {
+	align-items: center;
+	background: var(--ph-editor-mist);
+	border: 1px solid var(--ph-editor-smoke);
+	border-radius: 6px;
+	display: grid;
+	gap: 10px;
+	grid-template-columns: 34px minmax(0, 1fr);
+	min-height: 44px;
+	padding: 7px 9px;
+	transition: background-color 140ms ease, border-color 140ms ease, opacity 140ms ease;
+}
+
+.ph-template-editor-search-result-field:hover {
+	background: var(--ph-editor-white);
+	border-color: var(--ph-editor-slate);
+}
+
+.ph-template-editor-search-result-field.is-dragging {
+	opacity: 0.45;
+}
+
+.ph-template-editor-search-result-field.is-drop-before {
+	box-shadow: inset 0 3px 0 var(--ph-editor-carbon);
+}
+
+.ph-template-editor-search-result-field.is-drop-after {
+	box-shadow: inset 0 -3px 0 var(--ph-editor-carbon);
+}
+
+.ph-template-editor-search-result-field input[type="checkbox"] {
+	accent-color: var(--ph-editor-carbon);
+	height: 18px;
+	margin: 0;
+	width: 18px;
+}
+
+.ph-template-editor-search-result-field input[type="checkbox"]:focus-visible,
+.ph-template-editor-search-result-field [data-ph-template-editor-search-result-field-handle]:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
+}
+
+.ph-template-editor-search-result-field [data-ph-template-editor-search-result-field-handle] {
+	align-items: center;
+	appearance: none;
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	color: var(--ph-editor-carbon);
+	cursor: grab;
+	display: inline-flex;
+	height: 34px;
+	justify-content: center;
+	line-height: 1;
+	padding: 0;
+	touch-action: none;
+	width: 34px;
+}
+
+.ph-template-editor-search-result-field [data-ph-template-editor-search-result-field-handle]:active {
+	cursor: grabbing;
+}
+
+.ph-template-editor-search-result-field [data-ph-template-editor-search-result-field-handle]:hover {
+	background: var(--ph-editor-sunlight);
+	border-color: var(--ph-editor-wax);
+}
+
+.ph-template-editor-search-result-field label,
+.ph-template-editor-search-result-field > span,
+.ph-template-editor-search-result-field > strong {
+	align-items: center;
+	color: var(--ph-editor-carbon);
+	display: flex;
+	gap: 10px;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ph-template-editor-search-result-settings-status,
+[data-ph-template-editor-search-result-fields-status],
+[data-ph-search-result-fields-status] {
+	color: var(--ph-editor-muted);
+	display: block;
+	font-size: 12px;
+	line-height: 1.35;
+	min-height: 16px;
+}
+
+.ph-template-editor-field textarea[name="search_result_css"],
+.ph-template-editor-field textarea[data-ph-template-editor-search-result-css],
+.ph-template-editor-field textarea[data-ph-search-result-css] {
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	box-sizing: border-box;
+	color: var(--ph-editor-carbon);
+	font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+	font-size: 12px;
+	line-height: 1.5;
+	min-height: 180px;
+	padding: 10px 12px;
+	resize: vertical;
+	width: 100%;
+}
+
+.ph-template-editor-field textarea[name="search_result_css"]:focus,
+.ph-template-editor-field textarea[data-ph-template-editor-search-result-css]:focus,
+.ph-template-editor-field textarea[data-ph-search-result-css]:focus {
+	border-color: var(--ph-editor-carbon);
+	box-shadow: 0 0 0 1px var(--ph-editor-carbon);
+	outline: none;
+}
+
+.ph-template-editor-field textarea[name="search_result_css"]:focus-visible,
+.ph-template-editor-field textarea[data-ph-template-editor-search-result-css]:focus-visible,
+.ph-template-editor-field textarea[data-ph-search-result-css]:focus-visible {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ph-template-editor-search-result-field {
+		transition: none;
+	}
+}
+
 .ph-template-editor-footer {
 	align-items: center;
 	background: var(--ph-editor-white);
