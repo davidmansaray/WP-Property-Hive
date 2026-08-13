@@ -82,6 +82,14 @@ $assert(
 );
 
 $assert(
+	'grid_cards_use_consistent_outer_padding',
+	(bool) preg_match(
+		'/\.ph-template-search\.ph-search-view-grid[^\{]*li\.ph-template-card[^\{]*\{[^}]*padding-block:\s*0/s',
+		$template_css
+	)
+);
+
+$assert(
 	'portal_grid_list_layout_uses_horizontal_cards',
 	false !== strpos(
 		$structure_css,
