@@ -124,6 +124,11 @@ $assert(
 );
 
 $assert(
+	'editor_preview_keeps_frontend_sort_control_visible',
+	false === strpos( $template_css, '.ph-template-preview-mode .ph-template-search .propertyhive-ordering' )
+);
+
+$assert(
 	'portal_grid_list_layout_uses_horizontal_cards',
 	false !== strpos(
 		$structure_css,
