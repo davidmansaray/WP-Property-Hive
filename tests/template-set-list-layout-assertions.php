@@ -25,8 +25,11 @@ $assert   = static function ( $name, $condition, $details = '' ) use ( &$failure
 
 $plugin_path   = trailingslashit( PH()->plugin_path() );
 $structure_css = file_get_contents( $plugin_path . 'assets/css/template-set-search-structure.css' );
+$fallback_css  = file_get_contents( $plugin_path . 'assets/css/template-set-search-fallbacks.css' );
 $template_css  = file_get_contents( $plugin_path . 'assets/css/template-set.css' );
 $preview_trait = file_get_contents( $plugin_path . 'includes/template-set/traits/trait-ph-template-set-preview.php' );
+$search_trait  = file_get_contents( $plugin_path . 'includes/template-set/traits/trait-ph-template-set-search.php' );
+$toolbar_php   = file_get_contents( $plugin_path . 'templates/template-set/search/results-toolbar.php' );
 $gallery_js    = file_get_contents( $plugin_path . 'assets/js/frontend/template-set/gallery.js' );
 
 $assert(
@@ -112,7 +115,8 @@ $assert(
 	'portal_style_search_controls_use_compact_edge_spacing',
 	false !== strpos( $template_css, 'align-self: flex-end;' )
 		&& false !== strpos( $template_css, 'height: 44px;' )
-		&& false !== strpos( $template_css, 'padding-inline-end: 4px;' )
+		&& false !== strpos( $template_css, 'background-position: right 10px center;' )
+		&& false !== strpos( $template_css, 'padding-inline-end: 32px;' )
 		&& false !== strpos( $template_css, 'padding-inline-end: 38px;' )
 		&& false !== strpos( $template_css, 'right: 4px !important;' )
 );
@@ -193,6 +197,43 @@ $assert(
 		'/\.ph-template-search-advanced-filters-panel \.control\s*\{[^}]*border:\s*0/s',
 		$structure_css
 	)
+);
+
+$assert(
+	'structural_search_controls_reserve_native_icon_space',
+	false !== strpos( $structure_css, 'padding-inline-end: 2rem;' )
+		&& false !== strpos( $structure_css, 'padding-inline-end: 3rem;' )
+);
+
+$assert(
+	'map_atlas_does_not_create_viewport_overflow',
+	false === strpos( $structure_css, 'inline-size: 100vw;' )
+		&& false === strpos( $structure_css, 'margin-inline: calc(50% - 50vw);' )
+);
+
+$assert(
+	'prototype_toolbar_uses_canonical_action_order',
+	strpos( $toolbar_php, 'ph-template-map-toggle' ) < strpos( $toolbar_php, 'ph-template-ordering-label' )
+		&& strpos( $toolbar_php, 'ph-template-ordering-label' ) < strrpos( $toolbar_php, '$save_search_button' )
+);
+
+$assert(
+	'prototype_toolbar_removes_duplicate_addon_view_links',
+	false !== strpos( $search_trait, "'propertyhive_results_views'" )
+		&& false !== strpos( $search_trait, "self::\$scoped_search_action_removals[] = array( 'propertyhive_before_search_results_loop', \$map_views_callback, 25 )" )
+);
+
+$assert(
+	'prototype_text_contrast_uses_opaque_accessible_colours',
+	false !== strpos( $fallback_css, 'color: #66706c;' )
+		&& false !== strpos( $fallback_css, 'color: #234337;' )
+);
+
+$assert(
+	'all_search_templates_use_a_consistent_inset_select_chevron',
+	false !== strpos( $template_css, 'background-position: right 10px center;' )
+		&& false !== strpos( $fallback_css, 'background-position: right 10px center;' )
+		&& false !== strpos( $fallback_css, 'padding-inline-end: 32px !important;' )
 );
 
 if ( ! empty( $failures ) ) {

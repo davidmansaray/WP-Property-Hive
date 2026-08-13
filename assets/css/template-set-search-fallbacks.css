@@ -130,7 +130,7 @@
 	}
 
 	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .ph-template-search-kicker {
-		color: #d3e0e9;
+		color: #ffffff;
 		font-size: 0.6875rem;
 		font-weight: 700;
 		letter-spacing: 0.18em;
@@ -158,6 +158,15 @@
 	:where(.ph-template-search.ph-search-template-portal-grid-search-results, .ph-template-search.ph-search-template-map-led-search-results) .property-search-form {
 		border: 1px solid #d9ddd9;
 		background: #fff;
+	}
+
+	:where(.ph-template-search.ph-search-template-portal-grid-search-results, .ph-template-search.ph-search-template-map-led-search-results) .property-search-form select {
+		appearance: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1.5 5 5 5-5' fill='none' stroke='%2317211d' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+		background-position: right 10px center;
+		background-repeat: no-repeat;
+		background-size: 12px 8px;
+		padding-inline-end: 32px !important;
 	}
 
 	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .property-search-form {
@@ -398,7 +407,7 @@
 	:where(.ph-template-search.ph-search-template-portal-grid-search-results) .ph-template-card-meta {
 		padding-block-start: 0.95rem;
 		border-block-start: 1px solid #e1e3e1;
-		color: #717974;
+		color: #66706c;
 		font-size: 0.625rem;
 	}
 
@@ -753,7 +762,7 @@
 	:where(.ph-template-search.ph-search-template-map-led-search-results) .ph-template-map-label {
 		position: absolute;
 		z-index: 1;
-		color: rgb(35 67 55 / 62%);
+		color: #234337;
 		font-family: var(--ph-search-display-font);
 		font-size: 1rem;
 		font-style: italic;
@@ -895,4 +904,16 @@
 			padding: 0.875rem 1rem;
 		}
 	}
+}
+
+/* Final form-control layer: keep select chevrons inset after template-specific
+ * background resets later in the cascade. */
+:where(.ph-template-search.ph-search-template-portal-grid-search-results, .ph-template-search.ph-search-template-map-led-search-results) .property-search-form select {
+	appearance: none;
+	background-color: transparent;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1.5 5 5 5-5' fill='none' stroke='%2317211d' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+	background-position: right 10px center !important;
+	background-repeat: no-repeat !important;
+	background-size: 12px 8px !important;
+	padding-inline-end: 32px !important;
 }

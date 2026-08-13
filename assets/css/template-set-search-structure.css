@@ -906,9 +906,9 @@
 	display: grid;
 	grid-template-columns: minmax(27.5rem, min(42%, 36rem)) minmax(0, 1fr);
 	align-items: start;
-	inline-size: 100vw;
-	max-inline-size: 100vw;
-	margin-inline: calc(50% - 50vw);
+	inline-size: 100%;
+	max-inline-size: 100%;
+	margin-inline: 0;
 }
 
 .ph-template-search.ph-search-template-map-led-search-results:is(.ph-search-map-panel-suppressed, .ph-search-map-panel-absent):not(.ph-search-map-split) {
@@ -1054,6 +1054,14 @@ body.ph-search-template-map-led-search-results {
 	line-height: 1.375rem;
 }
 
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form > .control select {
+	padding-inline-end: 2rem;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form > .control-address_keyword:has(.current-location) input[name='address_keyword'] {
+	padding-inline-end: 3rem;
+}
+
 .ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form > .ph-template-search-advanced-filters,
 .ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form > input[type='submit'],
 .ph-template-set:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form > input[type='submit'] {
@@ -1148,6 +1156,17 @@ body.ph-search-template-map-led-search-results {
 	inset-block-end: 0.55rem !important;
 	inset-inline-end: 0.75rem !important;
 	translate: none;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form .control-address_keyword .current-location,
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form .control-address_keyword .current-location a {
+	inline-size: 1.875rem !important;
+	block-size: 1.875rem;
+}
+
+.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .property-search-form .control-address_keyword .current-location img {
+	inline-size: 1.375rem;
+	block-size: 1.375rem;
 }
 
 /* Keep the borderless form cells while retaining a visible keyboard focus indicator. */
@@ -1447,9 +1466,9 @@ body.admin-bar .ph-template-search {
 		inline-size: 100%;
 	}
 
-	.ph-template-search .ph-template-results-toolbar {
-		display: flex;
-		flex-wrap: wrap;
+	.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-template-results-toolbar {
+		display: grid;
+		gap: 0.75rem;
 		align-items: center;
 		min-block-size: 0;
 		inline-size: 100%;
@@ -1457,16 +1476,16 @@ body.admin-bar .ph-template-search {
 		padding-inline: 1rem;
 	}
 
-	.ph-template-search .ph-template-results-count {
+	.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-template-results-count {
 		flex: 1 1 100%;
 	}
 
-	.ph-template-search .ph-template-results-toolbar-actions {
+	.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-template-results-toolbar-actions {
 		inline-size: 100%;
 		justify-content: flex-start;
 	}
 
-	.ph-template-search .ph-template-ordering-label {
+	.ph-template-search:is(.ph-search-template-portal-grid-search-results, .ph-search-template-map-led-search-results) .ph-template-ordering-label {
 		display: inline-flex;
 	}
 
