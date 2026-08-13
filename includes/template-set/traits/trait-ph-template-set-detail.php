@@ -46,7 +46,11 @@ trait PH_Template_Set_Detail {
 			: array();
 		$rooms          = self::get_detail_room_items( $property );
 		$show_rooms     = 'yes' === PH_Template_Set_Request_Context::get_show_rooms_breakdown();
-		$editor_active  = self::is_template_editor_active();
+		// The responsive preview is rendered in an authorized, closed iframe
+		// request. It is intentionally not "active" (the editor chrome lives in
+		// the parent document), but it still needs the same preview data treatment
+		// as the open editor page.
+		$editor_active  = self::is_detail_editor_preview();
 		$material       = self::get_detail_material_information( $property );
 		$features       = $property->get_features();
 		$gallery_images = self::get_property_gallery_images( $property );
@@ -71,9 +75,9 @@ trait PH_Template_Set_Detail {
 		$overview       = has_excerpt( $property->id ) ? get_the_excerpt( $property->id ) : '';
 		$location_label = self::get_property_location_label( $property );
 		$address        = $property->get_formatted_full_address();
-		$location_map_available = ! self::is_demo_preview()
-			&& 'real-map' === PH_Template_Set_Request_Context::get_location_map()
-			&& '' !== (string) get_option( 'propertyhive_maps_provider' )
+		$location_map_provider = (string) get_option( 'propertyhive_maps_provider' );
+		$location_map_available = 'real-map' === PH_Template_Set_Request_Context::get_location_map()
+			&& ( '' !== $location_map_provider || self::is_demo_preview() )
 			&& '' !== (string) $property->latitude
 			&& '0' !== (string) $property->latitude
 			&& '' !== (string) $property->longitude
@@ -152,6 +156,19 @@ trait PH_Template_Set_Detail {
 
 		$previous_property = $property;
 		$property          = $map_property;
+		$preview_provider_filter = null;
+
+		// The editor's sample property should remain useful even on installs
+		// where the administrator has not configured a production map provider
+		// yet. Leaflet/OpenStreetMap is bundled and requires no API key, so use it
+		// only for the authorized preview request; live frontend requests keep
+		// the configured provider and existing API-key requirements.
+		if ( self::is_demo_preview() && '' === (string) get_option( 'propertyhive_maps_provider' ) ) {
+			$preview_provider_filter = static function () {
+				return 'osm';
+			};
+			add_filter( 'option_propertyhive_maps_provider', $preview_provider_filter, 99 );
+		}
 		$what3words_removed = array();
 
 		if ( 'yes' !== PH_Template_Set_Request_Context::get_show_what3words() && ! self::is_template_editor_active() && class_exists( 'PH_What3words' ) && method_exists( 'PH_What3words', 'instance' ) ) {
@@ -171,8 +188,14 @@ trait PH_Template_Set_Detail {
 		}
 
 		try {
+			echo '<div id="ph-template-detail-location-map">';
 			get_property_map();
+			echo '</div>';
 		} finally {
+			if ( $preview_provider_filter ) {
+				remove_filter( 'option_propertyhive_maps_provider', $preview_provider_filter, 99 );
+			}
+
 			foreach ( $what3words_removed as $callback_data ) {
 				add_action( $callback_data[0], $callback_data[1], $callback_data[2] );
 			}
@@ -1148,16 +1171,11 @@ trait PH_Template_Set_Detail {
 			return $for_sale ? __( 'For sale', 'propertyhive' ) : __( 'Commercial property', 'propertyhive' );
 		}
 
-		$tenure = trim( wp_strip_all_tags( (string) $property->tenure ) );
 		$labels = array(
 			'standard-sales-detail'         => __( 'For sale', 'propertyhive' ),
-			'conversion-first-sales-detail' => $tenure ? sprintf(
-				/* translators: %s: property tenure */
-				__( 'For sale · %s', 'propertyhive' ),
-				$tenure
-			) : __( 'For sale', 'propertyhive' ),
+			'conversion-first-sales-detail' => __( 'For sale', 'propertyhive' ),
 			'immersive-cinema-detail'       => __( 'For sale', 'propertyhive' ),
-			'premium-editorial-detail'      => $tenure ? sprintf( __( 'For sale · %s', 'propertyhive' ), $tenure ) : __( 'For sale', 'propertyhive' ),
+			'premium-editorial-detail'      => __( 'For sale', 'propertyhive' ),
 			'new-homes-development-detail'  => __( 'New homes release', 'propertyhive' ),
 		);
 
@@ -1389,6 +1407,19 @@ trait PH_Template_Set_Detail {
 		}
 
 		return new PH_Property( $property_id );
+	}
+
+	/**
+	 * Whether this request is an authorized visual-editor detail preview.
+	 *
+	 * Responsive previews deliberately close the editor chrome inside the
+	 * iframe, so is_template_editor_active() is false there. They must still
+	 * receive the current property's media and detail-only preview behavior.
+	 *
+	 * @return bool
+	 */
+	private static function is_detail_editor_preview() {
+		return self::is_template_editor_active() || PH_Template_Set_Request_Context::is_template_editor_frame_request();
 	}
 
 	/**
@@ -1836,7 +1867,7 @@ trait PH_Template_Set_Detail {
 			return false;
 		}
 
-		return 'yes' === PH_Template_Set_Request_Context::get_show_floorplans() || self::is_template_editor_active();
+		return 'yes' === PH_Template_Set_Request_Context::get_show_floorplans() || self::is_detail_editor_preview();
 	}
 
 	/**
@@ -1860,7 +1891,7 @@ trait PH_Template_Set_Detail {
 			return false;
 		}
 
-		return 'yes' === PH_Template_Set_Request_Context::get_show_virtual_tours() || self::is_template_editor_active();
+		return 'yes' === PH_Template_Set_Request_Context::get_show_virtual_tours() || self::is_detail_editor_preview();
 	}
 
 	/**
@@ -1903,7 +1934,7 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_detail_brochure_url( $property ) {
-		if ( self::is_demo_preview() ) {
+		if ( self::is_demo_preview() && ! self::is_detail_editor_preview() ) {
 			return '';
 		}
 
@@ -2101,7 +2132,7 @@ trait PH_Template_Set_Detail {
 						(int) $index + 1
 					),
 					'type'  => 'virtual-tour',
-					'url'   => self::is_demo_preview() || empty( $tour['url'] ) ? '' : esc_url_raw( $tour['url'] ),
+					'url'   => empty( $tour['url'] ) ? '' : esc_url_raw( $tour['url'] ),
 				);
 			}
 		}
@@ -2182,7 +2213,12 @@ trait PH_Template_Set_Detail {
 	 * @return array
 	 */
 	private static function get_property_document_urls( $property, $document_type ) {
-		if ( self::is_demo_preview() ) {
+		// Catalogue previews use sample content and deliberately keep document
+		// controls non-navigable. The visual editor (including its responsive
+		// frame) renders the current property so editors can verify real EPCs,
+		// floorplans and tours.
+		$is_editor_preview = self::is_detail_editor_preview();
+		if ( self::is_demo_preview() && ! $is_editor_preview ) {
 			return array();
 		}
 
