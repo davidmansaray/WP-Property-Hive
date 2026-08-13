@@ -4531,12 +4531,14 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 
 .ph-template-search.ph-search-template-portal-style-search-results .property-search-form select,
 .ph-search-template-portal-style-search-results .ph-template-search .property-search-form select {
-	appearance: none;
+	-webkit-appearance: none !important;
+	appearance: none !important;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1.5 5 5 5-5' fill='none' stroke='%231a1f24' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 	background-position: right 10px center;
 	background-repeat: no-repeat;
 	background-size: 12px 8px;
 	padding-inline-end: 32px;
+	text-overflow: ellipsis;
 }
 
 .ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control-address_keyword input[name="address_keyword"],

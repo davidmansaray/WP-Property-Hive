@@ -232,8 +232,17 @@ $assert(
 $assert(
 	'all_search_templates_use_a_consistent_inset_select_chevron',
 	false !== strpos( $template_css, 'background-position: right 10px center;' )
-		&& false !== strpos( $fallback_css, 'background-position: right 10px center;' )
+		&& false !== strpos( $fallback_css, 'background-position: right 10px center !important;' )
 		&& false !== strpos( $fallback_css, 'padding-inline-end: 32px !important;' )
+		&& false !== strpos( $fallback_css, 'appearance: none !important;' )
+);
+
+$assert(
+	'structural_property_type_control_preserves_readable_width',
+	(bool) preg_match(
+		'/\.ph-template-search:is\([^}]*\.property-search-form[^}]*\{[^}]*grid-template-columns:\s*minmax\(10rem, 1\.5fr\) repeat\(2, minmax\(8rem, 1fr\)\) minmax\(11rem, 1\.2fr\) auto auto/s',
+		$structure_css
+	)
 );
 
 if ( ! empty( $failures ) ) {
