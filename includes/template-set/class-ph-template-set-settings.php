@@ -183,6 +183,253 @@ class PH_Template_Set_Settings {
 	}
 
 	/**
+	 * Get the legacy global search-result settings used by the visual editor.
+	 *
+	 * The Template Assistant stored these values in the same option as the
+	 * template-set settings. Keep that storage contract intact so existing
+	 * sites continue to render the same cards while the visual editor exposes
+	 * the controls. Search columns and the old result-layout switch deliberately
+	 * remain outside this group; the template-set layout controls own those
+	 * concerns now.
+	 *
+	 * @param array $settings Optional settings.
+	 * @return array
+	 */
+	public static function get_search_result_global_settings( $settings = null ) {
+		$settings = is_array( $settings ) ? $settings : self::get_settings();
+		$fields   = array_key_exists( 'search_result_fields', $settings ) ? $settings['search_result_fields'] : self::get_default_search_result_fields();
+
+		return array(
+			'search_result_default_order'  => self::sanitize_search_result_order( isset( $settings['search_result_default_order'] ) ? $settings['search_result_default_order'] : '' ),
+			'search_result_fields'         => self::sanitize_search_result_fields( $fields, '', $settings ),
+			'search_result_image_size'     => self::sanitize_search_result_image_size( isset( $settings['search_result_image_size'] ) ? $settings['search_result_image_size'] : 'medium' ),
+			'search_result_css'            => self::sanitize_search_result_css( isset( $settings['search_result_css'] ) ? $settings['search_result_css'] : '' ),
+			'search_result_css_all_pages'  => ( isset( $settings['search_result_css_all_pages'] ) && 'yes' === (string) $settings['search_result_css_all_pages'] ) ? 'yes' : '',
+		);
+	}
+
+	/**
+	 * Search-result default sort choices.
+	 *
+	 * @return array
+	 */
+	public static function get_search_result_order_options() {
+		return apply_filters(
+			'propertyhive_template_editor_search_result_order_options',
+			array(
+				''         => __( 'Price descending (default)', 'propertyhive' ),
+				'price-asc' => __( 'Price ascending', 'propertyhive' ),
+				'date'      => __( 'Date added', 'propertyhive' ),
+			)
+		);
+	}
+
+	/**
+	 * Search-result fields available to the legacy field-order control.
+	 *
+	 * Custom fields are represented by their existing `custom_field{field}`
+	 * values, matching the legacy renderer and avoiding a migration of saved
+	 * settings.
+	 *
+	 * @param array $settings Optional settings used to discover custom fields.
+	 * @return array
+	 */
+	public static function get_search_result_field_options( $settings = null ) {
+		$settings = is_array( $settings ) ? $settings : self::get_settings();
+		$fields   = array(
+			'price'          => __( 'Price / rent', 'propertyhive' ),
+			'floor_area'     => __( 'Floor area (commercial only)', 'propertyhive' ),
+			'summary'        => __( 'Summary description', 'propertyhive' ),
+			'actions'        => __( 'Actions (for example, More details)', 'propertyhive' ),
+			'rooms'          => __( 'Room counts', 'propertyhive' ),
+			'availability'   => __( 'Availability', 'propertyhive' ),
+			'property_type'  => __( 'Property type', 'propertyhive' ),
+			'available_date' => __( 'Available date (lettings only)', 'propertyhive' ),
+		);
+
+		$custom_fields = isset( $settings['custom_fields'] ) && is_array( $settings['custom_fields'] ) ? $settings['custom_fields'] : array();
+		foreach ( $custom_fields as $custom_field ) {
+			if ( ! is_array( $custom_field ) || empty( $custom_field['field_name'] ) ) {
+				continue;
+			}
+
+			$field_name = self::sanitize_search_result_custom_field_name( $custom_field['field_name'] );
+			if ( '' === $field_name ) {
+				continue;
+			}
+
+			$field_label = isset( $custom_field['field_label'] ) ? sanitize_text_field( $custom_field['field_label'] ) : $field_name;
+			$fields[ 'custom_field' . $field_name ] = sprintf(
+				/* translators: %s: configured custom field label. */
+				__( 'Custom field: %s', 'propertyhive' ),
+				$field_label
+			);
+		}
+
+		return apply_filters( 'propertyhive_template_editor_search_result_field_options', $fields, $settings );
+	}
+
+	/**
+	 * Get image-size choices for the legacy search-result image control.
+	 *
+	 * @return array
+	 */
+	public static function get_search_result_image_size_options() {
+		$sizes = function_exists( 'get_intermediate_image_sizes' ) ? get_intermediate_image_sizes() : array( 'medium' );
+		$sizes = array_values( array_unique( array_filter( array_map( 'sanitize_key', (array) $sizes ) ) ) );
+
+		if ( empty( $sizes ) ) {
+			$sizes = array( 'medium' );
+		}
+
+		$options = array();
+		foreach ( $sizes as $size ) {
+			$options[ $size ] = $size;
+		}
+
+		return apply_filters( 'propertyhive_template_editor_search_result_image_size_options', $options );
+	}
+
+	/**
+	 * Default legacy field order used when a site has not configured one yet.
+	 *
+	 * @return array
+	 */
+	public static function get_default_search_result_fields() {
+		return array( 'price', 'floor_area', 'summary', 'actions' );
+	}
+
+	/**
+	 * Sanitise the global search-result settings from editor input.
+	 *
+	 * Missing keys are intentionally left at their current values. This is
+	 * important because the same AJAX form is used by the detail editor, whose
+	 * request must not reset search settings it does not display.
+	 *
+	 * @param array $raw_settings Raw request values.
+	 * @param array $current_settings Existing settings.
+	 * @return array
+	 */
+	public static function sanitize_search_result_global_settings( $raw_settings, $current_settings = array() ) {
+		$raw_settings = is_array( $raw_settings ) ? wp_unslash( $raw_settings ) : array();
+		$current      = self::get_search_result_global_settings( is_array( $current_settings ) ? $current_settings : array() );
+		$sanitised    = $current;
+
+		if ( array_key_exists( 'search_result_default_order', $raw_settings ) ) {
+			$sanitised['search_result_default_order'] = self::sanitize_search_result_order( $raw_settings['search_result_default_order'] );
+		}
+
+		if ( array_key_exists( 'search_result_fields', $raw_settings ) || array_key_exists( 'search_result_fields_custom_field', $raw_settings ) ) {
+			$fields = array_key_exists( 'search_result_fields', $raw_settings ) ? $raw_settings['search_result_fields'] : array();
+			$custom = isset( $raw_settings['search_result_fields_custom_field'] ) ? $raw_settings['search_result_fields_custom_field'] : '';
+			$sanitised['search_result_fields'] = self::sanitize_search_result_fields( $fields, $custom, $current_settings );
+		}
+
+		if ( array_key_exists( 'search_result_image_size', $raw_settings ) ) {
+			$sanitised['search_result_image_size'] = self::sanitize_search_result_image_size( $raw_settings['search_result_image_size'] );
+		}
+
+		if ( array_key_exists( 'search_result_css', $raw_settings ) ) {
+			$sanitised['search_result_css'] = self::sanitize_search_result_css( $raw_settings['search_result_css'] );
+		}
+
+		if ( array_key_exists( 'search_result_css_all_pages', $raw_settings ) ) {
+			$sanitised['search_result_css_all_pages'] = self::normalise_checkbox_value( $raw_settings, 'search_result_css_all_pages' );
+		}
+
+		return $sanitised;
+	}
+
+	/**
+	 * Sanitise an ordered list of legacy result fields.
+	 *
+	 * @param mixed $fields Raw field values.
+	 * @param mixed $custom_field Legacy single custom-field selector value.
+	 * @param array $settings Settings used to validate custom fields.
+	 * @return array
+	 */
+	public static function sanitize_search_result_fields( $fields, $custom_field = '', $settings = array() ) {
+		$options       = self::get_search_result_field_options( $settings );
+		$fields        = is_array( $fields ) ? $fields : array( $fields );
+		$custom_field  = is_scalar( $custom_field ) ? (string) $custom_field : '';
+		$sanitised     = array();
+
+		foreach ( $fields as $field ) {
+			if ( ! is_scalar( $field ) ) {
+				continue;
+			}
+
+			$field = sanitize_text_field( $field );
+			if ( 'custom_field' === $field ) {
+				$field = $custom_field;
+			}
+
+			if ( '' === $field || ! array_key_exists( $field, $options ) || in_array( $field, $sanitised, true ) ) {
+				continue;
+			}
+
+			$sanitised[] = $field;
+		}
+
+		return $sanitised;
+	}
+
+	/**
+	 * Sanitise the legacy sort-order value.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private static function sanitize_search_result_order( $value ) {
+		$value   = is_scalar( $value ) ? sanitize_key( $value ) : '';
+		$options = self::get_search_result_order_options();
+
+		return array_key_exists( $value, $options ) ? $value : '';
+	}
+
+	/**
+	 * Sanitise the legacy image-size value.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private static function sanitize_search_result_image_size( $value ) {
+		$value   = is_scalar( $value ) ? sanitize_key( $value ) : '';
+		$options = self::get_search_result_image_size_options();
+
+		return array_key_exists( $value, $options ) ? $value : ( isset( $options['medium'] ) ? 'medium' : (string) key( $options ) );
+	}
+
+	/**
+	 * Remove markup and style-container escapes from custom CSS while retaining
+	 * the CSS syntax and line breaks users already saved in the admin screen.
+	 *
+	 * @param mixed $value Raw CSS.
+	 * @return string
+	 */
+	public static function sanitize_search_result_css( $value ) {
+		$value = is_scalar( $value ) ? (string) $value : '';
+		$value = wp_check_invalid_utf8( $value );
+		$value = preg_replace( '/<script\b[^>]*>[\s\S]*?<\/script\s*>/i', '', $value );
+		$value = preg_replace( '/<\/?style\b[^>]*>/i', '', $value );
+		$value = preg_replace( '/<\/?script\b[^>]*>/i', '', $value );
+
+		return str_replace( "\0", '', $value );
+	}
+
+	/**
+	 * Normalise a configured custom-field name for the legacy field token.
+	 *
+	 * @param mixed $value Raw field name.
+	 * @return string
+	 */
+	private static function sanitize_search_result_custom_field_name( $value ) {
+		$value = is_scalar( $value ) ? sanitize_key( $value ) : '';
+
+		return $value;
+	}
+
+	/**
 	 * Get the safe default editor mode for this site.
 	 *
 	 * Existing sites with legacy Template Assistant/front-end settings stay on
@@ -244,7 +491,8 @@ class PH_Template_Set_Settings {
 	 * @return array
 	 */
 	public static function sanitize_template_set_settings( $raw_settings, $current_settings = array(), $activate = false ) {
-		$raw_settings = is_array( $raw_settings ) ? wp_unslash( $raw_settings ) : array();
+		$raw_input_settings = is_array( $raw_settings ) ? $raw_settings : array();
+		$raw_settings       = wp_unslash( $raw_input_settings );
 		$current      = wp_parse_args( is_array( $current_settings ) ? $current_settings : array(), self::get_settings() );
 
 		$detail_templates = PH_Template_Set_Catalog::get_detail_templates();
@@ -415,6 +663,11 @@ class PH_Template_Set_Settings {
 		}
 
 		if ( 'search' === $editor_context ) {
+			$legacy_search_result_settings = self::sanitize_search_result_global_settings( $raw_input_settings, $current_settings );
+			foreach ( $legacy_search_result_settings as $key => $value ) {
+				$template_set_settings[ $key ] = $value;
+			}
+
 			$search_manifest = PH_Template_Set_Catalog::get_search_template_manifest( $search_template );
 			$search_controls = PH_Template_Set_Catalog::get_search_template_controls( $search_template );
 
@@ -550,29 +803,33 @@ class PH_Template_Set_Settings {
 	 * @return array
 	 */
 	public static function get_public_settings( $settings ) {
-		$settings = wp_parse_args( is_array( $settings ) ? $settings : array(), self::get_settings() );
+		$settings               = wp_parse_args( is_array( $settings ) ? $settings : array(), self::get_settings() );
+		$search_result_settings = self::get_search_result_global_settings( $settings );
 
-		return array(
-			'template_set_detail_template'        => sanitize_title( $settings['template_set_detail_template'] ),
-			'template_set_search_template'        => sanitize_title( $settings['template_set_search_template'] ),
-			'template_set_search_layout'          => sanitize_title( $settings['template_set_search_layout'] ),
-			'template_set_gallery_layout'         => sanitize_title( $settings['template_set_gallery_layout'] ),
-			'template_set_brand_colour'           => sanitize_hex_color( $settings['template_set_brand_colour'] ),
-			'template_set_accent_colour'          => sanitize_hex_color( $settings['template_set_accent_colour'] ),
-			'template_set_button_style'           => sanitize_title( $settings['template_set_button_style'] ),
-			'template_set_search_card_size'       => sanitize_title( $settings['template_set_search_card_size'] ),
-			'template_set_search_grid_columns'    => absint( $settings['template_set_search_grid_columns'] ),
-			'template_set_image_style'            => sanitize_title( $settings['template_set_image_style'] ),
-			'template_set_contact_card_style'     => sanitize_title( $settings['template_set_contact_card_style'] ),
-			'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
-			'template_set_show_badges'            => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
-			'template_set_show_mobile_cta'        => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
-			'template_set_show_floorplans'        => 'yes' === $settings['template_set_show_floorplans'] ? 'yes' : '',
-			'template_set_show_virtual_tours'     => 'yes' === $settings['template_set_show_virtual_tours'] ? 'yes' : '',
-			'template_set_show_recommended'       => 'yes' === $settings['template_set_show_recommended'] ? 'yes' : '',
-			'template_set_recommended_count'      => absint( $settings['template_set_recommended_count'] ),
-			'template_set_recommended_layout'     => sanitize_title( $settings['template_set_recommended_layout'] ),
-			'template_set_recommended_image_size' => sanitize_title( $settings['template_set_recommended_image_size'] ),
+		return array_merge(
+			array(
+				'template_set_detail_template'        => sanitize_title( $settings['template_set_detail_template'] ),
+				'template_set_search_template'        => sanitize_title( $settings['template_set_search_template'] ),
+				'template_set_search_layout'          => sanitize_title( $settings['template_set_search_layout'] ),
+				'template_set_gallery_layout'         => sanitize_title( $settings['template_set_gallery_layout'] ),
+				'template_set_brand_colour'           => sanitize_hex_color( $settings['template_set_brand_colour'] ),
+				'template_set_accent_colour'          => sanitize_hex_color( $settings['template_set_accent_colour'] ),
+				'template_set_button_style'           => sanitize_title( $settings['template_set_button_style'] ),
+				'template_set_search_card_size'       => sanitize_title( $settings['template_set_search_card_size'] ),
+				'template_set_search_grid_columns'    => absint( $settings['template_set_search_grid_columns'] ),
+				'template_set_image_style'            => sanitize_title( $settings['template_set_image_style'] ),
+				'template_set_contact_card_style'     => sanitize_title( $settings['template_set_contact_card_style'] ),
+				'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
+				'template_set_show_badges'            => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
+				'template_set_show_mobile_cta'        => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
+				'template_set_show_floorplans'        => 'yes' === $settings['template_set_show_floorplans'] ? 'yes' : '',
+				'template_set_show_virtual_tours'     => 'yes' === $settings['template_set_show_virtual_tours'] ? 'yes' : '',
+				'template_set_show_recommended'       => 'yes' === $settings['template_set_show_recommended'] ? 'yes' : '',
+				'template_set_recommended_count'      => absint( $settings['template_set_recommended_count'] ),
+				'template_set_recommended_layout'     => sanitize_title( $settings['template_set_recommended_layout'] ),
+				'template_set_recommended_image_size' => sanitize_title( $settings['template_set_recommended_image_size'] ),
+			),
+			$search_result_settings
 		);
 	}
 }

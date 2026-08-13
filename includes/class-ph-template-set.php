@@ -29,6 +29,9 @@ class PH_Template_Set {
 	const EDIT_OPEN_QUERY_ARG = 'ph_template_editor_open';
 	const EDIT_FRAME_QUERY_ARG = 'ph_template_editor_frame';
 	const MAP_SEARCH_FORMAT_QUERY_ARG = 'ph_template_map_search_format';
+	const SEARCH_RESULT_DEFAULT_ORDER_QUERY_ARG = 'ph_template_search_result_order';
+	const SEARCH_RESULT_FIELDS_QUERY_ARG = 'ph_template_search_result_fields';
+	const SEARCH_RESULT_IMAGE_SIZE_QUERY_ARG = 'ph_template_search_result_image_size';
 	const MAP_SEARCH_FORMAT_NONE = 'none';
 	const MAP_SEARCH_FORMAT_VIEW = 'view';
 	const MAP_SEARCH_FORMAT_SPLIT = 'split';
@@ -90,6 +93,8 @@ class PH_Template_Set {
 		// their setup observe the request-scoped preview format.
 		add_filter( 'option_propertyhive_map_search', array( 'PH_Template_Set_Request_Context', 'filter_map_search_option' ), 1 );
 		add_filter( 'default_option_propertyhive_map_search', array( 'PH_Template_Set_Request_Context', 'filter_map_search_option' ), 1 );
+		add_filter( 'option_propertyhive_template_assistant', array( 'PH_Template_Set_Request_Context', 'filter_template_assistant_option' ), 1 );
+		add_filter( 'default_option_propertyhive_template_assistant', array( 'PH_Template_Set_Request_Context', 'filter_template_assistant_option' ), 1 );
 
 		PH_Template_Set_Search_Form_Editor::init();
 
@@ -154,7 +159,6 @@ class PH_Template_Set {
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_modules' ), 50 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_similar_properties' ), 60 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_mobile_cta_bar' ), 95 );
-		add_action( 'propertyhive_property_actions_end', array( __CLASS__, 'render_trust_note' ), 20 );
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'render_preview_masthead' ), 5 );
 	}

@@ -32,6 +32,9 @@
 	var frameNavigationPending = false;
 	var lastFrameSubmitter = null;
 	var mirroringFrameControls = false;
+	var searchResultReloadTimer = null;
+	var searchResultSettingsChangeHandlerBound = false;
+	var searchResultSettingsChangeHandler = null;
 
 	function isElement(value) {
 		return !!value && value.nodeType === 1;
@@ -729,6 +732,124 @@
 		};
 	}
 
+	function getSearchResultPreviewQueryArgs() {
+		var configured = config.searchResultPreviewQueryArgs || {};
+
+		return {
+			defaultOrder: String(configured.defaultOrder || 'ph_template_search_result_order'),
+			fields: String(configured.fields || 'ph_template_search_result_fields'),
+			imageSize: String(configured.imageSize || 'ph_template_search_result_image_size')
+		};
+	}
+
+	function getEditorForm() {
+		var editor = document.querySelector('[data-ph-template-editor]');
+
+		return editor ? editor.querySelector('[data-ph-template-editor-form]') : null;
+	}
+
+	function getSearchResultPreviewState(form) {
+		var orderControl;
+		var imageSizeControl;
+		var fieldControls;
+
+		if (!form || !form.querySelector) {
+			return null;
+		}
+
+		orderControl = form.querySelector('[name="search_result_default_order"]');
+		imageSizeControl = form.querySelector('[name="search_result_image_size"]');
+		fieldControls = Array.prototype.slice.call(form.querySelectorAll('input[type="checkbox"][name="search_result_fields[]"]'));
+
+		if (!orderControl && !imageSizeControl && !fieldControls.length) {
+			return null;
+		}
+
+		return {
+			defaultOrder: orderControl ? String(orderControl.value || '') : '',
+			fields: fieldControls.filter(function (control) {
+				return control.checked;
+			}).map(function (control) {
+				return String(control.value || '');
+			}).filter(function (value) {
+				return !!value;
+			}),
+			imageSize: imageSizeControl ? String(imageSizeControl.value || '') : ''
+		};
+	}
+
+	function buildSearchResultSettingsPreviewUrl(url) {
+		var state = getSearchResultPreviewState(getEditorForm());
+		var args;
+		var parsedUrl;
+
+		if (!state || !window.URL) {
+			return getNavigationPreviewUrl(url);
+		}
+
+		args = getSearchResultPreviewQueryArgs();
+
+		try {
+			parsedUrl = new window.URL(getNavigationPreviewUrl(url), window.location.href);
+			parsedUrl.searchParams.set(args.defaultOrder, state.defaultOrder);
+			parsedUrl.searchParams.set(args.fields, state.fields.join('|'));
+			parsedUrl.searchParams.set(args.imageSize, state.imageSize);
+
+			return getPreviewUrl(parsedUrl.href);
+		} catch (error) {
+			return getNavigationPreviewUrl(url);
+		}
+	}
+
+	function reloadSearchResultSettings(options) {
+		var previewUrl;
+
+		if (!getSearchResultPreviewState(getEditorForm()) || !previewRoot || !previewFrame) {
+			return false;
+		}
+
+		previewUrl = buildSearchResultSettingsPreviewUrl(getCurrentFrameUrl());
+
+		return navigate(previewUrl, {
+			force: !options || options.force !== false
+		});
+	}
+
+	function scheduleSearchResultSettingsReload() {
+		if (!getSearchResultPreviewState(getEditorForm())) {
+			return false;
+		}
+
+		if (searchResultReloadTimer) {
+			window.clearTimeout(searchResultReloadTimer);
+		}
+
+		searchResultReloadTimer = window.setTimeout(function () {
+			searchResultReloadTimer = null;
+			reloadSearchResultSettings();
+		}, 140);
+
+		return true;
+	}
+
+	function handleSearchResultSettingsChanged(event) {
+		var detail = event && event.detail ? event.detail : {};
+
+		if (detail.reloadPreview || detail.previewReload) {
+			scheduleSearchResultSettingsReload();
+		}
+	}
+
+	function bindSearchResultSettingsEvent() {
+		if (searchResultSettingsChangeHandlerBound) {
+			return;
+		}
+
+		searchResultSettingsChangeHandler = handleSearchResultSettingsChanged;
+		document.addEventListener('ph:template_set_search_result_settings_changed', searchResultSettingsChangeHandler);
+		searchResultSettingsChangeHandlerBound = true;
+	}
+
 	function normalizeMapSearchFormat(value) {
 		var mapPreview = getMapSearchPreviewConfig();
 
@@ -1393,6 +1514,7 @@
 		restoreState();
 		bindPreviewSwapEvent();
 		bindSearchFormReplacementEvent();
+		bindSearchResultSettingsEvent();
 		root = getPreviewRoot();
 
 		if (!root) {
@@ -1464,10 +1586,21 @@
 			fitUpdateTimer = null;
 		}
 
+		if (searchResultReloadTimer) {
+			window.clearTimeout(searchResultReloadTimer);
+			searchResultReloadTimer = null;
+		}
+
 		if (searchFormReplacementHandlerBound && searchFormReplacementHandler) {
 			document.removeEventListener('propertyhive_template_set_search_form_replaced', searchFormReplacementHandler);
 			searchFormReplacementHandlerBound = false;
 			searchFormReplacementHandler = null;
+		}
+
+		if (searchResultSettingsChangeHandlerBound && searchResultSettingsChangeHandler) {
+			document.removeEventListener('ph:template_set_search_result_settings_changed', searchResultSettingsChangeHandler);
+			searchResultSettingsChangeHandlerBound = false;
+			searchResultSettingsChangeHandler = null;
 		}
 
 		previewRoot = null;
@@ -1493,8 +1626,10 @@
 		},
 		init: init,
 		navigate: navigate,
+		reloadSearchResultSettings: reloadSearchResultSettings,
 		reconcileMapSearchPreview: clearMapSearchPreviewFormat,
 		refresh: refresh,
+		scheduleSearchResultSettingsReload: scheduleSearchResultSettingsReload,
 		setError: setError,
 		setLoading: setLoading,
 		setMapSearchPreviewFormat: setMapSearchPreviewFormat

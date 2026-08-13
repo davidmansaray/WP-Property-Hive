@@ -2002,6 +2002,13 @@ function template_assistant_search_result_field_changes()
                 }
                 case "rooms":
                 {
+					// Template-set cards already render room counts in their compact
+					// facts row. The visual editor's Rooms option controls that existing
+					// row, so do not add the legacy duplicate text block as well.
+					if ( class_exists( 'PH_Template_Set' ) && PH_Template_Set::is_enabled() && class_exists( 'PH_Template_Set_Request_Context' ) && PH_Template_Set_Request_Context::is_search_results_request() ) {
+						break;
+					}
+
                     add_action( 'propertyhive_after_search_results_loop_item_title', function() { 
                         global $property; 
 
@@ -2102,6 +2109,5 @@ function propertyhive_get_flag()
 
     return $flag;
 }
-
 
 

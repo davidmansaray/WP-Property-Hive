@@ -548,6 +548,24 @@
 			&& modules.editorPreview.isStructuralPreviewControl(control));
 	}
 
+	function isSearchResultServerPreviewControl(control) {
+		return !!control && [
+			'search_result_default_order',
+			'search_result_image_size',
+			'search_result_fields[]'
+		].indexOf(control.name) !== -1;
+	}
+
+	function scheduleSearchResultPreviewReload(control) {
+		if (!isSearchResultServerPreviewControl(control)) {
+			return;
+		}
+
+		if (modules.editorResponsivePreview && typeof modules.editorResponsivePreview.scheduleSearchResultSettingsReload === 'function') {
+			modules.editorResponsivePreview.scheduleSearchResultSettingsReload();
+		}
+	}
+
 	function applyStructuralPreviewControl(control, editor, labels) {
 		var format = control.value;
 
@@ -740,6 +758,7 @@
 				control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
 				editor.classList.add('is-dirty');
 				setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+				scheduleSearchResultPreviewReload(control);
 			});
 
 			if (control.type === 'color') {
