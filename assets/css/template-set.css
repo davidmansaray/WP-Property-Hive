@@ -2236,7 +2236,7 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 .ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .details,
 .ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .details {
 	gap: 4px;
-	padding-bottom: 74px;
+	padding-bottom: 8px;
 }
 
 .ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .details h3,
@@ -2267,7 +2267,7 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 .ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .details,
 .ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .details {
 	gap: 8px;
-	padding-bottom: 94px;
+	padding-bottom: 8px;
 }
 
 .ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .details h3,
@@ -2358,15 +2358,24 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 	right: 8px;
 }
 
+.ph-template-set ul.properties li.ph-template-card {
+	grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.ph-template-set ul.properties li.ph-template-card .thumbnail {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+}
+
 .ph-template-set ul.properties li.ph-template-card .details {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 	grid-column: 2;
 	grid-row: 1;
-	min-height: 100%;
+	min-height: 0;
 	min-width: 0;
-	padding: 2px 0 86px;
+	padding: 2px 0 8px;
 }
 
 .ph-template-set ul.properties li.ph-template-card .details .status {
@@ -2428,6 +2437,22 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 
 .ph-template-set ul.properties li.ph-template-card .actions {
 	order: 5;
+	margin-top: 8px;
+	position: relative;
+	z-index: 1;
+}
+
+.ph-search-template-portal-style-search-results ul.properties li.ph-template-card .actions .button,
+.ph-template-search.ph-search-template-portal-style-search-results ul.properties li.ph-template-card .actions .button {
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--ph-template-brand);
+	font-size: 14px;
+	font-weight: 600;
+	justify-content: flex-start;
 }
 
 /* Status badge: single restrained marker, not a stack of pills. */
@@ -2466,8 +2491,8 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 	flex-direction: column;
 	gap: 9px;
 	grid-column: 2;
-	grid-row: 1;
-	margin-top: 18px;
+	grid-row: 2;
+	margin-top: 0;
 	order: 3;
 	padding-top: 14px;
 }
