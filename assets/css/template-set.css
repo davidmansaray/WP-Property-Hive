@@ -4520,10 +4520,25 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 .ph-template-search.ph-search-template-portal-style-search-results .property-search-form button[type="submit"],
 .ph-search-template-portal-style-search-results .ph-template-search .property-search-form input[type="submit"],
 .ph-search-template-portal-style-search-results .ph-template-search .property-search-form button[type="submit"] {
-	align-self: stretch;
+	align-self: flex-end;
+	height: 44px;
 	min-height: 44px;
-	height: auto;
-	padding: 0 20px;
+	padding: 0 16px;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form select,
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form select {
+	padding-inline-end: 4px;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control-address_keyword input[name="address_keyword"],
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form .control-address_keyword input[name="address_keyword"] {
+	padding-inline-end: 38px;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control-address_keyword .current-location,
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form .control-address_keyword .current-location {
+	right: 4px !important;
 }
 
 @media (max-width: 720px) {

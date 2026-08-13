@@ -97,6 +97,15 @@ $assert(
 );
 
 $assert(
+	'portal_style_search_controls_use_compact_edge_spacing',
+	false !== strpos( $template_css, 'align-self: flex-end;' )
+		&& false !== strpos( $template_css, 'height: 44px;' )
+		&& false !== strpos( $template_css, 'padding-inline-end: 4px;' )
+		&& false !== strpos( $template_css, 'padding-inline-end: 38px;' )
+		&& false !== strpos( $template_css, 'right: 4px !important;' )
+);
+
+$assert(
 	'portal_grid_list_layout_uses_horizontal_cards',
 	false !== strpos(
 		$structure_css,
