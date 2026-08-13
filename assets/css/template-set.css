@@ -4376,7 +4376,9 @@ body:not(.ph-search-view-grid) .ph-template-editor-field-template_set_search_gri
 }
 
 .ph-template-set .propertyhive-views {
-	margin: 0 0 18px;
+	display: inline-flex;
+	margin: 0 12px 18px 0;
+	vertical-align: middle;
 }
 
 .ph-template-set .propertyhive-views ul {
@@ -4414,6 +4416,41 @@ body:not(.ph-search-view-grid) .ph-template-editor-field-template_set_search_gri
 	border-color: var(--ph-template-brand);
 	color: #fff;
 	text-decoration: none;
+}
+
+/* Keep the classic ordering and Save Search controls together as one toolbar. */
+.ph-template-set .propertyhive-ordering {
+	display: inline-flex;
+	float: none;
+	margin: 0 8px 18px 0;
+	vertical-align: middle;
+}
+
+.ph-template-set .propertyhive-ordering .orderby {
+	min-height: 38px;
+	margin: 0;
+}
+
+.ph-template-set .propertyhive-ordering + .propertyhive-save-search-button {
+	align-items: center;
+	display: inline-flex;
+	justify-content: center;
+	margin: 0 0 18px;
+	min-height: 38px;
+	vertical-align: middle;
+}
+
+@media (max-width: 520px) {
+	.ph-template-set .propertyhive-views {
+		display: flex;
+		margin-bottom: 10px;
+		margin-right: 0;
+	}
+
+	.ph-template-set .propertyhive-ordering,
+	.ph-template-set .propertyhive-ordering + .propertyhive-save-search-button {
+		margin-bottom: 10px;
+	}
 }
 
 .ph-template-set .propertyhive-map-canvas-wrapper {
