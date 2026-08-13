@@ -4548,7 +4548,14 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 
 .ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control-address_keyword .current-location,
 .ph-search-template-portal-style-search-results .ph-template-search .property-search-form .control-address_keyword .current-location {
-	right: 4px !important;
+	inset-inline-end: 12px !important;
+	right: 12px !important;
+}
+
+.ph-template-search.ph-search-template-portal-style-search-results .property-search-form .control-address_keyword .current-location img,
+.ph-search-template-portal-style-search-results .ph-template-search .property-search-form .control-address_keyword .current-location img {
+	height: 18px !important;
+	width: 18px !important;
 }
 
 @media (max-width: 720px) {

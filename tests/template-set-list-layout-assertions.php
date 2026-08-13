@@ -118,7 +118,7 @@ $assert(
 		&& false !== strpos( $template_css, 'background-position: right 10px center;' )
 		&& false !== strpos( $template_css, 'padding-inline-end: 32px;' )
 		&& false !== strpos( $template_css, 'padding-inline-end: 38px;' )
-		&& false !== strpos( $template_css, 'right: 4px !important;' )
+		&& false !== strpos( $template_css, 'right: 12px !important;' )
 );
 
 $assert(
@@ -243,6 +243,13 @@ $assert(
 		'/\.ph-template-search:is\([^}]*\.property-search-form[^}]*\{[^}]*grid-template-columns:\s*minmax\(10rem, 1\.5fr\) repeat\(2, minmax\(8rem, 1fr\)\) minmax\(11rem, 1\.2fr\) auto auto/s',
 		$structure_css
 	)
+);
+
+$assert(
+	'location_icons_stay_inside_field_boundaries',
+	false !== strpos( $structure_css, 'inset-inline-end: 1rem !important;' )
+		&& false !== strpos( $template_css, 'inset-inline-end: 12px !important;' )
+		&& false !== strpos( $template_css, 'width: 18px !important;' )
 );
 
 if ( ! empty( $failures ) ) {
