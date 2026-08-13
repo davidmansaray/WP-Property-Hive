@@ -4058,6 +4058,7 @@ body:not(.ph-template-editor-active) .ph-template-map-search-active .ph-template
 	align-self: start;
 	grid-template-columns: minmax(0, 1fr);
 	height: auto;
+	padding-block: 0;
 }
 
 .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card > .thumbnail,
