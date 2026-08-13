@@ -448,6 +448,7 @@
 .ph-template-search.ph-search-map-split {
 	display: grid;
 	grid-template-columns: minmax(18rem, 2fr) minmax(20rem, 3fr);
+	grid-template-rows: auto auto auto minmax(0, 1fr);
 	gap: var(--ph-search-gap);
 	align-items: start;
 }
@@ -456,9 +457,21 @@
 	grid-column: 1 / -1;
 }
 
+.ph-template-search.ph-search-map-split > .ph-template-search-intro {
+	grid-row: 1;
+}
+
+.ph-template-search.ph-search-map-split > .property-search-form {
+	grid-row: 2;
+}
+
+.ph-template-search.ph-search-map-split > .ph-template-results-toolbar {
+	grid-row: 3;
+}
+
 .ph-template-search.ph-search-map-split .half-map-view {
 	grid-column: 2;
-	grid-row: 2;
+	grid-row: 4;
 	position: sticky;
 	inset-block-start: 1rem;
 	align-self: start;
@@ -467,7 +480,7 @@
 
 .ph-template-search.ph-search-map-split .half-list-view {
 	grid-column: 1;
-	grid-row: 2;
+	grid-row: 4;
 }
 
 .ph-template-search .half-map-view .propertyhive-map-canvas-wrapper {
