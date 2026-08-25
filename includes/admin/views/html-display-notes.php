@@ -44,38 +44,135 @@ if ( !empty($notes) )
 			{
 				if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
 				{
-					$email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
+					$email_log_id = absint( $comment_content['email_log_id'] );
+					$email_log    = $wpdb->get_row(
+						$wpdb->prepare(
+							"SELECT * FROM {$wpdb->prefix}ph_email_log WHERE email_id = %d",
+							$email_log_id
+						)
+					);
 
 					if ( null !== $email_log )
 					{
-						$next_cron_run = '';
-						$email_status = '';
-						$note_suffix = '';
-						switch ($email_log->status) {
-							case '':
-								$next_cron_run = $next_cron_run ?: propertyhive_human_time_difference( wp_next_scheduled( 'propertyhive_process_email_log' ) );
-								$email_status  =  __( 'queued', 'propertyhive' );
-								$note_suffix   = '<em>(' . __( 'Due to be sent', 'propertyhive' ) . ' ' . $next_cron_run . ')</em>';
-								break;
-							case 'fail1':
-							case 'fail2':
-								$email_status = '<b>' . __( 'failed', 'propertyhive' ) . '</b>';
-								break;
-						}
+						$next_cron_run = '' === $email_log->status
+							? propertyhive_human_time_difference( wp_next_scheduled( 'propertyhive_process_email_log' ) )
+							: '';
 						$note_body = '';
 						if ($section == 'property')
 						{
-							$note_body .= 'Included in ' . $email_status . ' email mailout to ' . get_the_title($email_log->contact_id) . '. ' . $note_suffix;
+							$contact_name = esc_html( get_the_title( $email_log->contact_id ) );
+							switch ( $email_log->status ) {
+								case '':
+									$note_body = sprintf(
+										/* translators: 1: contact name, 2: human-readable time until the queued email is due to be sent */
+										__( 'Included in queued email mailout to %1$s. <em>(Due to be sent %2$s)</em>', 'propertyhive' ),
+										$contact_name,
+										esc_html( $next_cron_run )
+									);
+									break;
+								case 'fail1':
+								case 'fail2':
+									$note_body = sprintf(
+										/* translators: %s: contact name */
+										__( 'Included in <b>failed</b> email mailout to %s.', 'propertyhive' ),
+										$contact_name
+									);
+									break;
+								case 'sent':
+									$note_body = sprintf(
+										/* translators: %s: contact name */
+										__( 'Included in sent email mailout to %s.', 'propertyhive' ),
+										$contact_name
+									);
+									break;
+								default:
+									$note_body = sprintf(
+										/* translators: %s: contact name */
+										__( 'Included in email mailout to %s.', 'propertyhive' ),
+										$contact_name
+									);
+							}
 						}
 						elseif ($section == 'contact')
 						{
 							$property_ids = @unserialize($email_log->property_ids, ['allowed_classes' => false]);
 							if ( $property_ids !== false )
 							{
-								$note_body .= count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . ' included in ' . $email_status . ' email mailout. ' . $note_suffix;
+								$property_count = count( $property_ids );
+								switch ( $email_log->status ) {
+									case '':
+										$note_body = sprintf(
+											/* translators: 1: number of properties, 2: human-readable time until the queued email is due to be sent */
+											_n( '%1$d property included in queued email mailout. <em>(Due to be sent %2$s)</em>', '%1$d properties included in queued email mailout. <em>(Due to be sent %2$s)</em>', $property_count, 'propertyhive' ),
+											$property_count,
+											esc_html( $next_cron_run )
+										);
+										break;
+									case 'fail1':
+									case 'fail2':
+										$note_body = sprintf(
+											/* translators: %d: number of properties */
+											_n( '%d property included in <b>failed</b> email mailout.', '%d properties included in <b>failed</b> email mailout.', $property_count, 'propertyhive' ),
+											$property_count
+										);
+										break;
+									case 'sent':
+										$note_body = sprintf(
+											/* translators: %d: number of properties */
+											_n( '%d property included in sent email mailout.', '%d properties included in sent email mailout.', $property_count, 'propertyhive' ),
+											$property_count
+										);
+										break;
+									default:
+										$note_body = sprintf(
+											/* translators: %d: number of properties */
+											_n( '%d property included in email mailout.', '%d properties included in email mailout.', $property_count, 'propertyhive' ),
+											$property_count
+										);
+								}
 							}
 						}
-						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Mailout</a>';
+
+						// Translations are not trusted markup, so restrict the
+						// mailout strings to the tags they intentionally contain.
+						$note_body = wp_kses(
+							$note_body,
+							array(
+								'em' => array(),
+								'b'  => array(),
+							)
+						);
+
+						if (
+							'sent' === $email_log->status
+							&& ! empty( $email_log->open_tracking_enabled )
+							&& class_exists( 'PH_Email_Tracking' )
+							&& PH_Email_Tracking::is_schema_ready()
+						) {
+							$open_summary = PH_Email_Tracking::get_open_summary( $email_log_id );
+							$opened_at    = is_array( $open_summary ) && isset( $open_summary['first_opened_at'] ) ? $open_summary['first_opened_at'] : '';
+
+							if ( '' !== $opened_at ) {
+								$opened_datetime = date_create_immutable( $opened_at, new DateTimeZone( 'UTC' ) );
+
+								if ( false !== $opened_datetime ) {
+									$note_body .= ' ' . sprintf(
+										/* translators: 1: date the email was first opened, 2: time the email was first opened */
+										esc_html__( 'Opened %1$s at %2$s.', 'propertyhive' ),
+										esc_html( wp_date( get_option( 'date_format' ), $opened_datetime->getTimestamp(), wp_timezone() ) ),
+										esc_html( wp_date( get_option( 'time_format' ), $opened_datetime->getTimestamp(), wp_timezone() ) )
+									);
+								}
+							} elseif ( ! PH_Email_Tracking::is_summary_retention_expired( $email_log->send_at ) ) {
+								$note_body .= ' ' . esc_html__( 'Not opened yet.', 'propertyhive' );
+							}
+						}
+
+						$view_mailout_url = wp_nonce_url(
+							admin_url( '?view_propertyhive_email=' . $email_log_id . '&email_id=' . $email_log_id ),
+							'view-email'
+						);
+						$note_body       .= ' <a href="' . esc_url( $view_mailout_url ) . '" target="_blank">' . esc_html__( 'View Mailout', 'propertyhive' ) . '</a>';
 					}
 					else
 					{

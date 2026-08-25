@@ -268,8 +268,11 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/ph-update-functions.php' );
             include_once( 'includes/class-ph-install.php' );
             include_once( 'includes/class-ph-comments.php' );
+            include_once( 'includes/class-ph-email-tracking.php' );
             include_once( 'includes/class-ph-emails.php' );
             include_once( 'includes/class-ph-licenses.php' );
+
+            PH_Email_Tracking::init();
     
             if ( is_admin() ) {
                 include_once( 'includes/admin/class-ph-admin.php' );

@@ -754,6 +754,7 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
 	 *
 	 * Tables:
 	 *		ph_email_log - Queueing table for emails
+	 *		ph_email_open_summary - Bounded email open tracking summaries
 	 *
 	 * @access public
 	 * @return void
@@ -784,6 +785,7 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
             from_email_address varchar(255) NOT NULL,
             subject varchar(255) NOT NULL,
             body blob NOT NULL,
+			open_tracking_enabled tinyint(1) unsigned NOT NULL DEFAULT 0,
             lock_id varchar(23) NOT NULL,
             locked_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
             status varchar(5) NOT NULL,
@@ -791,6 +793,18 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
             sent_by bigint(20) unsigned NOT NULL,
             PRIMARY KEY  (email_id)
         ) $collate;";
+
+		$tables .= "
+		CREATE TABLE {$wpdb->prefix}ph_email_open_summary (
+			email_id bigint(20) unsigned NOT NULL,
+			first_opened_at datetime NOT NULL,
+			last_opened_at datetime NOT NULL,
+			request_count bigint(20) unsigned NOT NULL DEFAULT 1,
+			first_user_agent varchar(255) NOT NULL DEFAULT '',
+			last_user_agent varchar(255) NOT NULL DEFAULT '',
+			PRIMARY KEY  (email_id),
+			KEY last_opened_at (last_opened_at)
+		) $collate;";
 
         $tables .= "
         CREATE TABLE {$wpdb->prefix}ph_address_keyword_polygon (

@@ -33,10 +33,20 @@ class PH_Search_Analytics
 			return;
 		}
 
+		if ( current_user_can( 'manage_propertyhive' ) ) 
+		{
+		    return;
+		}
+
 		if ( 
 			!is_post_type_archive( 'property' ) && 
 			!is_page( ph_get_page_id( 'search_results' ) ) 
 		)
+		{
+			return;
+		}
+
+		if ( apply_filters( 'propertyhive_enable_search_analytics', true ) === false )
 		{
 			return;
 		}

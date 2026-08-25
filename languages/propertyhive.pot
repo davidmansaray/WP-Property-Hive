@@ -9,12 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-16T14:59:39+01:00\n"
+"POT-Creation-Date: 2026-08-25T13:42:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: propertyhive\n"
 
 #. Plugin Name of the plugin
+#: propertyhive.php
 #: includes/admin/class-ph-admin-menus.php:118
 #: includes/admin/class-ph-admin-menus.php:124
 #: includes/admin/class-ph-admin-menus.php:126
@@ -60,18 +61,22 @@ msgid "Property Hive"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: propertyhive.php
 msgid "https://wordpress.org/plugins/propertyhive/"
 msgstr ""
 
 #. Description of the plugin
+#: propertyhive.php
 msgid "Property Hive has everything you need to build estate agency websites"
 msgstr ""
 
 #. Author of the plugin
+#: propertyhive.php
 msgid "PropertyHive"
 msgstr ""
 
 #. Author URI of the plugin
+#: propertyhive.php
 msgid "https://wp-property-hive.com"
 msgstr ""
 
@@ -502,6 +507,7 @@ msgstr ""
 
 #. translators: %s: URL to Property Hive documentation
 #: includes/admin/class-ph-admin-help.php:45
+#, php-format
 msgid "Should you need help understanding, using, or extending Property Hive, <a href=\"%s\" target=\"_blank\">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more."
 msgstr ""
 
@@ -755,6 +761,7 @@ msgstr ""
 
 #. translators: %s: URL to view the property
 #: includes/admin/class-ph-admin-post-types.php:309
+#, php-format
 msgid "Property updated. <a href=\"%s\">View property</a>"
 msgstr ""
 
@@ -785,6 +792,7 @@ msgstr ""
 
 #. translators: %s: URL to view the property
 #: includes/admin/class-ph-admin-post-types.php:315
+#, php-format
 msgid "Property published. <a href=\"%s\">View property</a>"
 msgstr ""
 
@@ -794,11 +802,13 @@ msgstr ""
 
 #. translators: %s: URL to preview the property
 #: includes/admin/class-ph-admin-post-types.php:318
+#, php-format
 msgid "Property submitted. <a target=\"_blank\" href=\"%s\">Preview property</a>"
 msgstr ""
 
 #. translators: 1: formatted date, 2: URL to preview the property
 #: includes/admin/class-ph-admin-post-types.php:320
+#, php-format
 msgid "Property scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview property</a>"
 msgstr ""
 
@@ -812,6 +822,7 @@ msgstr ""
 
 #. translators: %s: URL to preview the property
 #: includes/admin/class-ph-admin-post-types.php:323
+#, php-format
 msgid "Property draft updated. <a target=\"_blank\" href=\"%s\">Preview property</a>"
 msgstr ""
 
@@ -834,6 +845,7 @@ msgstr ""
 
 #. translators: 1: formatted date
 #: includes/admin/class-ph-admin-post-types.php:337
+#, php-format
 msgid "Contact scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
@@ -860,6 +872,7 @@ msgstr ""
 
 #. translators: 1: formatted date
 #: includes/admin/class-ph-admin-post-types.php:352
+#, php-format
 msgid "Office scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
@@ -886,6 +899,7 @@ msgstr ""
 
 #. translators: 1: formatted date
 #: includes/admin/class-ph-admin-post-types.php:368
+#, php-format
 msgid "Enquiry scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
@@ -966,7 +980,6 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-frontend.php:1079
 #: includes/admin/views/html-bulk-edit-property.php:108
 #: includes/admin/views/html-contact-enquiries-meta-box.php:51
-#: includes/admin/views/html-display-enquiries.php:12
 #: includes/admin/views/html-property-enquiries-meta-box.php:41
 #: includes/class-ph-post-types.php:616
 #: includes/class-ph-rest-api.php:290
@@ -1144,6 +1157,7 @@ msgstr ""
 
 #. translators: 1: number of items, 2: post type label
 #: includes/admin/class-ph-admin.php:55
+#, php-format
 msgid "%1$s %2$s moved to archive."
 msgid_plural "%1$s %2$s moved to archive."
 msgstr[0] ""
@@ -1151,6 +1165,7 @@ msgstr[1] ""
 
 #. translators: 1: number of items, 2: post type label
 #: includes/admin/class-ph-admin.php:85
+#, php-format
 msgid "%1$s %2$s removed from archive."
 msgid_plural "%1$s %2$s removed from archive."
 msgstr[0] ""
@@ -1177,7 +1192,7 @@ msgstr ""
 
 #: includes/admin/class-ph-admin.php:172
 #: includes/admin/class-ph-admin.php:182
-#: includes/admin/settings/class-ph-settings-emails.php:578
+#: includes/admin/settings/class-ph-settings-emails.php:586
 msgid "Date/Time"
 msgstr ""
 
@@ -1242,14 +1257,13 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:236
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:34
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:36
-#: includes/admin/settings/class-ph-settings-emails.php:581
+#: includes/admin/settings/class-ph-settings-emails.php:589
 #: includes/admin/settings/class-ph-settings-frontend.php:838
 #: includes/admin/views/html-contact-enquiries-meta-box.php:49
 #: includes/admin/views/html-contact-offers-meta-box.php:38
 #: includes/admin/views/html-contact-sales-meta-box.php:38
 #: includes/admin/views/html-contact-tenancies-meta-box.php:90
 #: includes/admin/views/html-contact-viewings-meta-box.php:34
-#: includes/admin/views/html-display-enquiries.php:10
 #: includes/admin/views/html-property-enquiries-meta-box.php:39
 #: includes/admin/views/html-property-offers-meta-box.php:37
 #: includes/admin/views/html-property-sales-meta-box.php:37
@@ -1281,7 +1295,6 @@ msgstr ""
 #: includes/admin/class-ph-admin.php:191
 #: includes/admin/views/html-contact-enquiries-meta-box.php:47
 #: includes/admin/views/html-contact-viewings-meta-box.php:31
-#: includes/admin/views/html-display-enquiries.php:8
 #: includes/admin/views/html-property-enquiries-meta-box.php:37
 #: includes/admin/views/html-property-viewings-meta-box.php:31
 msgid "Date"
@@ -1328,6 +1341,7 @@ msgstr ""
 
 #. translators: %s: URL to plugin settings page where the Google Maps API key can be entered
 #: includes/admin/class-ph-admin.php:764
+#, php-format
 msgid "We noticed that you haven't entered a Google Maps API key. If wishing to display a map on your website it's recommended that you <a href=\"https://developers.google.com/maps/documentation/javascript/get-api-key\" target=\"_blank\">create one</a> and <a href=\"%s\">enter it</a>."
 msgstr ""
 
@@ -1361,13 +1375,15 @@ msgstr ""
 
 #. translators: %s: human-readable time difference (e.g. "5 minutes")
 #: includes/admin/ph-admin-functions.php:317
-#: includes/admin/views/html-display-notes.php:335
+#: includes/admin/views/html-display-notes.php:432
 #: includes/class-ph-ajax.php:1927
+#, php-format
 msgid "%s ago"
 msgstr ""
 
 #. translators: %s: human-readable time difference (e.g. "5 minutes")
 #: includes/admin/ph-admin-functions.php:325
+#, php-format
 msgid "in %s"
 msgstr ""
 
@@ -1452,6 +1468,7 @@ msgstr ""
 
 #. translators: %s: number of existing viewings
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:161
+#, php-format
 msgid "<p>There are %s existing viewings for this applicant at this property.</p>"
 msgstr ""
 
@@ -1464,11 +1481,10 @@ msgid "Enter Enquiry Subject"
 msgstr ""
 
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:243
-#: includes/admin/settings/class-ph-settings-emails.php:580
+#: includes/admin/settings/class-ph-settings-emails.php:588
 #: includes/admin/views/html-admin-matching-applicants-email.php:59
 #: includes/admin/views/html-admin-matching-properties-email.php:48
 #: includes/admin/views/html-contact-enquiries-meta-box.php:48
-#: includes/admin/views/html-display-enquiries.php:9
 #: includes/admin/views/html-property-enquiries-meta-box.php:38
 #: includes/admin/views/html-viewing-actions.php:412
 #: includes/admin/views/html-viewing-actions.php:450
@@ -1490,14 +1506,12 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-record-details.php:49
 #: includes/admin/views/html-bulk-edit-property.php:91
 #: includes/admin/views/html-contact-enquiries-meta-box.php:50
-#: includes/admin/views/html-display-enquiries.php:11
 #: includes/admin/views/html-property-enquiries-meta-box.php:40
 msgid "Negotiator"
 msgstr ""
 
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:332
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:51
-#: includes/admin/views/html-display-enquiries.php:30
 #: includes/class-ph-enquiry.php:109
 #: includes/class-ph-enquiry.php:135
 msgid "Unassigned"
@@ -1685,6 +1699,7 @@ msgstr ""
 
 #. translators: %s: viewing number (e.g. 1, 2, 3)
 #: includes/admin/post-types/class-ph-admin-cpt-viewing.php:87
+#, php-format
 msgid "This is viewing number %s for this applicant at this property."
 msgstr ""
 
@@ -1748,11 +1763,13 @@ msgstr ""
 
 #. translators: %s: singular post type label
 #: includes/admin/post-types/class-ph-admin-cpt.php:44
+#, php-format
 msgid "Insert into %s"
 msgstr ""
 
 #. translators: %s: singular post type label
 #: includes/admin/post-types/class-ph-admin-cpt.php:50
+#, php-format
 msgid "Uploaded to this %s"
 msgstr ""
 
@@ -3113,6 +3130,7 @@ msgstr ""
 
 #. translators: %s: URL to settings page
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-features.php:95
+#, php-format
 msgid "No features available to choose from. These can be edited in the <a href=\"%s\" target=\"_blank\">settings area</a>."
 msgstr ""
 
@@ -3182,6 +3200,7 @@ msgstr ""
 #. translators: %s: utility type (e.g. "gas type", "electricity type")
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:128
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:197
+#, php-format
 msgid "Enter other %s"
 msgstr ""
 
@@ -3507,27 +3526,6 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-add-ons.php:27
-#: includes/admin/settings/class-ph-settings-add-ons.php:47
-msgid "Add Ons"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-add-ons.php:134
-msgid "View Add On"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-add-ons.php:146
-msgid "No add ons are currently available for Property Hive. As add ons become available they will appear here. Please check back soon."
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-add-ons.php:151
-msgid "Unable to retrieve list of add-ons. Please visit the Property Hive add ons page to view a full list of add ons available."
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-add-ons.php:153
-msgid "Browse All Add Ons"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-custom-fields.php:31
 msgid "Field Manager"
 msgstr ""
@@ -3773,7 +3771,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-frontend.php:578
 #: includes/admin/settings/class-ph-settings-offices.php:200
 #: includes/admin/settings/class-ph-settings-offices.php:457
-#: includes/admin/views/html-display-notes.php:352
+#: includes/admin/views/html-display-notes.php:449
 #: includes/class-ph-ajax.php:1929
 msgid "Delete"
 msgstr ""
@@ -4129,12 +4127,12 @@ msgid "Property Match"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:58
-#: includes/admin/settings/class-ph-settings-emails.php:411
+#: includes/admin/settings/class-ph-settings-emails.php:419
 msgid "Booking Confirmations & Cancellations"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:63
-#: includes/admin/settings/class-ph-settings-emails.php:449
+#: includes/admin/settings/class-ph-settings-emails.php:457
 msgid "Email Queue"
 msgstr ""
 
@@ -4203,24 +4201,24 @@ msgid "Property Match Email Settings"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:196
-#: includes/admin/settings/class-ph-settings-emails.php:278
-#: includes/admin/settings/class-ph-settings-emails.php:296
-#: includes/admin/settings/class-ph-settings-emails.php:315
-#: includes/admin/settings/class-ph-settings-emails.php:333
-#: includes/admin/settings/class-ph-settings-emails.php:352
-#: includes/admin/settings/class-ph-settings-emails.php:370
-#: includes/admin/settings/class-ph-settings-emails.php:392
+#: includes/admin/settings/class-ph-settings-emails.php:286
+#: includes/admin/settings/class-ph-settings-emails.php:304
+#: includes/admin/settings/class-ph-settings-emails.php:323
+#: includes/admin/settings/class-ph-settings-emails.php:341
+#: includes/admin/settings/class-ph-settings-emails.php:360
+#: includes/admin/settings/class-ph-settings-emails.php:378
+#: includes/admin/settings/class-ph-settings-emails.php:400
 msgid "Default Email Subject"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:203
-#: includes/admin/settings/class-ph-settings-emails.php:285
-#: includes/admin/settings/class-ph-settings-emails.php:303
-#: includes/admin/settings/class-ph-settings-emails.php:322
-#: includes/admin/settings/class-ph-settings-emails.php:340
-#: includes/admin/settings/class-ph-settings-emails.php:359
-#: includes/admin/settings/class-ph-settings-emails.php:377
-#: includes/admin/settings/class-ph-settings-emails.php:399
+#: includes/admin/settings/class-ph-settings-emails.php:293
+#: includes/admin/settings/class-ph-settings-emails.php:311
+#: includes/admin/settings/class-ph-settings-emails.php:330
+#: includes/admin/settings/class-ph-settings-emails.php:348
+#: includes/admin/settings/class-ph-settings-emails.php:367
+#: includes/admin/settings/class-ph-settings-emails.php:385
+#: includes/admin/settings/class-ph-settings-emails.php:407
 msgid "Default Email Body"
 msgstr ""
 
@@ -4229,12 +4227,12 @@ msgid "Default From Email Address"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:216
-#: includes/admin/settings/class-ph-settings-emails.php:422
+#: includes/admin/settings/class-ph-settings-emails.php:430
 msgid "User Email Address"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-emails.php:217
-#: includes/admin/settings/class-ph-settings-emails.php:420
+#: includes/admin/settings/class-ph-settings-emails.php:428
 msgid "Default \"From\" Email Address"
 msgstr ""
 
@@ -4262,57 +4260,65 @@ msgid ""
 "            \t- When sending out lots of emails we recommend using <a href=\"https://en-gb.wordpress.org/plugins/tags/smtp\" target=\"_blank\">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:275
+#: includes/admin/settings/class-ph-settings-emails.php:259
+msgid "Track email opens"
+msgstr ""
+
+#: includes/admin/settings/class-ph-settings-emails.php:260
+msgid "Show whether property match emails have been opened. Some email services may report an open automatically."
+msgstr ""
+
+#: includes/admin/settings/class-ph-settings-emails.php:283
 msgid "Applicant Viewing Booking Confirmations"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:293
+#: includes/admin/settings/class-ph-settings-emails.php:301
 msgid "Applicant Viewing Cancellation Notifications"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:312
+#: includes/admin/settings/class-ph-settings-emails.php:320
 msgid "Owner/Landlord Viewing Booking Confirmations"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:330
+#: includes/admin/settings/class-ph-settings-emails.php:338
 msgid "Owner/Landlord Viewing Cancellation Notifications"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:349
+#: includes/admin/settings/class-ph-settings-emails.php:357
 msgid "Attending Negotiator Viewing Booking Confirmations"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:367
+#: includes/admin/settings/class-ph-settings-emails.php:375
 msgid "Attending Negotiator Viewing Cancellation Notifications"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:389
+#: includes/admin/settings/class-ph-settings-emails.php:397
 msgid "Owner/Landlord Appraisal Booking Confirmations"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:414
+#: includes/admin/settings/class-ph-settings-emails.php:422
 msgid "Sent From Email Address"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:421
+#: includes/admin/settings/class-ph-settings-emails.php:429
 #: includes/elementor-widgets/property-office-email-address.php:14
 #: includes/elementor-widgets/property-office-email-address.php:34
 msgid "Office Email Address"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:424
+#: includes/admin/settings/class-ph-settings-emails.php:432
 msgid "This sets the email address that booking confirmations and cancellation notifications come from and that will receive the response should someone reply."
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:428
+#: includes/admin/settings/class-ph-settings-emails.php:436
 msgid "Customise Emails Before Sending"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:504
+#: includes/admin/settings/class-ph-settings-emails.php:512
 msgid "Next scheduled to run at"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-emails.php:579
+#: includes/admin/settings/class-ph-settings-emails.php:587
 msgid "Recipient"
 msgstr ""
 
@@ -4486,7 +4492,7 @@ msgstr ""
 #: includes/ph-form-functions.php:252
 #: includes/ph-form-functions.php:1122
 #: includes/ph-form-functions.php:1228
-#: includes/ph-form-functions.php:1489
+#: includes/ph-form-functions.php:1494
 msgid "No preference"
 msgstr ""
 
@@ -5050,10 +5056,6 @@ msgstr ""
 msgid "Help improve Property Hive by periodically sending us non-sensitive plugin data. Untick this option to opt-out. <a href=\"https://docs.wp-property-hive.com/user-guide/share-usage-data/\" target=\"_blank\">Learn more</a>"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-get-involved.php:28
-msgid "Get Involved"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-licenses.php:27
 msgid "License"
 msgstr ""
@@ -5092,11 +5094,13 @@ msgstr ""
 
 #. translators: %s: URL to the support page
 #: includes/admin/settings/class-ph-settings-licenses.php:189
+#, php-format
 msgid "To switch your existing license key over to the new pricing model, please <a href=\"%s\">get in touch</a>."
 msgstr ""
 
 #. translators: 1: URL to the pricing page, 2: optional message shown to legacy license holders
 #: includes/admin/settings/class-ph-settings-licenses.php:199
+#, php-format
 msgid ""
 "<p>If you purchased a license key prior to 16th October 2023, you can enter it here to benefit from updates to any existing add-ons you've purchased.</p>\n"
 "\t\t\t\t\t<p>We've since moved to a new and improved <a href=\"%1$s\" target=\"_blank\">pro pricing model</a> that is more cost effective for you and gives access to more features.</p>\n"
@@ -5135,11 +5139,13 @@ msgstr ""
 
 #. translators: %s: department (e.g. Sales, Lettings, Commercial)
 #: includes/admin/settings/class-ph-settings-offices.php:138
+#, php-format
 msgid "Telephone Number (%s)"
 msgstr ""
 
 #. translators: %s: department (e.g. Sales, Lettings, Commercial)
 #: includes/admin/settings/class-ph-settings-offices.php:151
+#, php-format
 msgid "Email Address (%s)"
 msgstr ""
 
@@ -5296,7 +5302,6 @@ msgstr ""
 
 #: includes/admin/views/html-contact-enquiries-meta-box.php:47
 #: includes/admin/views/html-contact-viewings-meta-box.php:31
-#: includes/admin/views/html-display-enquiries.php:8
 #: includes/admin/views/html-property-enquiries-meta-box.php:37
 #: includes/admin/views/html-property-viewings-meta-box.php:31
 msgid "Time"
@@ -5355,46 +5360,106 @@ msgstr ""
 msgid "No viewings found"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:57
-msgid "queued"
+#. translators: 1: contact name, 2: human-readable time until the queued email is due to be sent
+#: includes/admin/views/html-display-notes.php:68
+#, php-format
+msgid "Included in queued email mailout to %1$s. <em>(Due to be sent %2$s)</em>"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:58
-msgid "Due to be sent"
+#. translators: %s: contact name
+#: includes/admin/views/html-display-notes.php:77
+#, php-format
+msgid "Included in <b>failed</b> email mailout to %s."
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:62
-msgid "failed"
+#. translators: %s: contact name
+#: includes/admin/views/html-display-notes.php:84
+#, php-format
+msgid "Included in sent email mailout to %s."
+msgstr ""
+
+#. translators: %s: contact name
+#: includes/admin/views/html-display-notes.php:91
+#, php-format
+msgid "Included in email mailout to %s."
+msgstr ""
+
+#. translators: 1: number of properties, 2: human-readable time until the queued email is due to be sent
+#: includes/admin/views/html-display-notes.php:106
+#, php-format
+msgid "%1$d property included in queued email mailout. <em>(Due to be sent %2$s)</em>"
+msgid_plural "%1$d properties included in queued email mailout. <em>(Due to be sent %2$s)</em>"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of properties
+#: includes/admin/views/html-display-notes.php:115
+#, php-format
+msgid "%d property included in <b>failed</b> email mailout."
+msgid_plural "%d properties included in <b>failed</b> email mailout."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of properties
+#: includes/admin/views/html-display-notes.php:122
+#, php-format
+msgid "%d property included in sent email mailout."
+msgid_plural "%d properties included in sent email mailout."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of properties
+#: includes/admin/views/html-display-notes.php:129
+#, php-format
+msgid "%d property included in email mailout."
+msgid_plural "%d properties included in email mailout."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: date the email was first opened, 2: time the email was first opened
+#: includes/admin/views/html-display-notes.php:161
+#, php-format
+msgid "Opened %1$s at %2$s."
+msgstr ""
+
+#: includes/admin/views/html-display-notes.php:167
+msgid "Not opened yet."
+msgstr ""
+
+#: includes/admin/views/html-display-notes.php:175
+msgid "View Mailout"
 msgstr ""
 
 #. translators: %s: author name
-#: includes/admin/views/html-display-notes.php:344
+#: includes/admin/views/html-display-notes.php:441
 #: includes/class-ph-ajax.php:1928
+#, php-format
 msgid "by %s"
 msgstr ""
 
 #. translators: %s: linked post type label, for example "Property"
-#: includes/admin/views/html-display-notes.php:362
+#: includes/admin/views/html-display-notes.php:459
+#, php-format
 msgid "Note originally entered on %s"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:373
+#: includes/admin/views/html-display-notes.php:470
 msgid "There are no pinned notes to display"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:373
+#: includes/admin/views/html-display-notes.php:470
 msgid "There are no notes to display"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:378
+#: includes/admin/views/html-display-notes.php:475
 msgid "Add Note"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:382
+#: includes/admin/views/html-display-notes.php:479
 msgid "Pin Note"
 msgstr ""
 
-#: includes/admin/views/html-display-notes.php:385
+#: includes/admin/views/html-display-notes.php:482
 msgid "Save Note"
 msgstr ""
 
@@ -6074,6 +6139,7 @@ msgstr ""
 #: includes/divi-widgets/property-gallery.php:271
 #: includes/elementor-widgets/property-gallery.php:325
 #: includes/elementor-widgets/property-gallery.php:335
+#, php-format
 msgid "See all %d images"
 msgstr ""
 
@@ -6498,8 +6564,62 @@ msgstr ""
 msgid "The flag shown will take its colour and position settings from the <a href=\""
 msgstr ""
 
+#: includes/class-ph-email-tracking.php:188
+msgid "Property Hive: email open tracking is enabled, but the database changes it needs could not be applied, so opens are not being recorded. Deactivating and reactivating Property Hive may resolve this."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:199
+#: includes/class-ph-email-tracking.php:305
+msgid "Property Hive email open tracking"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:231
+msgid "Property Hive could not access the email open tracking data."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:244
+msgid "Property Hive could not find the email open tracking data to remove."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:269
+msgid "Property Hive could not disable all matching email tracking pixels."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:283
+msgid "Property Hive could not remove all matching email open tracking diagnostics."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:292
+msgid "Historical mailout records remain subject to the existing Property Hive email-log retention policy."
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:358
+msgid "First opened at (UTC)"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:362
+msgid "Last opened at (UTC)"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:366
+msgid "Open request count"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:373
+msgid "First user agent"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:380
+msgid "Last user agent"
+msgstr ""
+
+#: includes/class-ph-email-tracking.php:387
+msgid "Email open tracking"
+msgstr ""
+
 #. translators: %s: person name
 #: includes/class-ph-emails.php:121
+#, php-format
 msgid "A new applicant, %s, has registered through your website"
 msgstr ""
 
@@ -6539,6 +6659,7 @@ msgstr ""
 
 #. translators: %s: blog name shown in the email sign-off
 #: includes/class-ph-install.php:653
+#, php-format
 msgid ""
 "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.\n"
 "\n"
@@ -6671,7 +6792,7 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:827
+#: includes/class-ph-install.php:841
 msgid "Property Hive Contact"
 msgstr ""
 
@@ -6681,6 +6802,7 @@ msgstr ""
 
 #. translators: %s: HTTP header response code
 #: includes/class-ph-licenses.php:534
+#, php-format
 msgid "Received response code %s when activating license key status"
 msgstr ""
 
@@ -6702,6 +6824,7 @@ msgstr ""
 
 #. translators: %s: HTTP header response code
 #: includes/class-ph-licenses.php:633
+#, php-format
 msgid "Received response code %s when deactivating license key status"
 msgstr ""
 
@@ -6728,6 +6851,7 @@ msgstr ""
 
 #. translators: %s: HTTP header response code
 #: includes/class-ph-licenses.php:755
+#, php-format
 msgid "Received response code %s when requesting license key product list"
 msgstr ""
 
@@ -6757,6 +6881,7 @@ msgstr ""
 
 #. translators: %s: HTTP header response code
 #: includes/class-ph-licenses.php:955
+#, php-format
 msgid "Received response code %s when requesting license key status"
 msgstr ""
 
@@ -6783,6 +6908,7 @@ msgstr ""
 
 #. translators: %s: number of posts in "Archived" status
 #: includes/class-ph-post-types.php:71
+#, php-format
 msgid "Archived <span class=\"count\">(%s)</span>"
 msgid_plural "Archived <span class=\"count\">(%s)</span>"
 msgstr[0] ""
@@ -7976,6 +8102,7 @@ msgstr ""
 #. translators: %s: URL to Property Hive settings area
 #: includes/elementor-widgets/property-search-form.php:41
 #: includes/salient-widgets/property-search-form.php:39
+#, php-format
 msgid "Search forms can be managed from within '<a href=\"%s\" target=\"_blank\">Property Hive > Settings > Frontend > Search Forms</a>'"
 msgstr ""
 
@@ -8530,11 +8657,13 @@ msgstr ""
 
 #. translators: %s: search query
 #: includes/ph-template-functions.php:213
+#, php-format
 msgid "Search Results: &ldquo;%s&rdquo;"
 msgstr ""
 
 #. translators: %s: page number
 #: includes/ph-template-functions.php:221
+#, php-format
 msgid "&nbsp;&ndash; Page %s"
 msgstr ""
 
@@ -8811,11 +8940,13 @@ msgstr ""
 
 #. translators: %s: total number of properties
 #: templates/search/result-count.php:24
+#, php-format
 msgid "Showing %s properties"
 msgstr ""
 
 #. translators: 1: first result number, 2: last result number, 3: total number of properties
 #: templates/search/result-count.php:30
+#, php-format
 msgid "Showing %1$s–%2$s of %3$s properties"
 msgstr ""
 
