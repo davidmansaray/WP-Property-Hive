@@ -255,6 +255,14 @@ class PH_Settings_Emails extends PH_Settings_Page {
             'default' => '',
         );
 
+		$settings[] = array(
+			'title'   => __( 'Track email opens', 'propertyhive' ),
+			'desc'    => __( 'Show whether property match emails have been opened. Some email services may report an open automatically.', 'propertyhive' ),
+			'id'      => 'propertyhive_track_email_opens',
+			'type'    => 'checkbox',
+			'default' => 'no',
+		);
+
 		$settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' );
 		    
 		return apply_filters( 'propertyhive_property_match_settings', $settings ); // End settings

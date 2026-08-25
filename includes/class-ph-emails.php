@@ -238,6 +238,8 @@ class PH_Emails {
 				lock_id = '" . $lock_id . "'
 		");
 
+		$tracking_schema_ready = PH_Email_Tracking::is_schema_ready();
+
 		foreach ( $emails_to_send as $email_to_send ) 
 		{
 			$email_id = $email_to_send->email_id;
@@ -261,7 +263,50 @@ class PH_Emails {
                 $body = gzuncompress($body);
             }
 
-        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body, $email_to_send->contact_id ) ) );
+			$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body, $email_to_send->contact_id ) ) );
+
+			$body = apply_filters( 'propertyhive_queued_mail_content', $body, $email_to_send );
+
+			$open_tracking_enabled = 0;
+
+			if ( $tracking_schema_ready )
+			{
+				if ( PH_Email_Tracking::is_enabled() )
+				{
+					$tracked_body = PH_Email_Tracking::inject_tracking_pixel( $body, $email_id );
+
+					if ( false !== stripos( $tracked_body, 'data-propertyhive-email-open=' ) )
+					{
+						$tracking_updated = $wpdb->update(
+							$wpdb->prefix . 'ph_email_log',
+							array( 'open_tracking_enabled' => 1 ),
+							array( 'email_id' => $email_id ),
+							array( '%d' ),
+							array( '%d' )
+						);
+
+						if ( false !== $tracking_updated )
+						{
+							$body = $tracked_body;
+							$open_tracking_enabled = 1;
+						}
+					}
+				}
+
+			}
+
+			// Only clear a previously-set flag (e.g. a failed send being retried
+			// after tracking was switched off); fresh rows already default to 0.
+			if ( $tracking_schema_ready && 0 === $open_tracking_enabled && ! empty( $email_to_send->open_tracking_enabled ) )
+			{
+				$wpdb->update(
+					$wpdb->prefix . 'ph_email_log',
+					array( 'open_tracking_enabled' => 0 ),
+					array( 'email_id' => $email_id ),
+					array( '%d' ),
+					array( '%d' )
+				);
+			}
 			
 			$sent = wp_mail( 
 				$email_to_send->to_email_address, 
@@ -309,7 +354,12 @@ class PH_Emails {
 	        $keep_logs_days = '3650';
 	    }
 
-	    $wpdb->query( "DELETE FROM " . $wpdb->prefix . "ph_email_log WHERE send_at < DATE_SUB(NOW(), INTERVAL " . $keep_logs_days . " DAY)" );
+	    // send_at is written using PHP's date(), which WordPress runs in UTC, so
+	    // compare against UTC_TIMESTAMP() rather than the server-timezone NOW().
+	    $wpdb->query( "DELETE FROM " . $wpdb->prefix . "ph_email_log WHERE send_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL " . $keep_logs_days . " DAY)" );
+
+	    // Remove expired open-tracking data and summaries orphaned by the email-log cleanup above.
+	    PH_Email_Tracking::cleanup();
 	}
 
 	/*
