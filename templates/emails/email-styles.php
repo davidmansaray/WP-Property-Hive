@@ -12,9 +12,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 // Load colours
-$bg              = get_option( 'propertyhive_email_background_color' );
-$body            = get_option( 'propertyhive_email_body_background_color' );
-$text            = get_option( 'propertyhive_email_text_color' );
+$bg              = get_option( 'propertyhive_email_background_color', '#f7f7f7' );
+$body            = get_option( 'propertyhive_email_body_background_color', '#ffffff' );
+$text            = get_option( 'propertyhive_email_text_color', '#333333' );
 
 $bg_darker_10    = ph_hex_darker( $bg, 10 );
 $body_darker_10  = ph_hex_darker( $body, 10 );
