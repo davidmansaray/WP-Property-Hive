@@ -1,0 +1,7 @@
+{
+    "name": "Property Hive (wp-env)",
+    "user": "ubuntu",
+    "install": "bash .cursor/install.sh",
+    "start": "bash .cursor/start.sh",
+    "ports": [ 8888, 8889 ]
+}
