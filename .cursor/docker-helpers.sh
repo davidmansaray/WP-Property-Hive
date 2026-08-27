@@ -4,8 +4,10 @@
 # networking inside the nested (unprivileged) Cloud Agent VM. Sourced by both
 # the install and start phase scripts.
 
-# Start the Docker daemon in the background if it is not already responding.
-# Returns non-zero if the daemon does not become ready.
+# Start the Docker daemon if it is not already responding. The daemon is fully
+# detached (new session, no controlling terminal, stdio redirected) so it
+# survives the boot-time `start` phase exiting. Returns non-zero if the daemon
+# does not become ready.
 start_docker_daemon() {
     if sudo docker info >/dev/null 2>&1; then
         echo "Docker daemon already running"
@@ -13,10 +15,12 @@ start_docker_daemon() {
     fi
 
     echo "Starting Docker daemon"
-    sudo bash -c 'nohup dockerd >/tmp/dockerd.log 2>&1 &'
+    # setsid + </dev/null detaches dockerd into its own session so it is not
+    # reaped when this script (the `start` phase) returns.
+    sudo bash -c 'setsid dockerd >>/tmp/dockerd.log 2>&1 </dev/null &'
 
     local i
-    for i in $(seq 1 30); do
+    for i in $(seq 1 60); do
         if sudo docker info >/dev/null 2>&1; then
             echo "Docker daemon is ready"
             return 0
@@ -27,6 +31,25 @@ start_docker_daemon() {
     echo "Docker daemon failed to start; see /tmp/dockerd.log" >&2
     tail -n 20 /tmp/dockerd.log 2>/dev/null || true
     return 1
+}
+
+# Make node / npx available regardless of how this script is invoked. On boot
+# the `start` phase runs in a non-login shell that may not have nvm's node on
+# PATH, so add the common node install locations.
+ensure_node_on_path() {
+    command -v npx >/dev/null 2>&1 && return 0
+    # nvm-managed node (pick the newest installed version).
+    if [ -d "$HOME/.nvm/versions/node" ]; then
+        local latest
+        latest="$(ls -1 "$HOME/.nvm/versions/node" 2>/dev/null | sort -V | tail -n 1)"
+        [ -n "$latest" ] && export PATH="$HOME/.nvm/versions/node/$latest/bin:$PATH"
+    fi
+    # nvm may also expose a default alias via its script.
+    if ! command -v npx >/dev/null 2>&1 && [ -s "$HOME/.nvm/nvm.sh" ]; then
+        # shellcheck source=/dev/null
+        . "$HOME/.nvm/nvm.sh" >/dev/null 2>&1 || true
+    fi
+    command -v npx >/dev/null 2>&1
 }
 
 # Fix container-to-container networking. In this nested environment, bridged

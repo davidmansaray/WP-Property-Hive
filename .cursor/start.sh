@@ -19,6 +19,7 @@ if ! start_docker_daemon; then
 fi
 
 prepare_docker_networking
+ensure_node_on_path
 
 echo "Starting wp-env WordPress stack"
 cd "$REPO_DIR"

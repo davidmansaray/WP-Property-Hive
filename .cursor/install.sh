@@ -73,7 +73,7 @@ configure_docker
 # Pre-warm the wp-env stack so images and the WordPress volume are baked into
 # the environment snapshot. Best-effort: if the daemon cannot run during the
 # build phase, the boot-time start script will pull the images instead.
-if start_docker_daemon && prepare_docker_networking; then
+if start_docker_daemon && prepare_docker_networking && ensure_node_on_path; then
     log "Pre-warming wp-env images and WordPress volume"
     ( cd "$REPO_DIR" && npx --yes @wordpress/env start ) || \
         echo "wp-env pre-warm skipped (will run at boot instead)"
