@@ -20,14 +20,22 @@ install_docker() {
     log "Installing Docker engine"
     export DEBIAN_FRONTEND=noninteractive
 
+    # The base image ships its own /etc/fuse.conf, so installing fuse3 would
+    # otherwise stop on an interactive conffile prompt. Force apt to keep the
+    # existing config files so the install stays non-interactive.
+    local apt_opts=(-y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
+
+    # Clear any half-configured packages left by a previous run.
+    sudo dpkg --configure -a --force-confold || true
+
     # fuse-overlayfs is required as the storage driver inside the nested
     # (unprivileged) Cloud Agent container. iptables provides the firewall
     # backend Docker uses for container networking.
     sudo apt-get update -qq
-    sudo apt-get install -y -qq ca-certificates curl gnupg iptables uidmap fuse-overlayfs
-    # A pending fuse3 conffile prompt can leave dpkg half-configured; finish
-    # it non-interactively before continuing.
-    sudo dpkg --configure -a --force-confold || true
+    if ! sudo apt-get install "${apt_opts[@]}" ca-certificates curl gnupg iptables uidmap fuse-overlayfs; then
+        sudo dpkg --configure -a --force-confold || true
+        sudo apt-get install "${apt_opts[@]}" ca-certificates curl gnupg iptables uidmap fuse-overlayfs
+    fi
 
     sudo install -m 0755 -d /etc/apt/keyrings
     if [ ! -f /etc/apt/keyrings/docker.asc ]; then
@@ -41,7 +49,7 @@ install_docker() {
         | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     sudo apt-get update -qq
-    sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt-get install "${apt_opts[@]}" docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     log "Docker installed ($(docker --version))"
 }
